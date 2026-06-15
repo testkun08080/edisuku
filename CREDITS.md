@@ -1,13 +1,13 @@
-# Credits
+# クレジット
 
-This project uses or references the following third-party open source software.
+本プロジェクトは、以下の第三者オープンソースソフトウェアを利用または参照しています。
 
 ---
 
 ## SakanaAI / edinet2dataset
 
-The data ingestion pipeline (`apps/wrapper`) is inspired by and references
-[SakanaAI/edinet2dataset](https://github.com/SakanaAI/edinet2dataset).
+データ取り込みパイプライン（`apps/wrapper`）は
+[SakanaAI/edinet2dataset](https://github.com/SakanaAI/edinet2dataset) を参考にしています。
 
 ```
 Copyright 2024 Sakana AI

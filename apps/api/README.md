@@ -1,37 +1,37 @@
 # @edinet/api
 
-Hono on Cloudflare Workers. Reads from D1 via drizzle, returns JSON to `apps/web`.
+Cloudflare Workers 上の Hono API。drizzle 経由で D1 を読み、`apps/web` に JSON を返します。
 
-## Local dev
+## ローカル開発
 
 ```bash
-# 1. Copy template (local dev) or run infra/render-wrangler-config.sh (deploy)
+# 1. テンプレートをコピー（ローカル）または infra/render-wrangler-config.sh を実行（デプロイ）
 cp wrangler.toml.template wrangler.toml
 
-# 2. Start with local SQLite (miniflare)
+# 2. ローカル SQLite（miniflare）で起動
 pnpm --filter @edinet/api dev
 # → http://localhost:8787/api/health
 ```
 
-## Endpoints
+## エンドポイント
 
-| Method | Path                          | Description                                |
+| Method | Path                          | 説明                                |
 |--------|-------------------------------|--------------------------------------------|
-| GET    | `/api/health`                 | Health check                               |
-| GET    | `/api/companies`              | Company list with pagination               |
-| GET    | `/api/companies/:secCode`     | Company detail (secCode or edinetCode)     |
-| GET    | `/api/summaries/:secCode`     | Time-series financial summary              |
-| GET    | `/api/metrics`                | Latest snapshot for the screener table     |
-| GET    | `/api/search?q=`              | Full-text search across name / secCode     |
-| GET    | `/api/shareholders/:secCode`  | Major shareholders                         |
-| GET    | `/api/manifest`               | Column manifest (UI metadata)              |
+| GET    | `/api/health`                 | ヘルスチェック                               |
+| GET    | `/api/companies`              | 企業一覧（ページネーション付き）               |
+| GET    | `/api/companies/:secCode`     | 企業詳細（secCode または edinetCode）     |
+| GET    | `/api/summaries/:secCode`     | 時系列財務サマリー                              |
+| GET    | `/api/metrics`                | スクリーナーテーブル用の最新スナップショット     |
+| GET    | `/api/search?q=`              | 社名 / secCode の全文検索     |
+| GET    | `/api/shareholders/:secCode`  | 大株主                         |
+| GET    | `/api/manifest`               | カラムマニフェスト（UI メタデータ）              |
 
-## Type sharing with web
+## web との型共有
 
 ```ts
 // apps/web/lib/api.ts
 import { hc } from "hono/client";
 import type { AppType } from "@edinet/api";
 
-export const api = hc<AppType>(""); // web BFF same-origin proxy
+export const api = hc<AppType>(""); // web BFF 同一オリジンプロキシ
 ```

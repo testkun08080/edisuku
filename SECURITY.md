@@ -1,43 +1,40 @@
-# Security Policy
+# セキュリティポリシー
 
-## Supported Versions
+## サポート対象バージョン
 
-Only the latest `main` branch and the most recent published Worker on
-Cloudflare are supported with security updates.
+セキュリティ更新の対象は、最新の `main` ブランチと Cloudflare 上で公開中の最新 Worker のみです。
 
-| Version | Supported |
+| バージョン | サポート |
 |---------|-----------|
 | `main`  | ✅ |
 | v2.x    | ✅ |
 
-## Reporting a Vulnerability
+## 脆弱性の報告
 
-Please **do not** open a public GitHub issue for security-sensitive reports.
+セキュリティに関わる内容は、**公開の GitHub Issue では報告しないでください**。
 
-Instead, use GitHub's private vulnerability reporting:
+代わりに GitHub の非公開脆弱性報告をご利用ください:
 https://github.com/testkun08080/edisuku/security/advisories/new
 
-Include:
+報告には以下を含めてください:
 
-- a description of the issue and the impact you're worried about
-- steps to reproduce (or a minimal proof of concept)
-- the commit hash / version where you found it
-- (optional) suggested mitigation
+- 問題の内容と想定される影響
+- 再現手順（または最小限の PoC）
+- 発見したコミットハッシュ / バージョン
+- （任意）修正案
 
-We aim to acknowledge reports within **3 business days** and provide a fix
-or mitigation timeline within **14 days** for high-severity issues.
+報告には **3 営業日以内** に受領の返信を目指し、重大度の高い問題については **14 日以内** に修正または緩和策のスケジュールをお伝えします。
 
-## Scope
+## スコープ
 
-In scope:
+対象:
 
-- The `apps/api` Worker (`/api/*` endpoints)
-- The `apps/web` Vike SSR Worker
-- The `apps/wrapper` Python ingestion pipeline (e.g. SSRF, command injection)
-- The build / deploy pipelines (workflows under `.github/workflows/`)
+- `apps/api` Worker（`/api/*` エンドポイント）
+- `apps/web` Vike SSR Worker
+- `apps/wrapper` Python 取り込みパイプライン（SSRF、コマンドインジェクションなど）
+- ビルド / デプロイパイプライン（`.github/workflows/` 配下）
 
-Out of scope:
+対象外:
 
-- Issues in third-party services (Cloudflare, EDINET API, Sentry, GA)
-- DoS via large query inputs (we cache + rate-limit at the edge, but bursts
-  exceeding free-tier quotas are expected)
+- 第三者サービスの問題（Cloudflare、EDINET API、Sentry、GA など）
+- 大量クエリによる DoS（エッジでキャッシュとレート制限は行っていますが、無料枠を超えるバーストは想定内です）

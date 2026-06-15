@@ -1,21 +1,21 @@
 # @edinet/web
 
-Vike + React on Cloudflare Workers. UI for the EDINET financial screener.
+Cloudflare Workers 上の Vike + React。EDINET 財務スクリーナーの UI です。
 
-Data is fetched from `@edinet/api` via `hono/client` in `lib/api.ts`.
+データは `lib/api.ts` の `hono/client` 経由で `@edinet/api` から取得します。
 
-## Dev
+## 開発
 
 ```bash
 pnpm --filter @edinet/web dev
 # http://localhost:3000
 ```
 
-API calls use same-origin `/api/*`; the web Worker proxies to the API Worker using `API_UPSTREAM_URL` and `INTERNAL_API_KEY` from `.dev.vars` (see `.dev.vars.example`).
+API 呼び出しは同一オリジンの `/api/*` を使用します。web Worker は `.dev.vars`（`.dev.vars.example` 参照）の `API_UPSTREAM_URL` と `INTERNAL_API_KEY` を使って API Worker にプロキシします。
 
-## Deploy
+## デプロイ
 
 ```bash
-# one-time: see docs/FORK.md — infra/render-wrangler-config.sh
+# 初回のみ: docs/FORK.md — infra/render-wrangler-config.sh
 pnpm --filter @edinet/web deploy:staging
 ```

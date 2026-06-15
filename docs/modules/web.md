@@ -77,7 +77,7 @@ pnpm --filter @edinet/web build        # generate:ogp + vike build
 pnpm --filter @edinet/web typecheck
 ```
 
-## Cloudflare Static Assets
+## Cloudflare 静的アセット
 
 `/api/*` は BFF プロキシ用のため、wrangler の `assets.run_worker_first` に `/api/*` を指定する（未設定だと SPA の 404 ページが返る）。
 

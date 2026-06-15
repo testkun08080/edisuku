@@ -1,14 +1,14 @@
 # @edinet/db
 
-Drizzle ORM schema and shared queries for D1 / SQLite.
+D1 / SQLite 用の Drizzle ORM スキーマと共通クエリです。
 
-The schema mirrors `apps/wrapper/sql/d1_schema.sql` (kept for reference during migration). Generate migrations from this TypeScript schema:
+スキーマは `apps/wrapper/sql/d1_schema.sql` と対応しています（移行期間中の参照用に残置）。TypeScript スキーマからマイグレーションを生成します:
 
 ```bash
 pnpm --filter @edinet/db db:generate
 ```
 
-Use from `apps/api`:
+`apps/api` からの利用例:
 
 ```ts
 import { drizzle } from "drizzle-orm/d1";

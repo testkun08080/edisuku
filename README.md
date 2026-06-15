@@ -113,7 +113,7 @@ uv run python scripts/ingest_daily.py --help
 - [docs/MANUAL_SETUP.md](./docs/MANUAL_SETUP.md) — Docker なしの手動ローカルセットアップ
 - [docs/FORK.md](./docs/FORK.md) — フォーク利用者向けセットアップ・セキュリティ
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — 開発フロー
-- [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+- [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) — 行動規範
 - [SECURITY.md](./SECURITY.md) — 脆弱性報告
 
 ## ライセンス
