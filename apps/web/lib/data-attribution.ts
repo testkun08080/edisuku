@@ -1,17 +1,17 @@
 /**
  * EDINET 等の出典表示用（利用条件・ライセンスに従って表示を更新してください）。
- * 本番の取得パイプラインで実際に呼び出したエンドポイントが分かる場合はここを置き換えてください。
+ * EDINET 側は apps/wrapper の取り込みパイプライン（API v2）と揃えています。
  */
 
-export const EDINET_API_BASE = "https://disclosure.edinet-fsa.go.jp/api/v1";
+/** apps/wrapper が利用する EDINET Web API v2 のベース URL */
+export const EDINET_API_BASE = "https://api.edinet-fsa.go.jp/api/v2";
 
-/** データ生成パイプラインで一般的に用いられる EDINET Web API の例 */
+/** データ取り込みパイプライン（apps/wrapper）が呼び出す EDINET Web API */
 export const DOCUMENTED_EDINET_ENDPOINTS = [
   {
     method: "GET" as const,
     path: "/documents.json",
-    description:
-      "提出書類一覧の取得（日付などのクエリパラメータで対象日を指定する形式が一般的です）",
+    description: "提出書類一覧の取得（date / type / Subscription-Key クエリ）",
     fullUrlExample: `${EDINET_API_BASE}/documents.json`,
   },
   {
@@ -22,16 +22,17 @@ export const DOCUMENTED_EDINET_ENDPOINTS = [
   },
 ] as const;
 
-/** ブラウザ上の本アプリが読み込む静的データ（ビルド済み JSON） */
-export const RUNTIME_STATIC_DATA_PATHS = [
-  { path: "/data/company_metrics.json", description: "企業一覧用の指標サマリー" },
+/** ブラウザ上の本アプリが BFF 経由で取得する REST API（apps/api → D1） */
+export const RUNTIME_API_PATHS = [
+  { path: "/api/metrics", description: "スクリーナー用の企業指標一覧" },
+  { path: "/api/metrics/query", description: "フィルタ・ソート・ページング付き指標クエリ" },
   {
-    path: "/data/summaries/{証券コード}.json",
+    path: "/api/summaries/{証券コード}",
     description: "企業ごとの四半期サマリー・財務テーブル",
   },
   {
-    path: "/data/shareholders/{証券コード}.json",
-    description: "大株主の時系列データ（ビルド時に TSV から抽出済み）",
+    path: "/api/shareholders/{証券コード}",
+    description: "大株主の時系列データ",
   },
 ] as const;
 

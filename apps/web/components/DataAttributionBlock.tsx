@@ -2,7 +2,7 @@ import {
   DOCUMENTED_EDINET_ENDPOINTS,
   EDINET_API_BASE,
   LICENSE_AND_GUIDELINES,
-  RUNTIME_STATIC_DATA_PATHS,
+  RUNTIME_API_PATHS,
 } from "@/lib/data-attribution";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
@@ -67,7 +67,7 @@ export function DataAttributionBlock({ compact = false, lastUpdated }: { compact
         </div>
         <Separator />
         <div>
-          <p className="font-medium text-foreground mb-2">データ生成時に想定される EDINET Web API（例）</p>
+          <p className="font-medium text-foreground mb-2">データ取り込み時に利用する EDINET Web API</p>
           <p className="text-muted-foreground text-xs mb-2">
             ベース URL: <code className="rounded bg-muted px-1 py-0.5 text-xs">{EDINET_API_BASE}</code>
           </p>
@@ -86,9 +86,9 @@ export function DataAttributionBlock({ compact = false, lastUpdated }: { compact
           <>
             <Separator />
             <div>
-              <p className="font-medium text-foreground mb-2">本サイト実行時にブラウザが取得するデータ（静的 JSON）</p>
+              <p className="font-medium text-foreground mb-2">本サイト実行時にブラウザが取得するデータ（API）</p>
               <ul className="list-disc pl-5 space-y-1 text-muted-foreground text-xs">
-                {RUNTIME_STATIC_DATA_PATHS.map((r) => (
+                {RUNTIME_API_PATHS.map((r) => (
                   <li key={r.path}>
                     <code className="rounded bg-muted px-1">{r.path}</code> — {r.description}
                   </li>
