@@ -1,0 +1,260 @@
+"use client";
+
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+
+export type ColumnId =
+  | "filerName"
+  | "secCode"
+  | "edinetCode"
+  | "calcDate"
+  | "fiscalMonth"
+  | "PBR"
+  | "PER"
+  | "payoutRatio"
+  | "payoutRatioComputed"
+  | "dividendYield"
+  | "marketCap"
+  | "netCash"
+  | "netCashRatio"
+  | "EPS"
+  | "dilutedEPS"
+  | "ROE"
+  | "roeCalculated"
+  | "roa"
+  | "equityRatio"
+  | "equityRatioCalculated"
+  | "BPS"
+  | "dividendPerShare"
+  | "sharesOutstanding"
+  | "sales"
+  | "operatingProfit"
+  | "recurringProfit"
+  | "operatingProfitRatio"
+  | "netIncome"
+  | "netProfitRatio"
+  | "comprehensiveIncome"
+  | "liabilities"
+  | "currentLiabilities"
+  | "currentAssets"
+  | "netAssets"
+  | "totalAssets"
+  | "investmentSecurities"
+  | "cashBalance"
+  | "operatingCF"
+  | "investingCF"
+  | "fcf"
+  | "financingCF"
+  | "salesGrowthYoY"
+  | "opGrowthYoY"
+  | "epsGrowthYoY"
+  | "dividendGrowthYoY"
+  | "salesCagr3y"
+  | "salesCagr5y"
+  | "consecutiveDivIncreases"
+  | "currentRatio"
+  | "deRatio"
+  | "roic"
+  | "piotroskiFScore";
+
+export type ColumnCategory = "basic" | "valuation" | "performance" | "balancesheet" | "cash" | "growth";
+
+const COLUMN_CONFIG: { id: ColumnId; label: string; category: ColumnCategory }[] = [
+  { id: "filerName", label: "会社名*", category: "basic" },
+  { id: "secCode", label: "銘柄コード*", category: "basic" },
+  { id: "edinetCode", label: "EDINETコード", category: "basic" },
+  { id: "calcDate", label: "計算日", category: "basic" },
+  { id: "fiscalMonth", label: "決算月", category: "basic" },
+  { id: "PBR", label: "PBR（倍）", category: "valuation" },
+  { id: "PER", label: "PER（倍）", category: "valuation" },
+  { id: "payoutRatio", label: "配当性向（%）", category: "valuation" },
+  { id: "payoutRatioComputed", label: "配当性向（算出・%）", category: "valuation" },
+  { id: "dividendYield", label: "配当利回り（%）", category: "valuation" },
+  { id: "marketCap", label: "時価総額（百万円）", category: "valuation" },
+  { id: "netCash", label: "ネットキャッシュ（百万円）", category: "valuation" },
+  { id: "netCashRatio", label: "ネットキャッシュ比率（%）", category: "valuation" },
+  { id: "EPS", label: "EPS（円）", category: "valuation" },
+  { id: "dilutedEPS", label: "希薄化EPS（円）", category: "valuation" },
+  { id: "ROE", label: "ROE（%）", category: "valuation" },
+  { id: "roeCalculated", label: "ROE（算出・%）", category: "valuation" },
+  { id: "roa", label: "ROA（%）", category: "valuation" },
+  { id: "equityRatio", label: "自己資本比率（%）", category: "valuation" },
+  { id: "equityRatioCalculated", label: "自己資本比率（算出・%）", category: "valuation" },
+  { id: "BPS", label: "BPS（円）", category: "valuation" },
+  { id: "dividendPerShare", label: "1株当たり配当金（円）", category: "valuation" },
+  { id: "sharesOutstanding", label: "発行済株式総数（株）", category: "valuation" },
+  { id: "sales", label: "売上高（百万円）", category: "performance" },
+  { id: "operatingProfit", label: "営業利益（百万円）", category: "performance" },
+  { id: "recurringProfit", label: "経常利益（百万円）", category: "performance" },
+  { id: "operatingProfitRatio", label: "営業利益率（%）", category: "performance" },
+  { id: "netIncome", label: "当期純利益（百万円）", category: "performance" },
+  { id: "netProfitRatio", label: "純利益率（%）", category: "performance" },
+  { id: "comprehensiveIncome", label: "包括利益（百万円）", category: "performance" },
+  { id: "liabilities", label: "負債（百万円）", category: "balancesheet" },
+  { id: "currentLiabilities", label: "流動負債（百万円）", category: "balancesheet" },
+  { id: "currentAssets", label: "流動資産（百万円）", category: "balancesheet" },
+  { id: "netAssets", label: "純資産額（百万円）", category: "balancesheet" },
+  { id: "totalAssets", label: "総資産額（百万円）", category: "balancesheet" },
+  { id: "investmentSecurities", label: "投資有価証券（百万円）", category: "balancesheet" },
+  { id: "cashBalance", label: "現金及び現金同等物（百万円）", category: "cash" },
+  { id: "operatingCF", label: "営業CF（百万円）", category: "cash" },
+  { id: "investingCF", label: "投資CF（百万円）", category: "cash" },
+  { id: "fcf", label: "FCF（百万円）", category: "cash" },
+  { id: "financingCF", label: "財務CF（百万円）", category: "cash" },
+  { id: "salesGrowthYoY", label: "売上高成長率(YoY)（%）", category: "growth" },
+  { id: "opGrowthYoY", label: "営業利益成長率(YoY)（%）", category: "growth" },
+  { id: "epsGrowthYoY", label: "EPS成長率(YoY)（%）", category: "growth" },
+  { id: "dividendGrowthYoY", label: "配当成長率(YoY)（%）", category: "growth" },
+  { id: "salesCagr3y", label: "売上高CAGR(3年)（%）", category: "growth" },
+  { id: "salesCagr5y", label: "売上高CAGR(5年)（%）", category: "growth" },
+  { id: "consecutiveDivIncreases", label: "連続増配年数", category: "growth" },
+  { id: "currentRatio", label: "流動比率", category: "balancesheet" },
+  { id: "deRatio", label: "D/Eレシオ", category: "balancesheet" },
+  { id: "roic", label: "ROIC（%）", category: "valuation" },
+  { id: "piotroskiFScore", label: "Piotroski F-Score", category: "valuation" },
+];
+
+const COLUMN_IDS = COLUMN_CONFIG.map((c) => c.id);
+
+const CATEGORY_LABELS: Record<ColumnCategory, string> = {
+  basic: "基本情報",
+  valuation: "バリュエーション",
+  performance: "業績・収益性",
+  balancesheet: "バランスシート",
+  cash: "キャッシュ関連",
+  growth: "成長性",
+};
+
+/** ラベル末尾 * の列。常に表示し、ユーザー操作で非表示にできない */
+const REQUIRED_COLUMN_IDS: readonly ColumnId[] = ["filerName", "secCode"];
+
+/** 初回表示・リセット時のデフォルト列（packages/metrics/src/columns.ts と一致） */
+const DEFAULT_VISIBLE_COLUMN_IDS: readonly ColumnId[] = ["filerName", "secCode", "sales", "ROE"];
+
+const STORAGE_KEY = "edisuku-column-visibility";
+
+function buildDefaultVisibility(): Record<ColumnId, boolean> {
+  return COLUMN_IDS.reduce(
+    (acc, id) => ({ ...acc, [id]: DEFAULT_VISIBLE_COLUMN_IDS.includes(id) }),
+    {} as Record<ColumnId, boolean>,
+  );
+}
+
+function normalizeVisibility(vis: Record<ColumnId, boolean>): Record<ColumnId, boolean> {
+  const next = { ...vis };
+  for (const id of REQUIRED_COLUMN_IDS) {
+    next[id] = true;
+  }
+  return next;
+}
+
+function loadVisibility(): Record<ColumnId, boolean> {
+  const fallback = buildDefaultVisibility();
+  if (typeof window === "undefined") return fallback;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return fallback;
+    const parsed = JSON.parse(stored) as Record<string, boolean>;
+    const merged = COLUMN_IDS.reduce(
+      (acc, id) => ({ ...acc, [id]: parsed[id] ?? DEFAULT_VISIBLE_COLUMN_IDS.includes(id) }),
+      {} as Record<ColumnId, boolean>,
+    );
+    return normalizeVisibility(merged);
+  } catch {
+    return fallback;
+  }
+}
+
+function saveVisibility(vis: Record<ColumnId, boolean>) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(vis));
+  } catch {
+    /* ignore */
+  }
+}
+
+type ColumnVisibilityContextValue = {
+  visibility: Record<ColumnId, boolean>;
+  setColumnVisible: (id: ColumnId, visible: boolean) => void;
+  toggleColumn: (id: ColumnId) => void;
+  showAll: () => void;
+  hideAll: () => void;
+  resetColumns: () => void;
+  columnIds: readonly ColumnId[];
+  columnConfig: readonly { id: ColumnId; label: string; category: ColumnCategory }[];
+  columnLabel: (id: ColumnId) => string;
+  getCategoryLabel: (cat: ColumnCategory) => string;
+  isRequiredColumn: (id: ColumnId) => boolean;
+};
+
+const ColumnVisibilityContext = createContext<ColumnVisibilityContextValue | null>(null);
+
+export function ColumnVisibilityProvider({ children }: { children: ReactNode }) {
+  const [visibility, setVisibility] = useState<Record<ColumnId, boolean>>(() => buildDefaultVisibility());
+
+  useEffect(() => {
+    setVisibility(loadVisibility());
+  }, []);
+
+  useEffect(() => {
+    saveVisibility(visibility);
+  }, [visibility]);
+
+  const setColumnVisible = useCallback((id: ColumnId, visible: boolean) => {
+    if (REQUIRED_COLUMN_IDS.includes(id) && !visible) return;
+    setVisibility((prev) => normalizeVisibility({ ...prev, [id]: visible }));
+  }, []);
+
+  const toggleColumn = useCallback((id: ColumnId) => {
+    if (REQUIRED_COLUMN_IDS.includes(id)) return;
+    setVisibility((prev) => normalizeVisibility({ ...prev, [id]: !prev[id] }));
+  }, []);
+
+  const showAll = useCallback(() => {
+    setVisibility(normalizeVisibility(COLUMN_IDS.reduce((acc, id) => ({ ...acc, [id]: true }), {} as Record<ColumnId, boolean>)));
+  }, []);
+
+  const hideAll = useCallback(() => {
+    setVisibility(
+      normalizeVisibility(COLUMN_IDS.reduce((acc, id) => ({ ...acc, [id]: false }), {} as Record<ColumnId, boolean>)),
+    );
+  }, []);
+
+  const resetColumns = useCallback(() => {
+    setVisibility(buildDefaultVisibility());
+  }, []);
+
+  const columnLabel = useCallback((id: ColumnId) => COLUMN_CONFIG.find((c) => c.id === id)?.label ?? id, []);
+
+  const getCategoryLabel = useCallback((cat: ColumnCategory) => CATEGORY_LABELS[cat], []);
+
+  const isRequiredColumn = useCallback((id: ColumnId) => REQUIRED_COLUMN_IDS.includes(id), []);
+
+  return (
+    <ColumnVisibilityContext.Provider
+      value={{
+        visibility,
+        setColumnVisible,
+        toggleColumn,
+        showAll,
+        hideAll,
+        resetColumns,
+        columnIds: COLUMN_IDS,
+        columnConfig: COLUMN_CONFIG,
+        columnLabel,
+        getCategoryLabel,
+        isRequiredColumn,
+      }}
+    >
+      {children}
+    </ColumnVisibilityContext.Provider>
+  );
+}
+
+export function useColumnVisibility() {
+  const ctx = useContext(ColumnVisibilityContext);
+  if (!ctx) throw new Error("useColumnVisibility must be used within ColumnVisibilityProvider");
+  return ctx;
+}
+
+export { COLUMN_IDS, COLUMN_CONFIG, CATEGORY_LABELS, REQUIRED_COLUMN_IDS, DEFAULT_VISIBLE_COLUMN_IDS };

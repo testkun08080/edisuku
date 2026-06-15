@@ -1,0 +1,56 @@
+name = "edisuku-api"
+main = "src/index.ts"
+compatibility_date = "2025-09-06"
+compatibility_flags = ["nodejs_compat"]
+
+# Local `wrangler dev` only. Staging/production vars are under [env.*].
+[vars]
+CORS_ORIGIN = "http://localhost:3000"
+API_VERSION = "2.0.0-alpha.0"
+NODE_ENV = "development"
+# INTERNAL_API_KEY: apps/api/.dev.vars (local) or `wrangler secret put` (remote)
+
+[[d1_databases]]
+binding = "EDISUKU_DB"
+database_name = "edisuku-local"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+# ─── staging ─────────────────────────────────────────────────────────────
+[env.staging]
+name = "edisuku-api-staging"
+
+[env.staging.vars]
+CORS_ORIGIN = "__STAGING_WEB_URL__"
+API_VERSION = "2.0.0-alpha.0"
+NODE_ENV = "production"
+
+[[env.staging.d1_databases]]
+binding = "EDISUKU_DB"
+database_name = "edisuku-db-staging"
+database_id = "__STAGING_D1_ID__"
+
+[[env.staging.kv_namespaces]]
+binding = "EDISUKU_CACHE"
+id = "__STAGING_KV_ID__"
+
+# ─── production ──────────────────────────────────────────────────────────
+[env.production]
+name = "edisuku-api"
+
+[env.production.vars]
+CORS_ORIGIN = "__PROD_WEB_URL__"
+API_VERSION = "2.0.0-alpha.0"
+NODE_ENV = "production"
+
+[[env.production.d1_databases]]
+binding = "EDISUKU_DB"
+database_name = "edisuku-db"
+database_id = "__PROD_D1_ID__"
+
+[[env.production.kv_namespaces]]
+binding = "EDISUKU_CACHE"
+id = "__PROD_KV_ID__"
+
+[[env.production.r2_buckets]]
+binding = "EDISUKU_DATA"
+bucket_name = "edisuku-data"

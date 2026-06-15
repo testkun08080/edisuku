@@ -1,0 +1,57 @@
+/* Links */
+a {
+  text-decoration: none;
+}
+
+/* Reset */
+html {
+  overscroll-behavior: none;
+}
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  overscroll-behavior: none;
+}
+* {
+  box-sizing: border-box;
+}
+
+/* Prevent iOS input zoom (font-size must be >= 16px on touch devices) */
+@media (hover: none) and (pointer: coarse) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Prevent horizontal scroll in all sidebar containers */
+[data-sidebar="sidebar"],
+[data-sidebar="sidebar"] > div,
+[data-sidebar="content"],
+[data-sidebar="content"] [data-slot="scroll-area-viewport"] {
+  overflow-x: hidden !important;
+}
+
+/* Restrict touch scrolling to vertical only in sidebar */
+[data-sidebar="sidebar"],
+[data-sidebar="content"] {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+/* Page Transition Animation */
+#page-content {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+body.page-transition #page-content {
+  opacity: 0;
+}
+
+/* Sidebar scrollbar fix */
+[data-sidebar="content"]::-webkit-scrollbar {
+  width: 4px;
+}
+[data-sidebar="content"]::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: hsl(var(--muted-foreground) / 0.2);
+}

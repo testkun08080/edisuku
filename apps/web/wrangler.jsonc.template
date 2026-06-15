@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "edisuku-web",
+  "compatibility_date": "2025-09-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "virtual:photon:cloudflare:server-entry",
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "env": {
+    "staging": {
+      "name": "edisuku-web-staging",
+      "vars": {
+        "API_UPSTREAM_URL": "__STAGING_API_URL__"
+      }
+    },
+    "production": {
+      "name": "edisuku-web",
+      "vars": {
+        "API_UPSTREAM_URL": "__PROD_API_URL__"
+      }
+    }
+  }
+}

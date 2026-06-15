@@ -1,0 +1,38 @@
+{
+  "name": "edisuku",
+  "private": true,
+  "version": "2.0.0-alpha.0",
+  "type": "module",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "bash infra/init/dev-local.sh",
+    "build": "turbo run build",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules .turbo",
+    "db:generate": "pnpm --filter @edinet/db drizzle-kit generate",
+    "db:migrate:local": "pnpm --filter @edinet/db db:migrate:local",
+    "db:migrate:staging": "pnpm --filter @edinet/api db:migrate:staging",
+    "db:migrate:production": "pnpm --filter @edinet/api db:migrate:production",
+    "db:backfill:metrics": "pnpm --filter @edinet/metrics exec tsx ../../infra/init/build-company-metrics.mjs",
+    "db:backfill:shareholders": "pnpm --filter @edinet/metrics exec tsx ../../infra/init/build-shareholder-snapshots.mjs",
+    "sample:regenerate": "bash infra/init/regenerate-sample.sh",
+    "deploy:api:staging": "pnpm --filter @edinet/api deploy:staging",
+    "deploy:api:production": "pnpm --filter @edinet/api deploy:production",
+    "deploy:web:staging": "pnpm --filter @edinet/web deploy:staging",
+    "deploy:web:production": "pnpm --filter @edinet/web deploy:production"
+  },
+  "devDependencies": {
+    "better-sqlite3": "^11.7.0",
+    "@biomejs/biome": "1.9.4",
+    "@changesets/cli": "^2.27.9",
+    "turbo": "^2.3.0",
+    "typescript": "^5.9.3"
+  }
+}

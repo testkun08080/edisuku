@@ -1,0 +1,4 @@
+# Docker Compose only (mounted read-only into web container).
+# Host dev uses apps/web/.dev.vars.example → .dev.vars with 127.0.0.1.
+INTERNAL_API_KEY=dev-local-key
+API_UPSTREAM_URL=http://api:8787

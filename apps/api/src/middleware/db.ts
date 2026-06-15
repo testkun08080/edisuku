@@ -1,0 +1,14 @@
+import * as schema from "@edinet/db/schema";
+import { drizzle } from "drizzle-orm/d1";
+import type { Context, MiddlewareHandler } from "hono";
+import type { AppEnv, DB } from "../env.js";
+
+export const dbMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
+  const db = drizzle(c.env.EDISUKU_DB, { schema });
+  c.set("db", db);
+  await next();
+};
+
+export function getDb(c: Context<AppEnv>): DB {
+  return c.get("db");
+}

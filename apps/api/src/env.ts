@@ -1,0 +1,21 @@
+import type * as schema from "@edinet/db/schema";
+import type { DrizzleD1Database } from "drizzle-orm/d1";
+
+export interface Bindings {
+  EDISUKU_DB: D1Database;
+  EDISUKU_CACHE?: KVNamespace;
+  EDISUKU_DATA?: R2Bucket;
+  CORS_ORIGIN: string;
+  API_VERSION: string;
+  INTERNAL_API_KEY?: string;
+  NODE_ENV?: string;
+}
+
+export type DB = DrizzleD1Database<typeof schema>;
+
+export interface Variables {
+  requestId: string;
+  db: DB;
+}
+
+export type AppEnv = { Bindings: Bindings; Variables: Variables };

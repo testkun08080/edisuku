@@ -1,0 +1,88 @@
+## docker compose -f infra/compose.yml up
+##   - fetches sample SQLite from GitHub Release (db-init)
+##   - starts Hono API on :8787
+##   - starts Vike web on :3000
+## EDINET ingestion:
+##   docker compose -f infra/compose.yml --profile ingest run wrapper
+
+services:
+  db-init:
+    image: alpine:3.20
+    volumes:
+      - ../data:/data
+      - ./init:/init:ro
+      - ../packages/db/migrations:/migrations:ro
+    command: sh /init/fetch-sample-data.sh
+
+  deps:
+    image: node:22-slim
+    volumes:
+      - ..:/workspace
+      - root-node-modules:/workspace/node_modules
+      - api-node-modules:/workspace/apps/api/node_modules
+      - web-node-modules:/workspace/apps/web/node_modules
+      - pnpm-store:/root/.local/share/pnpm/store
+    working_dir: /workspace
+    command: sh -c "corepack enable && corepack prepare pnpm@9.12.0 --activate && pnpm install --frozen-lockfile"
+
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+      target: dev
+    depends_on:
+      deps:
+        condition: service_completed_successfully
+    volumes:
+      - ../data:/app/data
+      - ..:/workspace
+      - root-node-modules:/workspace/node_modules
+      - api-node-modules:/workspace/apps/api/node_modules
+      - pnpm-store:/root/.local/share/pnpm/store
+    working_dir: /workspace/apps/api
+    environment:
+      - NODE_ENV=development
+      - DB_PATH=/app/data/edinet.db
+    ports:
+      - "8787:8787"
+    command: sh -c "cp -f .dev.vars.example .dev.vars && sh /workspace/infra/init/prepare-local-d1.sh && pnpm exec wrangler dev --ip 0.0.0.0 --port 8787"
+
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+      target: dev
+    depends_on:
+      - api
+    volumes:
+      - ..:/workspace
+      - root-node-modules:/workspace/node_modules
+      - web-node-modules:/workspace/apps/web/node_modules
+      - pnpm-store:/root/.local/share/pnpm/store
+      - ./init/web.dev.vars.docker:/workspace/apps/web/.dev.vars:ro
+    working_dir: /workspace/apps/web
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    command: sh -c "cp -f wrangler.jsonc.template wrangler.jsonc && pnpm dev --host 0.0.0.0 --port 3000"
+
+  wrapper:
+    profiles: ["ingest"]
+    build:
+      context: ../apps/wrapper
+    volumes:
+      - ../data:/app/data
+      - ../apps/wrapper:/app
+    env_file:
+      - ../apps/wrapper/.env
+    working_dir: /app
+    entrypoint: ["sh", "-c"]
+    command:
+      - 'uv run python scripts/ingest_daily.py --date "$${INGEST_DATE:-$$(date +%F)}" --output /app/data/edinet.db'
+
+volumes:
+  root-node-modules:
+  api-node-modules:
+  web-node-modules:
+  pnpm-store:

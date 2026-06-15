@@ -1,0 +1,28 @@
+## Smoke-test the production-ready images locally before pushing to Workers.
+## Build contexts are the repo root so the multi-stage Dockerfiles can
+## copy the workspace lockfile and packages/* into their builder layer.
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+      target: production
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "8787:8787"
+    command: sh -c "cp -f .dev.vars.example .dev.vars && pnpm exec wrangler dev --port 8787 --ip 0.0.0.0"
+
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+      target: production
+    depends_on:
+      - api
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    command: sh -c "cp -f .dev.vars.example .dev.vars && sed -i 's|^API_UPSTREAM_URL=.*|API_UPSTREAM_URL=http://api:8787|' .dev.vars && pnpm preview --host 0.0.0.0 --port 3000"
