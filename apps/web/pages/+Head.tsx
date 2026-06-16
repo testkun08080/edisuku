@@ -37,14 +37,6 @@ export function Head() {
       <meta property="og:description" content={siteDescription} />
       <meta property="og:type" content="website" />
       {siteUrl && <meta property="og:url" content={siteUrl} />}
-      {ogImageSquareUrl && <meta property="og:image" content={ogImageSquareUrl} />}
-      {ogImageSquareUrl && (
-        <meta property="og:image:width" content={String(SITE_OG_IMAGE_SQUARE_SIZE)} />
-      )}
-      {ogImageSquareUrl && (
-        <meta property="og:image:height" content={String(SITE_OG_IMAGE_SQUARE_SIZE)} />
-      )}
-      {ogImageSquareUrl && <meta property="og:image:alt" content={SITE_OG_IMAGE_ALT} />}
       {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
       {ogImageUrl && (
         <meta property="og:image:width" content={String(SITE_OG_IMAGE_WIDTH)} />
@@ -53,6 +45,14 @@ export function Head() {
         <meta property="og:image:height" content={String(SITE_OG_IMAGE_HEIGHT)} />
       )}
       {ogImageUrl && <meta property="og:image:alt" content={SITE_OG_IMAGE_ALT} />}
+      {ogImageSquareUrl && <meta property="og:image" content={ogImageSquareUrl} />}
+      {ogImageSquareUrl && (
+        <meta property="og:image:width" content={String(SITE_OG_IMAGE_SQUARE_SIZE)} />
+      )}
+      {ogImageSquareUrl && (
+        <meta property="og:image:height" content={String(SITE_OG_IMAGE_SQUARE_SIZE)} />
+      )}
+      {ogImageSquareUrl && <meta property="og:image:alt" content={SITE_OG_IMAGE_ALT} />}
       <meta property="og:site_name" content={siteTitle} />
       <meta property="og:locale" content="ja_JP" />
 
