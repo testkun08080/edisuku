@@ -173,7 +173,7 @@ pnpm exec wrangler kv key delete "screener:metrics:v2" \
 
 ### 6-4. 大株主スナップショット（任意）
 
-v1 形式の `apps/web/public/data/shareholders/*.json` がある場合:
+`infra/init/sample/shareholders/*.json` から D1 へ投入する場合:
 
 ```bash
 pnpm --filter @edinet/metrics exec tsx ../../infra/init/build-shareholder-snapshots.mjs \
