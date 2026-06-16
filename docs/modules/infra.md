@@ -50,7 +50,7 @@ Cloudflare リソースの作成・wrangler 設定・GitHub Secrets は [FORK.md
 
 | スクリプト | 用途 |
 |---|---|
-| `infra/render-wrangler-config.sh` | `wrangler.{toml,jsonc}.template` に D1/KV ID と Worker URL を注入 |
+| `infra/render-wrangler-config.sh` | `wrangler.{toml,jsonc}.template` に ID/URL を注入（`--target api\|web\|all`、デフォルト `all`） |
 | `infra/apply-internal-api-key.sh` | `.internal-api-key` を Cloudflare secret に登録 |
 | `.internal-api-key.example` | 本番用キーのサンプル（プレースホルダ） |
 
@@ -59,7 +59,8 @@ Cloudflare リソースの作成・wrangler 設定・GitHub Secrets は [FORK.md
 | 種類 | 名前 |
 |---|---|
 | Secret | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `EDINET_API_KEY` |
-| Secret | `D1_STAGING_ID`, `D1_PRODUCTION_ID`, `KV_STAGING_ID`, `KV_PRODUCTION_ID`, `WORKERS_SUBDOMAIN` |
+| Secret | `D1_STAGING_ID`, `D1_PRODUCTION_ID`, `KV_STAGING_ID`, `KV_PRODUCTION_ID` |
+| Secret | `STAGING_API_URL`, `PROD_API_URL`, `STAGING_WEB_URL`, `PROD_WEB_URL` |
 | Secret | `INTERNAL_API_KEY`（任意・記録用。ランタイムは Worker secret） |
 
 ## fetch-sample-data.sh

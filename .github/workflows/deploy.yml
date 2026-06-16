@@ -1,0 +1,75 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: "Target environment"
+        required: true
+        type: choice
+        default: staging
+        options: [staging, production]
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - "apps/api/**"
+  #     - "apps/web/**"
+  #     - "packages/**"
+  #     - ".github/workflows/deploy.yml"
+
+concurrency:
+  group: deploy-${{ github.event.inputs.env || 'staging' }}
+  cancel-in-progress: false
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.12.0 }
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Render API wrangler config
+        env:
+          STAGING_D1_ID: ${{ secrets.D1_STAGING_ID }}
+          PROD_D1_ID: ${{ secrets.D1_PRODUCTION_ID }}
+          STAGING_KV_ID: ${{ secrets.KV_STAGING_ID }}
+          PROD_KV_ID: ${{ secrets.KV_PRODUCTION_ID }}
+          STAGING_WEB_URL: ${{ secrets.STAGING_WEB_URL }}
+          PROD_WEB_URL: ${{ secrets.PROD_WEB_URL }}
+        run: bash infra/render-wrangler-config.sh --target api
+      - name: Deploy API Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/api
+          command: deploy --env ${{ github.event.inputs.env || 'staging' }}
+
+  web:
+    needs: api
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.12.0 }
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Render web wrangler config
+        env:
+          STAGING_API_URL: ${{ secrets.STAGING_API_URL }}
+          PROD_API_URL: ${{ secrets.PROD_API_URL }}
+          STAGING_WEB_URL: ${{ secrets.STAGING_WEB_URL }}
+          PROD_WEB_URL: ${{ secrets.PROD_WEB_URL }}
+        run: bash infra/render-wrangler-config.sh --target web
+      - run: pnpm --filter @edinet/web build
+      - name: Deploy web Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/web
+          command: deploy --env ${{ github.event.inputs.env || 'staging' }}

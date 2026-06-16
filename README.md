@@ -103,7 +103,7 @@ uv run python scripts/ingest_daily.py --help
 | `CLOUDFLARE_ACCOUNT_ID` | 同上 | CI |
 | `INTERNAL_API_KEY` | API 認証（web BFF → api） | 自分で設定（[docs/FORK.md](./docs/FORK.md)） |
 | `API_UPSTREAM_URL` | web がプロキシする API の URL | web Worker secret（`render-wrangler-config.sh` / `apply-internal-api-key.sh`） |
-| `WORKERS_SUBDOMAIN` | workers.dev のサブドメイン | GitHub Secret（CI デプロイ用） |
+| `STAGING_API_URL` / `PROD_API_URL` / `STAGING_WEB_URL` / `PROD_WEB_URL` | Worker の公開 URL | GitHub Secret（CI デプロイ用） |
 | `PUBLIC_ENV__SENTRY_DSN` | Sentry DSN (任意) | web |
 
 ## ドキュメント

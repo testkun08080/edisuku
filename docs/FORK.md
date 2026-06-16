@@ -97,7 +97,10 @@ gh secret set D1_STAGING_ID --body "$STAGING_D1_ID"
 gh secret set D1_PRODUCTION_ID --body "$PROD_D1_ID"
 gh secret set KV_STAGING_ID --body "$STAGING_KV_ID"
 gh secret set KV_PRODUCTION_ID --body "$PROD_KV_ID"
-gh secret set WORKERS_SUBDOMAIN --body "$WORKERS_SUBDOMAIN"
+gh secret set STAGING_API_URL --body "$STAGING_API_URL"
+gh secret set PROD_API_URL --body "$PROD_API_URL"
+gh secret set STAGING_WEB_URL --body "$STAGING_WEB_URL"
+gh secret set PROD_WEB_URL --body "$PROD_WEB_URL"
 # EDINET 日次取り込みを使う場合
 gh secret set EDINET_API_KEY
 ```
@@ -170,16 +173,16 @@ pnpm deploy:web:production
 | Secret | 誰が設定するか |
 |--------|----------------|
 | `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` | あなた |
-| `WORKERS_SUBDOMAIN` | あなた（手順 2.6） |
 | `D1_*` / `KV_*` | あなた（手順 2.6） |
+| `STAGING_API_URL` / `PROD_API_URL` / `STAGING_WEB_URL` / `PROD_WEB_URL` | あなた（手順 2.6。カスタムドメイン可） |
 | `INTERNAL_API_KEY` | **あなた**（任意・記録用） |
 | `EDINET_API_KEY` | あなた（daily-refresh 用） |
 
-Worker URL:
+Worker URL（手順 2.2 で export した値を Secret に登録）:
 
 ```
-https://edisuku-api-staging.<WORKERS_SUBDOMAIN>.workers.dev
-https://edisuku-web-staging.<WORKERS_SUBDOMAIN>.workers.dev
+$STAGING_API_URL
+$STAGING_WEB_URL
 ```
 
 ## トラブルシュート
