@@ -1,5 +1,5 @@
-import { Badge } from "../ui/badge";
 import { GITHUB_REPO } from "../../lib/routes";
+import { Badge } from "../ui/badge";
 
 export function LandingQuickStart() {
   return (
@@ -12,8 +12,12 @@ export function LandingQuickStart() {
         }}
       />
       <div className="relative mx-auto max-w-4xl">
-        <p className="text-[10.5px] font-semibold uppercase tracking-widest text-muted-foreground">クイックスタート</p>
-        <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight sm:text-4xl">すぐに試せる</h2>
+        <p className="text-[10.5px] font-semibold uppercase tracking-widest text-muted-foreground">
+          クイックスタート
+        </p>
+        <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+          すぐに試せる
+        </h2>
         <p className="mt-4 max-w-lg text-sm font-light leading-relaxed text-muted-foreground">
           Docker でサンプルデータ付きの環境を起動できます。
         </p>
@@ -23,7 +27,9 @@ export function LandingQuickStart() {
             <span className="size-2.5 rounded-full bg-[#ff5f57]" />
             <span className="size-2.5 rounded-full bg-[#febc2e]" />
             <span className="size-2.5 rounded-full bg-[#28c840]" />
-            <span className="ml-2 font-mono text-[10px] text-muted-foreground">terminal — docker compose up</span>
+            <span className="ml-2 font-mono text-[10px] text-muted-foreground">
+              terminal — docker compose up
+            </span>
           </div>
           <div className="space-y-5 p-5 sm:p-6">
             <p className="text-sm text-muted-foreground">

@@ -33,7 +33,7 @@ export function trackPageView(path: string) {
   }
 }
 
-export function trackEvent(eventName: string, eventParams?: Record<string, any>) {
+export function trackEvent(eventName: string, eventParams?: Record<string, unknown>) {
   try {
     ReactGA.event(eventName, eventParams);
   } catch (error) {

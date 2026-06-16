@@ -10,7 +10,7 @@
  * Default input: infra/init/sample/shareholders
  * limit: process only first N JSON files (for small-sample testing)
  */
-import { existsSync, readdirSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 

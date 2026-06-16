@@ -1,7 +1,13 @@
 import { DataAttributionBlock } from "../../components/DataAttributionBlock";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
-import { SITE_NAME, DATA_LAST_UPDATED } from "../../lib/brand";
+import { DATA_LAST_UPDATED, SITE_NAME } from "../../lib/brand";
 
 export default function Page() {
   return (
@@ -64,7 +70,8 @@ export default function Page() {
           <div>
             <p className="font-medium text-foreground">ブラウザのローカルストレージ</p>
             <p className="mt-1">
-              お気に入り銘柄、表示列の設定、最近閲覧した企業などの利便性向上のため、ブラウザの localStorage
+              お気に入り銘柄、表示列の設定、最近閲覧した企業などの利便性向上のため、ブラウザの
+              localStorage
               に保存する場合があります。これらは当社のサーバーに自動送信されず、利用者のブラウザ内に留まります。削除はブラウザの設定から行えます。
             </p>
           </div>
@@ -72,8 +79,9 @@ export default function Page() {
           <div>
             <p className="font-medium text-foreground">アクセス解析（Google Analytics）</p>
             <p className="mt-1">
-              サイトの利用状況把握のため、Google Analytics を利用する場合があります。Cookie・端末情報・IPアドレス等が
-              Google により収集・処理されることがあります。詳細は
+              サイトの利用状況把握のため、Google Analytics
+              を利用する場合があります。Cookie・端末情報・IPアドレス等が Google
+              により収集・処理されることがあります。詳細は
               <a
                 href="https://policies.google.com/privacy?hl=ja"
                 target="_blank"

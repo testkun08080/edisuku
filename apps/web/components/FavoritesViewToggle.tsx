@@ -1,8 +1,8 @@
 "use client";
 
+import { List, Star } from "lucide-react";
 import { useFilters } from "./FilterContext.js";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
-import { List, Star } from "lucide-react";
 
 export function FavoritesViewToggle() {
   const { filters, setFilter } = useFilters();

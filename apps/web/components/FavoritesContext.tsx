@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 
 const STORAGE_KEY = "edisuku-favorites";
 
@@ -70,10 +70,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const isFavorite = useCallback(
-    (secCode: string) => favorites.has(secCode),
-    [favorites]
-  );
+  const isFavorite = useCallback((secCode: string) => favorites.has(secCode), [favorites]);
 
   return (
     <FavoritesContext.Provider

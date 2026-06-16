@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  type ReactNode,
-} from "react";
 import type { NumericFilterRule, SavedFilterPreset } from "@edinet/types";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import {
   createEmptyRule,
   deserializeRules,
@@ -106,10 +99,15 @@ type FilterContextValue = {
   presets: SavedFilterPreset[];
   setFilter: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void;
   addRule: (fieldId?: string) => void;
-  updateRule: (id: string, patch: Partial<Pick<NumericFilterRule, "fieldId" | "min" | "max">>) => void;
+  updateRule: (
+    id: string,
+    patch: Partial<Pick<NumericFilterRule, "fieldId" | "min" | "max">>,
+  ) => void;
   removeRule: (id: string) => void;
   clearFilters: () => void;
-  applyPreset: (preset: Pick<SavedFilterPreset, "searchName" | "searchCode" | "rules" | "showOnlyFavorites">) => void;
+  applyPreset: (
+    preset: Pick<SavedFilterPreset, "searchName" | "searchCode" | "rules" | "showOnlyFavorites">,
+  ) => void;
   savePreset: (name: string) => void;
   deletePreset: (id: string) => void;
   getShareableUrl: () => string;
@@ -160,7 +158,9 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const clearFilters = useCallback(() => setFilters({ ...defaultFilters }), []);
 
   const applyPreset = useCallback(
-    (preset: Pick<SavedFilterPreset, "searchName" | "searchCode" | "rules" | "showOnlyFavorites">) => {
+    (
+      preset: Pick<SavedFilterPreset, "searchName" | "searchCode" | "rules" | "showOnlyFavorites">,
+    ) => {
       setFilters((prev) => ({
         ...prev,
         searchName: preset.searchName,
@@ -168,7 +168,10 @@ export function FilterProvider({ children }: { children: ReactNode }) {
         showOnlyFavorites: preset.showOnlyFavorites,
         rules: preset.rules.map((r) => ({
           ...r,
-          id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `rule-${Date.now()}-${r.fieldId}`,
+          id:
+            typeof crypto !== "undefined" && crypto.randomUUID
+              ? crypto.randomUUID()
+              : `rule-${Date.now()}-${r.fieldId}`,
         })),
       }));
     },
@@ -180,7 +183,10 @@ export function FilterProvider({ children }: { children: ReactNode }) {
       const trimmed = name.trim();
       if (!trimmed) return;
       const preset: SavedFilterPreset = {
-        id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `preset-${Date.now()}`,
+        id:
+          typeof crypto !== "undefined" && crypto.randomUUID
+            ? crypto.randomUUID()
+            : `preset-${Date.now()}`,
         name: trimmed,
         createdAt: new Date().toISOString(),
         searchName: filters.searchName,
@@ -221,7 +227,8 @@ export function FilterProvider({ children }: { children: ReactNode }) {
     if (f.showOnlyFavorites) params.append("favorites", "1");
     if (f.itemCount && f.itemCount !== "50") params.append("itemCount", f.itemCount);
 
-    const baseUrl = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
+    const baseUrl =
+      typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
     return params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
   }, [filters]);
 

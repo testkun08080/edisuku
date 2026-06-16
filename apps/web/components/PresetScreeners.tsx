@@ -1,15 +1,10 @@
 "use client";
 
+import { Save, Trash2, Zap } from "lucide-react";
 import { useState } from "react";
 import { BUILTIN_PRESETS, useFilters } from "./FilterContext";
 import { Button } from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Input } from "./ui/input";
-import { Zap, Save, Trash2 } from "lucide-react";
 
 const BUILTIN_DESCRIPTIONS: Record<string, string> = {
   "ROE が高い": "ROE 15% 以上・自己資本比率 40% 以上",
@@ -56,7 +50,9 @@ export function PresetScreeners() {
               className="flex flex-col items-start gap-0.5 py-2 cursor-pointer"
             >
               <span className="font-medium text-sm">{preset.name}</span>
-              <span className="text-xs text-muted-foreground">{BUILTIN_DESCRIPTIONS[preset.name]}</span>
+              <span className="text-xs text-muted-foreground">
+                {BUILTIN_DESCRIPTIONS[preset.name]}
+              </span>
             </DropdownMenuItem>
           ))}
           <DropdownMenuItem onSelect={() => clearFilters()} className="cursor-pointer">
@@ -66,7 +62,9 @@ export function PresetScreeners() {
           {presets.length > 0 && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-xs text-muted-foreground">保存済み</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                保存済み
+              </DropdownMenuLabel>
               {presets.map((preset) => (
                 <DropdownMenuItem
                   key={preset.id}
@@ -98,10 +96,7 @@ export function PresetScreeners() {
           )}
 
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onSelect={() => setSaveOpen(true)}
-            className="gap-2 cursor-pointer"
-          >
+          <DropdownMenuItem onSelect={() => setSaveOpen(true)} className="gap-2 cursor-pointer">
             <Save className="size-4" />
             現在の条件を保存…
           </DropdownMenuItem>

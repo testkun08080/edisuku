@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 
 const STORAGE_KEY = "edisuku-recent-companies";
 const MAX_RECENT = 5;
@@ -54,7 +54,9 @@ export function RecentCompaniesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <RecentCompaniesContext.Provider value={{ recent, addRecent }}>{children}</RecentCompaniesContext.Provider>
+    <RecentCompaniesContext.Provider value={{ recent, addRecent }}>
+      {children}
+    </RecentCompaniesContext.Provider>
   );
 }
 

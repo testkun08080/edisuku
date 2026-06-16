@@ -40,17 +40,83 @@ function j(obj) {
 }
 
 const sampleCompanies = [
-  { edinetCode: "E00000", secCode: "9999", filerName: "サンプル株式会社", listedCategory: "上場", industry: "情報・通信業" },
-  { edinetCode: "E00001", secCode: "1301", filerName: "カブトシステムズ株式会社", listedCategory: "上場", industry: "情報・通信業" },
-  { edinetCode: "E00002", secCode: "1302", filerName: "ライオンロジスティクス株式会社", listedCategory: "上場", industry: "陸運業" },
-  { edinetCode: "E00003", secCode: "1303", filerName: "ペンギンソリューションズ株式会社", listedCategory: "上場", industry: "サービス業" },
-  { edinetCode: "E00004", secCode: "1304", filerName: "キツネクラウド株式会社", listedCategory: "上場", industry: "情報・通信業" },
-  { edinetCode: "E00005", secCode: "1305", filerName: "クジラデータバンク株式会社", listedCategory: "上場", industry: "銀行業" },
-  { edinetCode: "E00006", secCode: "1306", filerName: "ハリネズミファイナンス株式会社", listedCategory: "上場", industry: "その他金融業" },
-  { edinetCode: "E00007", secCode: "1307", filerName: "フクロウメディア株式会社", listedCategory: "上場", industry: "情報・通信業" },
-  { edinetCode: "E00008", secCode: "1308", filerName: "ラッコアセットマネジメント株式会社", listedCategory: "上場", industry: "証券、商品先物取引業" },
-  { edinetCode: "E00009", secCode: "1309", filerName: "シロクマエナジー株式会社", listedCategory: "上場", industry: "電気・ガス業" },
-  { edinetCode: "E00010", secCode: "1310", filerName: "ウサギテクノロジーズ株式会社", listedCategory: "上場", industry: "電気機器" },
+  {
+    edinetCode: "E00000",
+    secCode: "9999",
+    filerName: "サンプル株式会社",
+    listedCategory: "上場",
+    industry: "情報・通信業",
+  },
+  {
+    edinetCode: "E00001",
+    secCode: "1301",
+    filerName: "カブトシステムズ株式会社",
+    listedCategory: "上場",
+    industry: "情報・通信業",
+  },
+  {
+    edinetCode: "E00002",
+    secCode: "1302",
+    filerName: "ライオンロジスティクス株式会社",
+    listedCategory: "上場",
+    industry: "陸運業",
+  },
+  {
+    edinetCode: "E00003",
+    secCode: "1303",
+    filerName: "ペンギンソリューションズ株式会社",
+    listedCategory: "上場",
+    industry: "サービス業",
+  },
+  {
+    edinetCode: "E00004",
+    secCode: "1304",
+    filerName: "キツネクラウド株式会社",
+    listedCategory: "上場",
+    industry: "情報・通信業",
+  },
+  {
+    edinetCode: "E00005",
+    secCode: "1305",
+    filerName: "クジラデータバンク株式会社",
+    listedCategory: "上場",
+    industry: "銀行業",
+  },
+  {
+    edinetCode: "E00006",
+    secCode: "1306",
+    filerName: "ハリネズミファイナンス株式会社",
+    listedCategory: "上場",
+    industry: "その他金融業",
+  },
+  {
+    edinetCode: "E00007",
+    secCode: "1307",
+    filerName: "フクロウメディア株式会社",
+    listedCategory: "上場",
+    industry: "情報・通信業",
+  },
+  {
+    edinetCode: "E00008",
+    secCode: "1308",
+    filerName: "ラッコアセットマネジメント株式会社",
+    listedCategory: "上場",
+    industry: "証券、商品先物取引業",
+  },
+  {
+    edinetCode: "E00009",
+    secCode: "1309",
+    filerName: "シロクマエナジー株式会社",
+    listedCategory: "上場",
+    industry: "電気・ガス業",
+  },
+  {
+    edinetCode: "E00010",
+    secCode: "1310",
+    filerName: "ウサギテクノロジーズ株式会社",
+    listedCategory: "上場",
+    industry: "電気機器",
+  },
 ];
 
 /** 企業ごとにフィルター試験用の多様な財務プロファイルを生成 */
@@ -105,21 +171,25 @@ function buildBlocks(profile, scale, { headcountScale = 1 } = {}) {
   const eq = net / profile.roe;
   const ta = eq / profile.equityRatio;
   const liab = ta - eq;
-  const cl = liab * pick(createRng(Math.round(eq) % 10000 + 1), 0.32, 0.58);
+  const cl = liab * pick(createRng((Math.round(eq) % 10000) + 1), 0.32, 0.58);
   const ca = cl * profile.currentRatio;
-  const ocf = sales * pick(createRng(Math.round(sales) % 10000 + 2), 0.08, 0.18);
+  const ocf = sales * pick(createRng((Math.round(sales) % 10000) + 2), 0.08, 0.18);
   const icf = sales * profile.icfToSales;
   const fcfFlow = sales * profile.fcfToSales;
-  const cash = sales * pick(createRng(Math.round(sales) % 10000 + 3), 0.06, 0.22);
-  const invSec = sales * pick(createRng(Math.round(sales) % 10000 + 4), 0.01, 0.08);
-  const cogs = sales * (1 - profile.opMargin - pick(createRng(Math.round(sales) % 10000 + 5), 0.02, 0.08));
+  const cash = sales * pick(createRng((Math.round(sales) % 10000) + 3), 0.06, 0.22);
+  const invSec = sales * pick(createRng((Math.round(sales) % 10000) + 4), 0.01, 0.08);
+  const cogs =
+    sales * (1 - profile.opMargin - pick(createRng((Math.round(sales) % 10000) + 5), 0.02, 0.08));
   const gross = sales - cogs;
   const sga = gross - op;
   const eps = (net / profile.shares).toFixed(2);
   const bps = (eq / profile.shares).toFixed(2);
   const dps = ((profile.payoutRatio * net) / profile.shares).toFixed(2);
   const employees = Math.max(100, Math.round(profile.employeesBase * headcountScale));
-  const temp = Math.max(10, Math.round(employees * pick(createRng(Math.round(sales) % 10000 + 6), 0.15, 0.35)));
+  const temp = Math.max(
+    10,
+    Math.round(employees * pick(createRng((Math.round(sales) % 10000) + 6), 0.15, 0.35)),
+  );
   const equityRatioStr = profile.equityRatio.toFixed(4);
   const roeStr = profile.roe.toFixed(4);
 
@@ -127,12 +197,12 @@ function buildBlocks(profile, scale, { headcountScale = 1 } = {}) {
     売上高: yen(sales),
     経常利益: yen(ord),
     包括利益: yen(comp),
-    "親会社株主に帰属する当期純利益": yen(net),
+    親会社株主に帰属する当期純利益: yen(net),
     純資産額: yen(eq),
     総資産額: yen(ta),
     "１株当たり純資産額": bps,
     "１株当たり当期純利益又は当期純損失": eps,
-    "潜在株式調整後１株当たり当期純利益": (parseFloat(eps) * 0.985).toFixed(2),
+    潜在株式調整後１株当たり当期純利益: (Number.parseFloat(eps) * 0.985).toFixed(2),
     自己資本比率: equityRatioStr,
     "自己資本利益率、経営指標等": roeStr,
     株価収益率: profile.per.toFixed(2),
@@ -152,11 +222,11 @@ function buildBlocks(profile, scale, { headcountScale = 1 } = {}) {
     売上高: yen(sales),
     売上原価: yen(cogs),
     "売上総利益又は売上総損失（△)": yen(gross),
-    "販売費及び一般管理費": yen(Math.max(sga, sales * 0.01)),
+    販売費及び一般管理費: yen(Math.max(sga, sales * 0.01)),
     営業利益: yen(op),
     経常利益: yen(ord),
     税引前利益: yen(ord * 0.98),
-    "親会社株主に帰属する当期純利益": yen(net),
+    親会社株主に帰属する当期純利益: yen(net),
   };
   const bs = {
     総資産: yen(ta),

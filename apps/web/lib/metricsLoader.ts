@@ -2,8 +2,8 @@ import type { CompanyMetricsRow } from "@edinet/metrics";
 import type { MetricsQueryResponse } from "@edinet/types";
 import type { ColumnId } from "../components/ColumnVisibilityContext.js";
 import type { FilterState } from "../components/FilterContext.js";
-import { rulesToServerFilterBounds } from "./filterEngine.js";
 import { api } from "./api";
+import { rulesToServerFilterBounds } from "./filterEngine.js";
 
 export type CompanyMetric = CompanyMetricsRow;
 

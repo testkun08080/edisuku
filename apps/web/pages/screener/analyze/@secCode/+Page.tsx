@@ -1,51 +1,59 @@
 "use client";
 
+import {
+  AlertCircle,
+  Banknote,
+  BarChart3,
+  CalendarRange,
+  ExternalLink,
+  FileText,
+  Star,
+  TrendingUp,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useConfig } from "vike-react/useConfig";
 import { usePageContext } from "vike-react/usePageContext";
-import {
-  metricsFromPeriods,
-  normalizeCompanySummary,
-  type CompanySummary,
-  type CompanyMetricsRow,
-} from "./companyData.js";
-import { api } from "../../../../lib/api.js";
-import { useRecentCompanies } from "../../../../components/RecentCompaniesContext.js";
 import { useFavorites } from "../../../../components/FavoritesContext.js";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardAction } from "../../../../components/ui/card";
-import { Button } from "../../../../components/ui/button";
-import { Badge } from "../../../../components/ui/badge";
+import { MajorShareholdersTimeSeries } from "../../../../components/MajorShareholdersTimeSeries.js";
+import { useRecentCompanies } from "../../../../components/RecentCompaniesContext.js";
+import { SummaryCharts } from "../../../../components/SummaryCharts.js";
 import { Alert, AlertDescription } from "../../../../components/ui/alert";
+import { Badge } from "../../../../components/ui/badge";
+import { Button } from "../../../../components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../../components/ui/card";
 import { Skeleton } from "../../../../components/ui/skeleton";
 import {
-  Star,
-  AlertCircle,
-  FileText,
-  BarChart3,
-  TrendingUp,
-  Wallet,
-  Banknote,
-  Users,
-  CalendarRange,
-  ExternalLink,
-} from "lucide-react";
-import { SITE_NAME } from "../../../../lib/brand";
-import { MajorShareholdersTimeSeries } from "../../../../components/MajorShareholdersTimeSeries.js";
-import { SummaryCharts } from "../../../../components/SummaryCharts.js";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../../components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "../../../../components/ui/toggle-group";
 import {
   ANALYZE_VISIBLE_YEAR_OPTIONS,
-  filterPeriodsByVisibleYears,
   type AnalyzeVisibleYears,
+  filterPeriodsByVisibleYears,
 } from "../../../../lib/analyze-period-range.js";
 import {
   ANALYZE_REPORT_KIND_OPTIONS,
+  type AnalyzeReportKind,
   analyzeReportKindLabel,
   reportMatchesKind,
-  type AnalyzeReportKind,
 } from "../../../../lib/analyze-report-kind.js";
+import { api } from "../../../../lib/api.js";
+import { SITE_NAME } from "../../../../lib/brand";
 import {
   ANALYZE_HEADCOUNT_ROW_KEYS,
   formatAnalyzeFinancialTableCell,
@@ -53,6 +61,12 @@ import {
   formatSharesCountString,
   formatYenStringAsMillionYen,
 } from "../../../../lib/metricFormat.js";
+import {
+  type CompanyMetricsRow,
+  type CompanySummary,
+  metricsFromPeriods,
+  normalizeCompanySummary,
+} from "./companyData.js";
 
 function formatDisplayName(name: string): string {
   return name.replace(/^株式会社\s*|\s*株式会社$/g, "").trim() || name;
@@ -93,7 +107,12 @@ function hasRenderableTableCell(v: unknown): boolean {
 function EdinetLinksCard({
   periods,
 }: {
-  periods: { periodEnd: string; docID?: string; docDescription?: string; submitDateTime?: string }[];
+  periods: {
+    periodEnd: string;
+    docID?: string;
+    docDescription?: string;
+    submitDateTime?: string;
+  }[];
 }) {
   const links = periods.filter((p) => p.docID);
   if (links.length === 0) return null;
@@ -161,13 +180,17 @@ function DataTable({
 
   return (
     <Card>
-      {unitCaption ? <div className="text-muted-foreground border-b px-4 py-2 text-xs">{unitCaption}</div> : null}
+      {unitCaption ? (
+        <div className="text-muted-foreground border-b px-4 py-2 text-xs">{unitCaption}</div>
+      ) : null}
       <CardContent className="p-0">
         <div className="rounded-lg border-0">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="sticky left-0 z-20 bg-background font-semibold">項目</TableHead>
+                <TableHead className="sticky left-0 z-20 bg-background font-semibold">
+                  項目
+                </TableHead>
                 {periods.map((p) => (
                   <TableHead key={p.periodEnd} className="text-right font-semibold">
                     {p.periodEnd}
@@ -258,8 +281,8 @@ function IndicatorsTable({ metrics }: { metrics: CompanyMetricsRow | null }) {
     <Card>
       <CardContent className="p-0">
         <p className="text-muted-foreground border-b px-4 py-2 text-xs leading-relaxed">
-          金額は百万円（元データは円÷1,000,000）。比率・成長率・ROIC は小数を×100して % 表示。PER・PBR
-          は倍。EPS・BPS・1株配当は円。発行済株式総数は株。
+          金額は百万円（元データは円÷1,000,000）。比率・成長率・ROIC は小数を×100して %
+          表示。PER・PBR は倍。EPS・BPS・1株配当は円。発行済株式総数は株。
         </p>
         <Table>
           <TableHeader>
@@ -323,8 +346,10 @@ function IndicatorsTable({ metrics }: { metrics: CompanyMetricsRow | null }) {
                 } else if (key === "sharesOutstanding") {
                   display = formatSharesCountString(val);
                 } else if (INDICATOR_PER_SHARE_STRING_KEYS.has(key)) {
-                  const n = parseFloat(val.replace(/,/g, ""));
-                  display = Number.isFinite(n) ? n.toLocaleString("ja-JP", { maximumFractionDigits: 4 }) : val;
+                  const n = Number.parseFloat(val.replace(/,/g, ""));
+                  display = Number.isFinite(n)
+                    ? n.toLocaleString("ja-JP", { maximumFractionDigits: 4 })
+                    : val;
                 } else {
                   display = val;
                 }
@@ -355,7 +380,9 @@ export default function Page() {
   const config = useConfig();
   // data() 内では useConfig が使えない（getPageContext が無いと React フックに落ちる）。ページコンポーネントで設定する。
   config({
-    title: company?.filerName ? `${company.filerName} - 企業分析 | ${SITE_NAME}` : `企業分析 - ${SITE_NAME}`,
+    title: company?.filerName
+      ? `${company.filerName} - 企業分析 | ${SITE_NAME}`
+      : `企業分析 - ${SITE_NAME}`,
   });
   const { addRecent } = useRecentCompanies();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -386,7 +413,9 @@ export default function Page() {
             if (!cancelled) {
               setCompany(null);
               setMetrics(null);
-              setError(`証券コード ${secCode} のデータが見つかりません。企業一覧から選択してください。`);
+              setError(
+                `証券コード ${secCode} のデータが見つかりません。企業一覧から選択してください。`,
+              );
               setLoading(false);
             }
             return;
@@ -488,7 +517,9 @@ export default function Page() {
         <Card>
           <CardHeader>
             <div>
-              <CardTitle className="text-xl font-bold tracking-tight">{formatDisplayName(filerName)}</CardTitle>
+              <CardTitle className="text-xl font-bold tracking-tight">
+                {formatDisplayName(filerName)}
+              </CardTitle>
               <CardDescription className="flex items-center gap-2 mt-1">
                 <Badge variant="outline">{companySecCode}</Badge>
                 <span>EDINET 四半期報告書データ</span>

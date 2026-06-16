@@ -4,21 +4,23 @@ import {
   LICENSE_AND_GUIDELINES,
   RUNTIME_API_PATHS,
 } from "@/lib/data-attribution";
+import { AlertCircle, Calendar } from "lucide-react";
+import { Alert, AlertDescription } from "./ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Separator } from "./ui/separator";
-import { Alert, AlertDescription } from "./ui/alert";
-import { Calendar, AlertCircle } from "lucide-react";
 
-export function DataAttributionBlock({ compact = false, lastUpdated }: { compact?: boolean; lastUpdated?: string }) {
-
+export function DataAttributionBlock({
+  compact = false,
+  lastUpdated,
+}: { compact?: boolean; lastUpdated?: string }) {
   return (
     <Card className={compact ? "border-dashed" : ""}>
       <CardHeader className="pb-2">
         <CardTitle className="text-base">データの出典・履歴</CardTitle>
         <CardDescription>
           本サービスの数値・表は、金融庁 EDINET
-          において開示された情報等をもとに加工したものです。二次利用・表示にあたっては、各ライセンスおよび EDINET
-          の注意事項に従ってください。
+          において開示された情報等をもとに加工したものです。二次利用・表示にあたっては、各ライセンスおよび
+          EDINET の注意事項に従ってください。
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
@@ -67,9 +69,12 @@ export function DataAttributionBlock({ compact = false, lastUpdated }: { compact
         </div>
         <Separator />
         <div>
-          <p className="font-medium text-foreground mb-2">データ取り込み時に利用する EDINET Web API</p>
+          <p className="font-medium text-foreground mb-2">
+            データ取り込み時に利用する EDINET Web API
+          </p>
           <p className="text-muted-foreground text-xs mb-2">
-            ベース URL: <code className="rounded bg-muted px-1 py-0.5 text-xs">{EDINET_API_BASE}</code>
+            ベース URL:{" "}
+            <code className="rounded bg-muted px-1 py-0.5 text-xs">{EDINET_API_BASE}</code>
           </p>
           <ul className="space-y-2">
             {DOCUMENTED_EDINET_ENDPOINTS.map((e) => (
@@ -86,7 +91,9 @@ export function DataAttributionBlock({ compact = false, lastUpdated }: { compact
           <>
             <Separator />
             <div>
-              <p className="font-medium text-foreground mb-2">本サイト実行時にブラウザが取得するデータ（API）</p>
+              <p className="font-medium text-foreground mb-2">
+                本サイト実行時にブラウザが取得するデータ（API）
+              </p>
               <ul className="list-disc pl-5 space-y-1 text-muted-foreground text-xs">
                 {RUNTIME_API_PATHS.map((r) => (
                   <li key={r.path}>

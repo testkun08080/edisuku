@@ -1,10 +1,10 @@
 "use client";
 
-import { Badge } from "../ui/badge";
-import { Button } from "../ui/button";
+import { ArrowRight, Github } from "lucide-react";
 import { SITE_TAGLINE } from "../../lib/brand";
 import { GITHUB_REPO, SCREENER } from "../../lib/routes";
-import { ArrowRight, Github } from "lucide-react";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 
 export function LandingHero() {
   return (
@@ -34,12 +34,17 @@ export function LandingHero() {
         </h1>
 
         <p className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 mx-auto mt-5 max-w-lg text-base font-light leading-relaxed text-white/55 sm:text-lg">
-          金融庁の EDINET に開示された財務データを自動収集・構造化。 スクリーニング・企業分析・比較を、誰でも無料で。
+          金融庁の EDINET に開示された財務データを自動収集・構造化。
+          スクリーニング・企業分析・比較を、誰でも無料で。
         </p>
         <p className="mt-2 text-xs text-white/35">{SITE_TAGLINE}</p>
 
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 mt-10 flex flex-wrap items-center justify-center gap-3">
-          <Button size="lg" className="bg-background text-foreground hover:bg-background/90" asChild>
+          <Button
+            size="lg"
+            className="bg-background text-foreground hover:bg-background/90"
+            asChild
+          >
             <a href={SCREENER}>
               スクリーナーを開く
               <ArrowRight className="size-4" />

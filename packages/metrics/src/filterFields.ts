@@ -45,7 +45,11 @@ export function getFilterFieldById(id: string): FilterFieldDefinition | undefine
   return cachedById.get(id);
 }
 
-export function getFilterFieldsByCategory(): { category: string; label: string; fields: FilterFieldDefinition[] }[] {
+export function getFilterFieldsByCategory(): {
+  category: string;
+  label: string;
+  fields: FilterFieldDefinition[];
+}[] {
   const groups = new Map<string, FilterFieldDefinition[]>();
   for (const field of getFilterFields()) {
     const list = groups.get(field.category) ?? [];

@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { formatMajorShareholderCell } from "@/lib/parse-major-shareholders";
 import { api } from "@/lib/api";
+import { formatMajorShareholderCell } from "@/lib/parse-major-shareholders";
 import type { ShareholdersResponse } from "@edinet/types";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { AlertCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { Alert, AlertDescription } from "./ui/alert";
 import { Skeleton } from "./ui/skeleton";
-import { AlertCircle } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
 type PeriodData = {
   periodEnd: string;
@@ -72,7 +72,9 @@ export function MajorShareholdersTimeSeries({
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [active, secCode]);
 
   // 表示期間でフィルタ
@@ -124,7 +126,9 @@ export function MajorShareholdersTimeSeries({
       {error && (
         <Alert variant="default" className="border-amber-200 bg-amber-50/80 dark:bg-amber-950/20">
           <AlertCircle className="size-4 text-amber-700 dark:text-amber-400" />
-          <AlertDescription className="text-amber-900 dark:text-amber-100/90">{error}</AlertDescription>
+          <AlertDescription className="text-amber-900 dark:text-amber-100/90">
+            {error}
+          </AlertDescription>
         </Alert>
       )}
       <p className="text-muted-foreground text-xs">
@@ -134,7 +138,9 @@ export function MajorShareholdersTimeSeries({
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="sticky left-0 z-20 min-w-[200px] bg-background font-semibold">株主名</TableHead>
+              <TableHead className="sticky left-0 z-20 min-w-[200px] bg-background font-semibold">
+                株主名
+              </TableHead>
               {parsed.map((col) => (
                 <TableHead
                   key={`${col.periodEnd}-${col.docID}`}
@@ -149,7 +155,9 @@ export function MajorShareholdersTimeSeries({
             {rowNames.map((name) => (
               <TableRow key={name}>
                 <TableCell className="sticky left-0 z-10 max-w-[280px] bg-background font-medium align-top">
-                  <span className="line-clamp-3" title={name}>{name}</span>
+                  <span className="line-clamp-3" title={name}>
+                    {name}
+                  </span>
                 </TableCell>
                 {parsed.map((col) => {
                   const cell = col.byName.get(name);

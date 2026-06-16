@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 
 export type ColumnId =
   | "filerName"
@@ -56,7 +56,13 @@ export type ColumnId =
   | "roic"
   | "piotroskiFScore";
 
-export type ColumnCategory = "basic" | "valuation" | "performance" | "balancesheet" | "cash" | "growth";
+export type ColumnCategory =
+  | "basic"
+  | "valuation"
+  | "performance"
+  | "balancesheet"
+  | "cash"
+  | "growth";
 
 const COLUMN_CONFIG: { id: ColumnId; label: string; category: ColumnCategory }[] = [
   { id: "filerName", label: "会社名*", category: "basic" },
@@ -190,7 +196,9 @@ type ColumnVisibilityContextValue = {
 const ColumnVisibilityContext = createContext<ColumnVisibilityContextValue | null>(null);
 
 export function ColumnVisibilityProvider({ children }: { children: ReactNode }) {
-  const [visibility, setVisibility] = useState<Record<ColumnId, boolean>>(() => buildDefaultVisibility());
+  const [visibility, setVisibility] = useState<Record<ColumnId, boolean>>(() =>
+    buildDefaultVisibility(),
+  );
 
   useEffect(() => {
     setVisibility(loadVisibility());
@@ -211,12 +219,18 @@ export function ColumnVisibilityProvider({ children }: { children: ReactNode }) 
   }, []);
 
   const showAll = useCallback(() => {
-    setVisibility(normalizeVisibility(COLUMN_IDS.reduce((acc, id) => ({ ...acc, [id]: true }), {} as Record<ColumnId, boolean>)));
+    setVisibility(
+      normalizeVisibility(
+        COLUMN_IDS.reduce((acc, id) => ({ ...acc, [id]: true }), {} as Record<ColumnId, boolean>),
+      ),
+    );
   }, []);
 
   const hideAll = useCallback(() => {
     setVisibility(
-      normalizeVisibility(COLUMN_IDS.reduce((acc, id) => ({ ...acc, [id]: false }), {} as Record<ColumnId, boolean>)),
+      normalizeVisibility(
+        COLUMN_IDS.reduce((acc, id) => ({ ...acc, [id]: false }), {} as Record<ColumnId, boolean>),
+      ),
     );
   }, []);
 
@@ -224,7 +238,10 @@ export function ColumnVisibilityProvider({ children }: { children: ReactNode }) 
     setVisibility(buildDefaultVisibility());
   }, []);
 
-  const columnLabel = useCallback((id: ColumnId) => COLUMN_CONFIG.find((c) => c.id === id)?.label ?? id, []);
+  const columnLabel = useCallback(
+    (id: ColumnId) => COLUMN_CONFIG.find((c) => c.id === id)?.label ?? id,
+    [],
+  );
 
   const getCategoryLabel = useCallback((cat: ColumnCategory) => CATEGORY_LABELS[cat], []);
 
@@ -257,4 +274,10 @@ export function useColumnVisibility() {
   return ctx;
 }
 
-export { COLUMN_IDS, COLUMN_CONFIG, CATEGORY_LABELS, REQUIRED_COLUMN_IDS, DEFAULT_VISIBLE_COLUMN_IDS };
+export {
+  COLUMN_IDS,
+  COLUMN_CONFIG,
+  CATEGORY_LABELS,
+  REQUIRED_COLUMN_IDS,
+  DEFAULT_VISIBLE_COLUMN_IDS,
+};

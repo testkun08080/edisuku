@@ -1,7 +1,7 @@
+import { ArrowRight, Github } from "lucide-react";
+import { GITHUB_DOCS, GITHUB_REPO, SCREENER } from "../../lib/routes";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { GITHUB_DOCS, GITHUB_REPO, SCREENER } from "../../lib/routes";
-import { ArrowRight, Github } from "lucide-react";
 
 const OSS_STATS = [
   { value: "MIT", label: "ライセンス" },
@@ -27,11 +27,16 @@ export function LandingOpenSource() {
             <span className="font-light text-white/55">完全オープンソース</span>
           </h2>
           <p className="mx-auto mt-5 max-w-lg text-sm font-light leading-relaxed text-white/45 sm:text-base">
-            ソースコードは GitHub で公開中。Cloudflare Workers を使って自分のアカウントにデプロイして、
+            ソースコードは GitHub で公開中。Cloudflare Workers
+            を使って自分のアカウントにデプロイして、
             プライベートな環境でご利用いただけます。貢献も歓迎しています。
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" className="bg-background text-foreground shadow-sm hover:bg-background/90" asChild>
+            <Button
+              size="lg"
+              className="bg-background text-foreground shadow-sm hover:bg-background/90"
+              asChild
+            >
               <a href={SCREENER}>
                 スクリーナーを開く
                 <ArrowRight className="size-4" />

@@ -4,16 +4,20 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import type { NameType, Payload, ValueType } from "recharts/types/component/DefaultTooltipContent";
 import {
+  pickCfDividendPaid,
+  pickPlRevenueForChart,
+  pickSummaryRevenueForChart,
+} from "../lib/financial-pickers.js";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import {
+  type ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-  type ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
 } from "./ui/chart";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
-import { pickCfDividendPaid, pickPlRevenueForChart, pickSummaryRevenueForChart } from "../lib/financial-pickers.js";
 
 type Period = {
   periodEnd: string;
@@ -32,7 +36,7 @@ export type DividendMetricsSnapshot = {
 
 function parseIntYen(raw: string | undefined): number | null {
   if (raw == null || raw === "" || raw === "－") return null;
-  const n = parseInt(String(raw).replace(/,/g, ""), 10);
+  const n = Number.parseInt(String(raw).replace(/,/g, ""), 10);
   return Number.isFinite(n) ? n : null;
 }
 
@@ -90,7 +94,9 @@ const bnTooltipFormatter = (
 const periodTooltipLabelFormatter = (label: unknown, _payload: unknown): ReactNode => (
   <div className="border-border/60 mb-1 border-b pb-1.5 text-[11px] leading-tight">
     <span className="text-muted-foreground">決算期末日</span>
-    <div className="mt-0.5 font-medium tabular-nums text-foreground">{formatPeriodTooltip(String(label ?? ""))}</div>
+    <div className="mt-0.5 font-medium tabular-nums text-foreground">
+      {formatPeriodTooltip(String(label ?? ""))}
+    </div>
   </div>
 );
 
@@ -138,7 +144,10 @@ const bsChartConfig = {
   },
 } satisfies ChartConfig;
 
-export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics: DividendMetricsSnapshot }) {
+export function SummaryCharts({
+  periods,
+  metrics,
+}: { periods: Period[]; metrics: DividendMetricsSnapshot }) {
   const list = periods ?? [];
   const [mounted, setMounted] = useState(false);
 
@@ -206,7 +215,9 @@ export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics
   const hasSales = salesRows.some((r) => r.sales != null);
   const hasDividend = dividendRows.some((r) => r.dividend != null);
   const hasPl = plRows.some((r) => r.revenue != null || r.operating != null || r.netIncome != null);
-  const hasBs = bsRows.some((r) => r.totalAssets != null || r.liabilities != null || r.netAssets != null);
+  const hasBs = bsRows.some(
+    (r) => r.totalAssets != null || r.liabilities != null || r.netAssets != null,
+  );
 
   const yAxisProps = {
     tickLine: false,
@@ -247,13 +258,19 @@ export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">売上高の推移</CardTitle>
-            <CardDescription>summary の「売上高」または IFRS「売上収益（IFRS）」（百万円）</CardDescription>
+            <CardDescription>
+              summary の「売上高」または IFRS「売上収益（IFRS）」（百万円）
+            </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             {hasSales ? (
               <ChartContainer config={salesChartConfig} className="aspect-auto h-64 w-full md:h-72">
                 <BarChart accessibilityLayer data={salesRows} margin={chartMargins}>
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/50" />
+                  <CartesianGrid
+                    vertical={false}
+                    strokeDasharray="3 3"
+                    className="stroke-border/50"
+                  />
                   <XAxis {...xAxisProps} />
                   <YAxis {...yAxisProps} tickFormatter={(v: number) => String(v)} />
                   <ChartTooltip
@@ -266,11 +283,19 @@ export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics
                       />
                     }
                   />
-                  <Bar name="売上高" dataKey="sales" fill="var(--color-sales)" radius={[5, 5, 0, 0]} maxBarSize={52} />
+                  <Bar
+                    name="売上高"
+                    dataKey="sales"
+                    fill="var(--color-sales)"
+                    radius={[5, 5, 0, 0]}
+                    maxBarSize={52}
+                  />
                 </BarChart>
               </ChartContainer>
             ) : (
-              <p className="text-muted-foreground py-10 text-center text-sm">表示できる売上データがありません。</p>
+              <p className="text-muted-foreground py-10 text-center text-sm">
+                表示できる売上データがありません。
+              </p>
             )}
           </CardContent>
         </Card>
@@ -284,9 +309,16 @@ export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics
           </CardHeader>
           <CardContent className="pt-0">
             {hasDividend ? (
-              <ChartContainer config={dividendChartConfig} className="aspect-auto h-64 w-full md:h-72">
+              <ChartContainer
+                config={dividendChartConfig}
+                className="aspect-auto h-64 w-full md:h-72"
+              >
                 <BarChart accessibilityLayer data={dividendRows} margin={chartMargins}>
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/50" />
+                  <CartesianGrid
+                    vertical={false}
+                    strokeDasharray="3 3"
+                    className="stroke-border/50"
+                  />
                   <XAxis {...xAxisProps} />
                   <YAxis {...yAxisProps} tickFormatter={(v: number) => String(v)} />
                   <ChartTooltip
@@ -327,7 +359,11 @@ export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics
             {hasPl ? (
               <ChartContainer config={plChartConfig} className="aspect-auto h-64 w-full md:h-80">
                 <BarChart accessibilityLayer data={plRows} margin={chartMargins}>
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/50" />
+                  <CartesianGrid
+                    vertical={false}
+                    strokeDasharray="3 3"
+                    className="stroke-border/50"
+                  />
                   <XAxis {...xAxisProps} />
                   <YAxis {...yAxisProps} tickFormatter={(v: number) => String(v)} />
                   <ChartTooltip
@@ -365,7 +401,9 @@ export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics
                 </BarChart>
               </ChartContainer>
             ) : (
-              <p className="text-muted-foreground py-10 text-center text-sm">PL の数値が取得できません。</p>
+              <p className="text-muted-foreground py-10 text-center text-sm">
+                PL の数値が取得できません。
+              </p>
             )}
           </CardContent>
         </Card>
@@ -379,7 +417,11 @@ export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics
             {hasBs ? (
               <ChartContainer config={bsChartConfig} className="aspect-auto h-64 w-full md:h-80">
                 <BarChart accessibilityLayer data={bsRows} margin={chartMargins}>
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border/50" />
+                  <CartesianGrid
+                    vertical={false}
+                    strokeDasharray="3 3"
+                    className="stroke-border/50"
+                  />
                   <XAxis {...xAxisProps} />
                   <YAxis {...yAxisProps} tickFormatter={(v: number) => String(v)} />
                   <ChartTooltip
@@ -417,7 +459,9 @@ export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics
                 </BarChart>
               </ChartContainer>
             ) : (
-              <p className="text-muted-foreground py-10 text-center text-sm">BS の数値が取得できません。</p>
+              <p className="text-muted-foreground py-10 text-center text-sm">
+                BS の数値が取得できません。
+              </p>
             )}
           </CardContent>
         </Card>
@@ -453,8 +497,10 @@ export function SummaryCharts({ periods, metrics }: { periods: Period[]; metrics
                   <dd className="mt-1 font-semibold tabular-nums">
                     {metrics.payoutRatio != null && metrics.payoutRatio !== ""
                       ? (() => {
-                          const r = parseFloat(metrics.payoutRatio);
-                          return Number.isFinite(r) ? `${(r * 100).toFixed(2)}%` : metrics.payoutRatio;
+                          const r = Number.parseFloat(metrics.payoutRatio);
+                          return Number.isFinite(r)
+                            ? `${(r * 100).toFixed(2)}%`
+                            : metrics.payoutRatio;
                         })()
                       : "―"}
                   </dd>

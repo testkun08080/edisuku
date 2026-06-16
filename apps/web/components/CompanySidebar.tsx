@@ -1,14 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  BarChart3,
+  Clock,
+  Home,
+  Mail,
+  Search,
+  Shield,
+  SlidersHorizontal,
+  Star,
+  Trash2,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { usePageContext } from "vike-react/usePageContext";
-import { useFilters } from "./FilterContext.js";
-import { useFavorites } from "./FavoritesContext.js";
-import { useRecentCompanies } from "./RecentCompaniesContext.js";
 import logoUrl from "../assets/logo.png";
 import { api } from "../lib/api";
 import { SITE_NAME, SITE_TAGLINE } from "../lib/brand";
 import { SCREENER, analyzePath } from "../lib/routes";
+import { DynamicFilterPanel } from "./DynamicFilterPanel.js";
+import { useFavorites } from "./FavoritesContext.js";
+import { useFilters } from "./FilterContext.js";
+import { useRecentCompanies } from "./RecentCompaniesContext.js";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { ScrollArea } from "./ui/scroll-area";
 import {
   Sidebar,
   SidebarContent,
@@ -20,15 +36,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
   SidebarRail,
+  SidebarSeparator,
 } from "./ui/sidebar";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { ScrollArea } from "./ui/scroll-area";
-import { Search, Star, Clock, Home, BarChart3, SlidersHorizontal, Trash2, Shield, Mail } from "lucide-react";
-import { DynamicFilterPanel } from "./DynamicFilterPanel.js";
 
 type CompanyItem = { secCode: string; filerName: string };
 
@@ -175,7 +185,9 @@ export function AppSidebar() {
                   {Array.from(favorites).length === 0 ? (
                     <SidebarMenuItem>
                       <SidebarMenuButton disabled>
-                        <span className="text-muted-foreground text-xs">お気に入りがありません</span>
+                        <span className="text-muted-foreground text-xs">
+                          お気に入りがありません
+                        </span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ) : (
@@ -292,7 +304,12 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={urlPathname === "/contact"} size="sm" tooltip="お問い合わせ">
+                <SidebarMenuButton
+                  asChild
+                  isActive={urlPathname === "/contact"}
+                  size="sm"
+                  tooltip="お問い合わせ"
+                >
                   <a href="/contact">
                     <Mail className="size-3.5" />
                     <span>お問い合わせ</span>

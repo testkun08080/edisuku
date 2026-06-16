@@ -4,7 +4,7 @@ export type {
 } from "@edinet/metrics";
 export { metricsFromPeriods } from "@edinet/metrics";
 
-import { compareSubmitDateTime, type CompanySummary } from "@edinet/metrics";
+import { type CompanySummary, compareSubmitDateTime } from "@edinet/metrics";
 
 function docDescriptionFromPeriod(p: Record<string, unknown>): string {
   const explicit = String(p.docDescription ?? "");
@@ -38,7 +38,9 @@ function blockToStringRecord(block: unknown): Record<string, string> {
 /**
  * 同一提出（periodEnd + docID）の重複行を除去。提出日時が新しい方を残す。
  */
-function dedupePeriodsByPeriodEndAndDoc(periods: CompanySummary["periods"]): CompanySummary["periods"] {
+function dedupePeriodsByPeriodEndAndDoc(
+  periods: CompanySummary["periods"],
+): CompanySummary["periods"] {
   const map = new Map<string, CompanySummary["periods"][0]>();
   for (const p of periods) {
     const key = `${p.periodEnd}\0${p.docID}`;

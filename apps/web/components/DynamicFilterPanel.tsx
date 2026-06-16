@@ -46,7 +46,10 @@ export function DynamicFilterPanel() {
           return (
             <div key={rule.id} className="rounded-md border border-border/60 p-2 space-y-1.5">
               <div className="flex items-center gap-1">
-                <Select value={rule.fieldId} onValueChange={(v) => updateRule(rule.id, { fieldId: v })}>
+                <Select
+                  value={rule.fieldId}
+                  onValueChange={(v) => updateRule(rule.id, { fieldId: v })}
+                >
                   <SelectTrigger size="sm" className="h-7 flex-1 text-xs">
                     <SelectValue />
                   </SelectTrigger>

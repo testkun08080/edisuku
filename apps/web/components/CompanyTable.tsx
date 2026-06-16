@@ -1,18 +1,27 @@
 "use client";
 
-import { useState, useEffect, useMemo, type ReactNode } from "react";
-import { useFilters } from "./FilterContext.js";
-import { useColumnVisibility, type ColumnId } from "./ColumnVisibilityContext.js";
-import { useFavorites } from "./FavoritesContext.js";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { Skeleton } from "./ui/skeleton";
-import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Star } from "lucide-react";
-import { formatRatioDecimalStringAsPercent, formatYenStringAsMillionYen } from "../lib/metricFormat.js";
-import { analyzePath } from "../lib/routes";
-import { loadCompanyMetrics, getScreenerMode, buildMetricsQueryParams, queryCompanyMetricsPage, type CompanyMetric } from "../lib/metricsLoader";
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { passesFilter } from "../lib/filterEngine.js";
+import {
+  formatRatioDecimalStringAsPercent,
+  formatYenStringAsMillionYen,
+} from "../lib/metricFormat.js";
+import {
+  type CompanyMetric,
+  buildMetricsQueryParams,
+  getScreenerMode,
+  loadCompanyMetrics,
+  queryCompanyMetricsPage,
+} from "../lib/metricsLoader";
+import { analyzePath } from "../lib/routes";
+import { type ColumnId, useColumnVisibility } from "./ColumnVisibilityContext.js";
+import { useFavorites } from "./FavoritesContext.js";
+import { useFilters } from "./FilterContext.js";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Skeleton } from "./ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
 export type { CompanyMetric };
 
@@ -20,17 +29,24 @@ const formatSales = formatYenStringAsMillionYen;
 const formatRatio = formatRatioDecimalStringAsPercent;
 const ROW_LIMIT_OPTIONS = ["50", "100", "200", "500"] as const;
 const SERVER_MODE = getScreenerMode() === "server";
-const SERVER_SORT_COLUMNS = new Set<ColumnId>(["filerName", "calcDate", "sales", "ROE", "totalAssets", "equityRatio"]);
+const SERVER_SORT_COLUMNS = new Set<ColumnId>([
+  "filerName",
+  "calcDate",
+  "sales",
+  "ROE",
+  "totalAssets",
+  "equityRatio",
+]);
 
 function parseMetricNumber(value: string | number | null | undefined): number {
   if (typeof value === "number") return value;
-  if (typeof value !== "string") return NaN;
+  if (typeof value !== "string") return Number.NaN;
   return Number(value.replace(/,/g, "").trim());
 }
 
 function sortNum(value: string | number | null | undefined): number {
   const n = parseMetricNumber(value);
-  return Number.isFinite(n) ? n : -Infinity;
+  return Number.isFinite(n) ? n : Number.NEGATIVE_INFINITY;
 }
 
 function formatDisplayName(name: string): string {
@@ -69,13 +85,17 @@ function getCellValue(
                 e.stopPropagation();
                 favHelpers.toggleFavorite(m.secCode);
               }}
-              aria-label={favHelpers.isFavorite(m.secCode) ? "お気に入りから外す" : "お気に入りに追加"}
+              aria-label={
+                favHelpers.isFavorite(m.secCode) ? "お気に入りから外す" : "お気に入りに追加"
+              }
               title={favHelpers.isFavorite(m.secCode) ? "お気に入りから外す" : "お気に入りに追加"}
               className="h-5 w-5"
             >
               <Star
                 className={`size-3.5 ${
-                  favHelpers.isFavorite(m.secCode) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
+                  favHelpers.isFavorite(m.secCode)
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "text-muted-foreground"
                 }`}
               />
             </Button>
@@ -218,17 +238,17 @@ function getSortValue(m: CompanyMetric, colId: ColumnId): number | string {
     case "fiscalMonth":
       return m.fiscalMonth ?? "";
     case "PER":
-      return m.PER ?? -Infinity;
+      return m.PER ?? Number.NEGATIVE_INFINITY;
     case "PBR":
-      return m.PBR ?? -Infinity;
+      return m.PBR ?? Number.NEGATIVE_INFINITY;
     case "dividendYield":
-      return m.dividendYield ?? -Infinity;
+      return m.dividendYield ?? Number.NEGATIVE_INFINITY;
     case "marketCap":
-      return m.marketCap ?? -Infinity;
+      return m.marketCap ?? Number.NEGATIVE_INFINITY;
     case "netCash":
-      return m.netCash ?? -Infinity;
+      return m.netCash ?? Number.NEGATIVE_INFINITY;
     case "netCashRatio":
-      return m.netCashRatio ?? -Infinity;
+      return m.netCashRatio ?? Number.NEGATIVE_INFINITY;
     case "equityRatio":
       return sortNum(m.equityRatio);
     case "ROE":
@@ -256,16 +276,16 @@ function getSortValue(m: CompanyMetric, colId: ColumnId): number | string {
     case "operatingProfitRatio": {
       const s = parseMetricNumber(m.sales);
       const op = parseMetricNumber(m.operatingProfit);
-      if (isNaN(s) || s === 0) return -Infinity;
-      return isNaN(op) ? -Infinity : op / s;
+      if (isNaN(s) || s === 0) return Number.NEGATIVE_INFINITY;
+      return isNaN(op) ? Number.NEGATIVE_INFINITY : op / s;
     }
     case "netIncome":
       return sortNum(m.netIncome);
     case "netProfitRatio": {
       const s = parseMetricNumber(m.sales);
       const ni = parseMetricNumber(m.netIncome);
-      if (isNaN(s) || s === 0) return -Infinity;
-      return isNaN(ni) ? -Infinity : ni / s;
+      if (isNaN(s) || s === 0) return Number.NEGATIVE_INFINITY;
+      return isNaN(ni) ? Number.NEGATIVE_INFINITY : ni / s;
     }
     case "liabilities":
       return sortNum(m.liabilities);
@@ -310,15 +330,15 @@ function getSortValue(m: CompanyMetric, colId: ColumnId): number | string {
     case "salesCagr5y":
       return sortNum(m.salesCagr5y);
     case "consecutiveDivIncreases":
-      return m.consecutiveDivIncreases ?? -Infinity;
+      return m.consecutiveDivIncreases ?? Number.NEGATIVE_INFINITY;
     case "currentRatio":
-      return m.currentRatio ?? -Infinity;
+      return m.currentRatio ?? Number.NEGATIVE_INFINITY;
     case "deRatio":
-      return m.deRatio ?? -Infinity;
+      return m.deRatio ?? Number.NEGATIVE_INFINITY;
     case "roic":
-      return m.roic ?? -Infinity;
+      return m.roic ?? Number.NEGATIVE_INFINITY;
     case "piotroskiFScore":
-      return m.piotroskiFScore ?? -Infinity;
+      return m.piotroskiFScore ?? Number.NEGATIVE_INFINITY;
     default:
       return "";
   }
@@ -331,7 +351,12 @@ function getHeadAlign(colId: ColumnId): string {
 
 function getCellAlign(colId: ColumnId): string {
   if (colId === "filerName") return "";
-  if (colId === "secCode" || colId === "edinetCode" || colId === "calcDate" || colId === "fiscalMonth")
+  if (
+    colId === "secCode" ||
+    colId === "edinetCode" ||
+    colId === "calcDate" ||
+    colId === "fiscalMonth"
+  )
     return "tabular-nums";
   return "text-right tabular-nums";
 }
@@ -349,7 +374,9 @@ export function CompanyTable() {
 
   const parsedLimit = Number.parseInt(filters.itemCount, 10);
   const pageSize = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 50;
-  const itemCountSelectValue = ROW_LIMIT_OPTIONS.includes(filters.itemCount as (typeof ROW_LIMIT_OPTIONS)[number])
+  const itemCountSelectValue = ROW_LIMIT_OPTIONS.includes(
+    filters.itemCount as (typeof ROW_LIMIT_OPTIONS)[number],
+  )
     ? filters.itemCount
     : "50";
 
@@ -362,7 +389,13 @@ export function CompanyTable() {
         showOnlyFavorites: filters.showOnlyFavorites,
         itemCount: filters.itemCount,
       }),
-    [filters.searchName, filters.searchCode, filters.rules, filters.showOnlyFavorites, filters.itemCount],
+    [
+      filters.searchName,
+      filters.searchCode,
+      filters.rules,
+      filters.showOnlyFavorites,
+      filters.itemCount,
+    ],
   );
 
   const serverQuerySignature = useMemo(
@@ -466,7 +499,9 @@ export function CompanyTable() {
   const safePageIndex = Math.min(pageIndex, pageCount - 1);
   const rangeStart = totalRows === 0 ? 0 : safePageIndex * pageSize + 1;
   const rangeEnd = Math.min((safePageIndex + 1) * pageSize, totalRows);
-  const displayed = SERVER_MODE ? sorted : sorted.slice(safePageIndex * pageSize, safePageIndex * pageSize + pageSize);
+  const displayed = SERVER_MODE
+    ? sorted
+    : sorted.slice(safePageIndex * pageSize, safePageIndex * pageSize + pageSize);
 
   if (loading) {
     return (
@@ -481,7 +516,9 @@ export function CompanyTable() {
   if (filtered.length === 0 && !loading) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center">
-        <p className="text-muted-foreground text-sm">該当する企業がありません。フィルターを緩めてください。</p>
+        <p className="text-muted-foreground text-sm">
+          該当する企業がありません。フィルターを緩めてください。
+        </p>
       </div>
     );
   }
@@ -489,7 +526,9 @@ export function CompanyTable() {
   if (!hasColumns) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center">
-        <p className="text-muted-foreground text-sm">右上の「表示列」で表示する列を選択してください。</p>
+        <p className="text-muted-foreground text-sm">
+          右上の「表示列」で表示する列を選択してください。
+        </p>
       </div>
     );
   }
@@ -499,7 +538,8 @@ export function CompanyTable() {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/30 px-3 py-2">
         <span className="text-xs text-muted-foreground">
           {totalRows.toLocaleString()}件中{" "}
-          {totalRows === 0 ? "0" : `${rangeStart.toLocaleString()}〜${rangeEnd.toLocaleString()}`}件を表示
+          {totalRows === 0 ? "0" : `${rangeStart.toLocaleString()}〜${rangeEnd.toLocaleString()}`}
+          件を表示
         </span>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1">
@@ -577,7 +617,9 @@ export function CompanyTable() {
                 <TableCell
                   key={id}
                   className={`${getCellAlign(id)} ${
-                    id === "filerName" ? "md:sticky md:left-0 md:z-10 bg-background font-medium" : ""
+                    id === "filerName"
+                      ? "md:sticky md:left-0 md:z-10 bg-background font-medium"
+                      : ""
                   }`}
                 >
                   {getCellValue(m, id, { isFavorite, toggleFavorite })}

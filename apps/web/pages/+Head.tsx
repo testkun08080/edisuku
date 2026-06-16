@@ -2,6 +2,7 @@
 
 import logoUrl from "../assets/logo.svg";
 import {
+  SITE_KEYWORDS,
   SITE_NAME,
   SITE_OG_DESCRIPTION,
   SITE_OG_IMAGE_ALT,
@@ -10,7 +11,6 @@ import {
   SITE_OG_IMAGE_SQUARE_PATH,
   SITE_OG_IMAGE_SQUARE_SIZE,
   SITE_OG_IMAGE_WIDTH,
-  SITE_KEYWORDS,
 } from "../lib/brand";
 
 export function Head() {
@@ -23,10 +23,7 @@ export function Head() {
   return (
     <>
       <meta charSet="UTF-8" />
-      <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, viewport-fit=cover"
-      />
+      <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       <meta name="description" content={siteDescription} />
       <meta name="keywords" content={SITE_KEYWORDS} />
       <meta name="author" content="edisuku" />
@@ -38,12 +35,8 @@ export function Head() {
       <meta property="og:type" content="website" />
       {siteUrl && <meta property="og:url" content={siteUrl} />}
       {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-      {ogImageUrl && (
-        <meta property="og:image:width" content={String(SITE_OG_IMAGE_WIDTH)} />
-      )}
-      {ogImageUrl && (
-        <meta property="og:image:height" content={String(SITE_OG_IMAGE_HEIGHT)} />
-      )}
+      {ogImageUrl && <meta property="og:image:width" content={String(SITE_OG_IMAGE_WIDTH)} />}
+      {ogImageUrl && <meta property="og:image:height" content={String(SITE_OG_IMAGE_HEIGHT)} />}
       {ogImageUrl && <meta property="og:image:alt" content={SITE_OG_IMAGE_ALT} />}
       {ogImageSquareUrl && <meta property="og:image" content={ogImageSquareUrl} />}
       {ogImageSquareUrl && (
@@ -94,7 +87,6 @@ export function Head() {
           }),
         }}
       ></script>
-
     </>
   );
 }

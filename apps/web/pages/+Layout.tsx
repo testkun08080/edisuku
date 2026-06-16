@@ -3,16 +3,21 @@
 import "./Layout.css";
 import "./tailwind.css";
 import { useEffect } from "react";
-import { AppSidebar } from "../components/CompanySidebar";
-import { FilterProvider } from "../components/FilterContext";
-import { ColumnVisibilityProvider } from "../components/ColumnVisibilityContext";
-import { FavoritesProvider } from "../components/FavoritesContext";
-import { RecentCompaniesProvider } from "../components/RecentCompaniesContext";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "../components/ui/sidebar";
-import { TooltipProvider } from "../components/ui/tooltip";
-import { Separator } from "../components/ui/separator";
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "../components/ui/breadcrumb";
 import { usePageContext } from "vike-react/usePageContext";
+import { ColumnVisibilityProvider } from "../components/ColumnVisibilityContext";
+import { AppSidebar } from "../components/CompanySidebar";
+import { FavoritesProvider } from "../components/FavoritesContext";
+import { FilterProvider } from "../components/FilterContext";
+import { RecentCompaniesProvider } from "../components/RecentCompaniesContext";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+} from "../components/ui/breadcrumb";
+import { Separator } from "../components/ui/separator";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
+import { TooltipProvider } from "../components/ui/tooltip";
 import { initializeGA, trackPageView } from "../lib/analytics";
 import { SCREENER } from "../lib/routes";
 

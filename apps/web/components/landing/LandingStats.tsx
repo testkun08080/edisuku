@@ -14,10 +14,7 @@ function StatItem({
   const [val, ref] = useCountUp(target);
 
   return (
-    <div
-      ref={ref}
-      className="flex-1 border-r border-white/6 px-5 py-9 text-center last:border-r-0"
-    >
+    <div ref={ref} className="flex-1 border-r border-white/6 px-5 py-9 text-center last:border-r-0">
       <div className="font-mono text-3xl font-bold tracking-tight text-white sm:text-4xl">
         {val.toLocaleString()}
         <span className="font-light text-white/45">{suffix}</span>

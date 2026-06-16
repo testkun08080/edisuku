@@ -1,6 +1,12 @@
 import { ExternalLink } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import {
   CONTACT_FORM_EMBED_URL as DEFAULT_CONTACT_FORM_EMBED_URL,
   CONTACT_FORM_URL as DEFAULT_CONTACT_FORM_URL,
@@ -31,7 +37,9 @@ export default function Page() {
         <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
           <div className="space-y-1.5">
             <CardTitle className="text-lg">お問い合わせフォーム</CardTitle>
-            <CardDescription>メールアドレス・お名前・お問い合わせ内容をご記入のうえ送信してください。</CardDescription>
+            <CardDescription>
+              メールアドレス・お名前・お問い合わせ内容をご記入のうえ送信してください。
+            </CardDescription>
           </div>
           <Button variant="outline" size="sm" asChild className="shrink-0">
             <a href={contactFormUrl} target="_blank" rel="noopener noreferrer">

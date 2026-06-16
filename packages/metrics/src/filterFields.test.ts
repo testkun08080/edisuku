@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import screenerColumnsJson from "./screener_columns.json";
-import filterFieldsJson from "./filter_fields.json";
 import { getFilterFields } from "./filterFields.js";
+import filterFieldsJson from "./filter_fields.json";
+import screenerColumnsJson from "./screener_columns.json";
 
 describe("filter_fields.json", () => {
   const screenerIds = new Set(

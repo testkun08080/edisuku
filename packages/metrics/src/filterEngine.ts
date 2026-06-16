@@ -1,14 +1,14 @@
-import type { CompanyMetricsRow } from "./types.js";
-import { getFilterFieldById } from "./filterFields.js";
 import type { FilterFieldDefinition, NumericFilterRule } from "@edinet/types";
+import { getFilterFieldById } from "./filterFields.js";
+import type { CompanyMetricsRow } from "./types.js";
 
 export type MetricRow = CompanyMetricsRow & Record<string, string | number | null | undefined>;
 
 function parseMetricNumber(value: string | number | null | undefined): number {
   if (typeof value === "number") return value;
-  if (typeof value !== "string") return NaN;
+  if (typeof value !== "string") return Number.NaN;
   const cleaned = value.replace(/,/g, "").trim();
-  if (cleaned === "" || cleaned === "－" || cleaned === "-") return NaN;
+  if (cleaned === "" || cleaned === "－" || cleaned === "-") return Number.NaN;
   return Number.parseFloat(cleaned);
 }
 
@@ -107,7 +107,10 @@ export function passesFilter(
   showOnlyFavorites: boolean,
 ): boolean {
   if (showOnlyFavorites && !favorites.has(row.secCode)) return false;
-  if (text.searchName.trim() && !row.filerName.toLowerCase().includes(text.searchName.trim().toLowerCase())) {
+  if (
+    text.searchName.trim() &&
+    !row.filerName.toLowerCase().includes(text.searchName.trim().toLowerCase())
+  ) {
     return false;
   }
   if (text.searchCode.trim() && !row.secCode.includes(text.searchCode.trim())) return false;
@@ -159,18 +162,20 @@ export function rulesToServerFilterBounds(rules: NumericFilterRule[]): ServerFil
     const key = field.serverFilterKey;
     if (key === "roe" || key === "equityRatio") {
       if (rule.min.trim()) {
-        bounds[`min${key === "roe" ? "Roe" : "EquityRatio"}` as keyof ServerFilterBounds] = mergeBound(
-          bounds[`min${key === "roe" ? "Roe" : "EquityRatio"}` as keyof ServerFilterBounds],
-          percentInputToDecimal(rule.min),
-          "min",
-        );
+        bounds[`min${key === "roe" ? "Roe" : "EquityRatio"}` as keyof ServerFilterBounds] =
+          mergeBound(
+            bounds[`min${key === "roe" ? "Roe" : "EquityRatio"}` as keyof ServerFilterBounds],
+            percentInputToDecimal(rule.min),
+            "min",
+          );
       }
       if (rule.max.trim()) {
-        bounds[`max${key === "roe" ? "Roe" : "EquityRatio"}` as keyof ServerFilterBounds] = mergeBound(
-          bounds[`max${key === "roe" ? "Roe" : "EquityRatio"}` as keyof ServerFilterBounds],
-          percentInputToDecimal(rule.max),
-          "max",
-        );
+        bounds[`max${key === "roe" ? "Roe" : "EquityRatio"}` as keyof ServerFilterBounds] =
+          mergeBound(
+            bounds[`max${key === "roe" ? "Roe" : "EquityRatio"}` as keyof ServerFilterBounds],
+            percentInputToDecimal(rule.max),
+            "max",
+          );
       }
     } else if (key === "sales" || key === "totalAssets") {
       const minKey = key === "sales" ? "minSales" : "minTotalAssets";
@@ -208,11 +213,19 @@ export function legacyParamsToRules(params: URLSearchParams): NumericFilterRule[
     return n > 1 ? String(n) : String(n * 100);
   };
 
-  add("equityRatio", legacyPercent(params.get("minEquityRatio")), legacyPercent(params.get("maxEquityRatio")));
+  add(
+    "equityRatio",
+    legacyPercent(params.get("minEquityRatio")),
+    legacyPercent(params.get("maxEquityRatio")),
+  );
   add("EPS", params.get("minEps") ?? undefined, params.get("maxEps") ?? undefined);
   add("sales", params.get("minSales") ?? undefined, params.get("maxSales") ?? undefined);
   add("ROE", legacyPercent(params.get("minRoe")), legacyPercent(params.get("maxRoe")));
-  add("totalAssets", params.get("minTotalAssets") ?? undefined, params.get("maxTotalAssets") ?? undefined);
+  add(
+    "totalAssets",
+    params.get("minTotalAssets") ?? undefined,
+    params.get("maxTotalAssets") ?? undefined,
+  );
 
   return rules;
 }
@@ -247,7 +260,10 @@ export function deserializeRules(raw: string): NumericFilterRule[] {
 
 export function createEmptyRule(fieldId = "ROE"): NumericFilterRule {
   return {
-    id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `rule-${Date.now()}`,
+    id:
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `rule-${Date.now()}`,
     fieldId,
     min: "",
     max: "",

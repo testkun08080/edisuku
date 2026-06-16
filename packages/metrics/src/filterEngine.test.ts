@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import type { CompanyMetricsRow } from "./types.js";
 import {
+  deserializeRules,
   getMetricValue,
-  passesRules,
   legacyParamsToRules,
+  passesRules,
   rulesToServerFilterBounds,
   serializeRules,
-  deserializeRules,
 } from "./filterEngine.js";
 import { getFilterFieldById } from "./filterFields.js";
+import type { CompanyMetricsRow } from "./types.js";
 
 const sampleRow: CompanyMetricsRow = {
   edinetCode: "E00000",

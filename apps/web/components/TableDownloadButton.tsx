@@ -1,17 +1,20 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useFilters } from "./FilterContext.js";
-import { useColumnVisibility, type ColumnId } from "./ColumnVisibilityContext.js";
-import { useFavorites } from "./FavoritesContext.js";
-import { loadCompanyMetrics } from "../lib/metricsLoader.js";
+import { Download, Loader2 } from "lucide-react";
+import { useCallback, useState } from "react";
+import { CSV_EXPORT_ENABLED } from "../lib/features.js";
 import { passesFilter } from "../lib/filterEngine.js";
+import {
+  formatRatioDecimalStringAsPercent,
+  formatYenStringAsMillionYen,
+} from "../lib/metricFormat.js";
+import { loadCompanyMetrics } from "../lib/metricsLoader.js";
 import type { CompanyMetric } from "../lib/metricsLoader.js";
+import { type ColumnId, useColumnVisibility } from "./ColumnVisibilityContext.js";
+import { useFavorites } from "./FavoritesContext.js";
+import { useFilters } from "./FilterContext.js";
 import { Button } from "./ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { Download, Loader2 } from "lucide-react";
-import { CSV_EXPORT_ENABLED } from "../lib/features.js";
-import { formatRatioDecimalStringAsPercent, formatYenStringAsMillionYen } from "../lib/metricFormat.js";
 
 const formatSales = formatYenStringAsMillionYen;
 const formatRatio = formatRatioDecimalStringAsPercent;
@@ -20,9 +23,12 @@ function formatDisplayName(name: string): string {
   return name.replace(/^株式会社\s*|\s*株式会社$/g, "").trim() || name;
 }
 
-function ratioOfSalesPct(numerator: string | null | undefined, sales: string | null | undefined): string {
-  const s = sales != null ? parseFloat(String(sales).replace(/,/g, "")) : NaN;
-  const n = numerator != null ? parseFloat(String(numerator).replace(/,/g, "")) : NaN;
+function ratioOfSalesPct(
+  numerator: string | null | undefined,
+  sales: string | null | undefined,
+): string {
+  const s = sales != null ? Number.parseFloat(String(sales).replace(/,/g, "")) : Number.NaN;
+  const n = numerator != null ? Number.parseFloat(String(numerator).replace(/,/g, "")) : Number.NaN;
   if (!Number.isFinite(s) || !Number.isFinite(n) || s === 0) return "－";
   return ((n / s) * 100).toFixed(2) + "%";
 }
@@ -94,8 +100,9 @@ function getCellValueForExport(m: CompanyMetric, colId: ColumnId): string {
     case "dividendPerShare":
       return m.dividendPerShare ?? "－";
     case "sharesOutstanding": {
-      if (m.sharesOutstanding == null || m.sharesOutstanding === "" || m.sharesOutstanding === "－") return "－";
-      const n = parseInt(String(m.sharesOutstanding).replace(/,/g, ""), 10);
+      if (m.sharesOutstanding == null || m.sharesOutstanding === "" || m.sharesOutstanding === "－")
+        return "－";
+      const n = Number.parseInt(String(m.sharesOutstanding).replace(/,/g, ""), 10);
       return Number.isFinite(n) ? n.toLocaleString() : "－";
     }
     case "recurringProfit":

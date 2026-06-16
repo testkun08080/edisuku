@@ -1,13 +1,13 @@
 "use client";
 
-import { CompanyTable } from "../../components/CompanyTable";
 import { ColumnVisibilityControls } from "../../components/ColumnVisibilityControls";
+import { CompanyTable } from "../../components/CompanyTable";
 import { FavoritesViewToggle } from "../../components/FavoritesViewToggle";
-import { TableDownloadButton } from "../../components/TableDownloadButton";
 import { PresetScreeners } from "../../components/PresetScreeners";
 import { ShareButton } from "../../components/ShareButton";
-import { Card, CardHeader, CardAction } from "../../components/ui/card";
+import { TableDownloadButton } from "../../components/TableDownloadButton";
 import { Badge } from "../../components/ui/badge";
+import { Card, CardAction, CardHeader } from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
 
 export default function Page() {

@@ -1,20 +1,28 @@
 "use client";
 
+import { Columns3 } from "lucide-react";
 import { useColumnVisibility } from "./ColumnVisibilityContext.js";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Columns3 } from "lucide-react";
 
 export function ColumnVisibilityControls() {
-  const { visibility, toggleColumn, showAll, hideAll, resetColumns, columnConfig, getCategoryLabel, isRequiredColumn } =
-    useColumnVisibility();
+  const {
+    visibility,
+    toggleColumn,
+    showAll,
+    hideAll,
+    resetColumns,
+    columnConfig,
+    getCategoryLabel,
+    isRequiredColumn,
+  } = useColumnVisibility();
 
   return (
     <DropdownMenu>
@@ -25,30 +33,32 @@ export function ColumnVisibilityControls() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64 max-h-[70vh] overflow-y-auto">
-        {(["basic", "valuation", "performance", "balancesheet", "cash", "growth"] as const).map((cat, catIdx) => {
-          const cols = columnConfig.filter((c) => c.category === cat);
-          if (cols.length === 0) return null;
-          return (
-            <div key={cat}>
-              {catIdx > 0 && <DropdownMenuSeparator />}
-              <DropdownMenuLabel className="text-xs">{getCategoryLabel(cat)}</DropdownMenuLabel>
-              {cols.map((c) => {
-                const required = isRequiredColumn(c.id);
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={c.id}
-                    checked={!!visibility[c.id]}
-                    disabled={required}
-                    onCheckedChange={() => toggleColumn(c.id)}
-                    onSelect={(e: Event) => e.preventDefault()}
-                  >
-                    {c.label}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-            </div>
-          );
-        })}
+        {(["basic", "valuation", "performance", "balancesheet", "cash", "growth"] as const).map(
+          (cat, catIdx) => {
+            const cols = columnConfig.filter((c) => c.category === cat);
+            if (cols.length === 0) return null;
+            return (
+              <div key={cat}>
+                {catIdx > 0 && <DropdownMenuSeparator />}
+                <DropdownMenuLabel className="text-xs">{getCategoryLabel(cat)}</DropdownMenuLabel>
+                {cols.map((c) => {
+                  const required = isRequiredColumn(c.id);
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={c.id}
+                      checked={!!visibility[c.id]}
+                      disabled={required}
+                      onCheckedChange={() => toggleColumn(c.id)}
+                      onSelect={(e: Event) => e.preventDefault()}
+                    >
+                      {c.label}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+              </div>
+            );
+          },
+        )}
         <DropdownMenuSeparator />
         <div className="flex gap-1 px-2 py-1.5">
           <Button variant="ghost" size="xs" onClick={showAll}>

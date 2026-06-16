@@ -1,6 +1,6 @@
-import type { Config } from "vike/types";
 import vikePhoton from "vike-photon/config";
 import vikeReact from "vike-react/config";
+import type { Config } from "vike/types";
 import { SITE_NAME } from "../lib/brand";
 
 // Default config (can be overridden by pages)

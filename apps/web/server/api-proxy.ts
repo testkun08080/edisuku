@@ -1,5 +1,5 @@
-import { enhance } from "@universal-middleware/core";
 import { env } from "cloudflare:workers";
+import { enhance } from "@universal-middleware/core";
 
 const PROXY_QUERY = "_q";
 const API_KEY_HEADER = "X-Internal-Api-Key";

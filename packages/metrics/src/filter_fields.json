@@ -1,55 +1,341 @@
 {
   "fields": [
-    { "id": "PBR", "label": "PBR（倍）", "category": "valuation", "metricsKey": "PBR", "inputUnit": "multiple" },
-    { "id": "PER", "label": "PER（倍）", "category": "valuation", "metricsKey": "PER", "inputUnit": "multiple" },
-    { "id": "payoutRatio", "label": "配当性向（%）", "category": "valuation", "metricsKey": "payoutRatio", "inputUnit": "percent" },
-    { "id": "payoutRatioComputed", "label": "配当性向（算出・%）", "category": "valuation", "metricsKey": "payoutRatioComputed", "inputUnit": "percent" },
-    { "id": "dividendYield", "label": "配当利回り（%）", "category": "valuation", "metricsKey": "dividendYield", "inputUnit": "percent" },
-    { "id": "marketCap", "label": "時価総額（百万円）", "category": "valuation", "metricsKey": "marketCap", "inputUnit": "millionYen" },
-    { "id": "netCash", "label": "ネットキャッシュ（百万円）", "category": "valuation", "metricsKey": "netCash", "inputUnit": "millionYen" },
-    { "id": "netCashRatio", "label": "ネットキャッシュ比率（%）", "category": "valuation", "metricsKey": "netCashRatio", "inputUnit": "percent" },
-    { "id": "EPS", "label": "EPS（円）", "category": "valuation", "metricsKey": "EPS", "inputUnit": "yen" },
-    { "id": "dilutedEPS", "label": "希薄化EPS（円）", "category": "valuation", "metricsKey": "dilutedEPS", "inputUnit": "yen" },
-    { "id": "ROE", "label": "ROE（%）", "category": "valuation", "metricsKey": "ROE", "inputUnit": "percent", "serverFilterKey": "roe" },
-    { "id": "roeCalculated", "label": "ROE（算出・%）", "category": "valuation", "metricsKey": "roeCalculated", "inputUnit": "percent" },
-    { "id": "roa", "label": "ROA（%）", "category": "valuation", "metricsKey": "roa", "inputUnit": "percent" },
-    { "id": "equityRatio", "label": "自己資本比率（%）", "category": "valuation", "metricsKey": "equityRatio", "inputUnit": "percent", "serverFilterKey": "equityRatio" },
-    { "id": "equityRatioCalculated", "label": "自己資本比率（算出・%）", "category": "valuation", "metricsKey": "equityRatioCalculated", "inputUnit": "percent" },
-    { "id": "BPS", "label": "BPS（円）", "category": "valuation", "metricsKey": "BPS", "inputUnit": "yen" },
-    { "id": "dividendPerShare", "label": "1株当たり配当金（円）", "category": "valuation", "metricsKey": "dividendPerShare", "inputUnit": "yen" },
-    { "id": "sharesOutstanding", "label": "発行済株式総数（株）", "category": "valuation", "metricsKey": "sharesOutstanding", "inputUnit": "count" },
-    { "id": "roic", "label": "ROIC（%）", "category": "valuation", "metricsKey": "roic", "inputUnit": "percent" },
-    { "id": "piotroskiFScore", "label": "Piotroski F-Score", "category": "valuation", "metricsKey": "piotroskiFScore", "inputUnit": "count" },
+    {
+      "id": "PBR",
+      "label": "PBR（倍）",
+      "category": "valuation",
+      "metricsKey": "PBR",
+      "inputUnit": "multiple"
+    },
+    {
+      "id": "PER",
+      "label": "PER（倍）",
+      "category": "valuation",
+      "metricsKey": "PER",
+      "inputUnit": "multiple"
+    },
+    {
+      "id": "payoutRatio",
+      "label": "配当性向（%）",
+      "category": "valuation",
+      "metricsKey": "payoutRatio",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "payoutRatioComputed",
+      "label": "配当性向（算出・%）",
+      "category": "valuation",
+      "metricsKey": "payoutRatioComputed",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "dividendYield",
+      "label": "配当利回り（%）",
+      "category": "valuation",
+      "metricsKey": "dividendYield",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "marketCap",
+      "label": "時価総額（百万円）",
+      "category": "valuation",
+      "metricsKey": "marketCap",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "netCash",
+      "label": "ネットキャッシュ（百万円）",
+      "category": "valuation",
+      "metricsKey": "netCash",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "netCashRatio",
+      "label": "ネットキャッシュ比率（%）",
+      "category": "valuation",
+      "metricsKey": "netCashRatio",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "EPS",
+      "label": "EPS（円）",
+      "category": "valuation",
+      "metricsKey": "EPS",
+      "inputUnit": "yen"
+    },
+    {
+      "id": "dilutedEPS",
+      "label": "希薄化EPS（円）",
+      "category": "valuation",
+      "metricsKey": "dilutedEPS",
+      "inputUnit": "yen"
+    },
+    {
+      "id": "ROE",
+      "label": "ROE（%）",
+      "category": "valuation",
+      "metricsKey": "ROE",
+      "inputUnit": "percent",
+      "serverFilterKey": "roe"
+    },
+    {
+      "id": "roeCalculated",
+      "label": "ROE（算出・%）",
+      "category": "valuation",
+      "metricsKey": "roeCalculated",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "roa",
+      "label": "ROA（%）",
+      "category": "valuation",
+      "metricsKey": "roa",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "equityRatio",
+      "label": "自己資本比率（%）",
+      "category": "valuation",
+      "metricsKey": "equityRatio",
+      "inputUnit": "percent",
+      "serverFilterKey": "equityRatio"
+    },
+    {
+      "id": "equityRatioCalculated",
+      "label": "自己資本比率（算出・%）",
+      "category": "valuation",
+      "metricsKey": "equityRatioCalculated",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "BPS",
+      "label": "BPS（円）",
+      "category": "valuation",
+      "metricsKey": "BPS",
+      "inputUnit": "yen"
+    },
+    {
+      "id": "dividendPerShare",
+      "label": "1株当たり配当金（円）",
+      "category": "valuation",
+      "metricsKey": "dividendPerShare",
+      "inputUnit": "yen"
+    },
+    {
+      "id": "sharesOutstanding",
+      "label": "発行済株式総数（株）",
+      "category": "valuation",
+      "metricsKey": "sharesOutstanding",
+      "inputUnit": "count"
+    },
+    {
+      "id": "roic",
+      "label": "ROIC（%）",
+      "category": "valuation",
+      "metricsKey": "roic",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "piotroskiFScore",
+      "label": "Piotroski F-Score",
+      "category": "valuation",
+      "metricsKey": "piotroskiFScore",
+      "inputUnit": "count"
+    },
 
-    { "id": "sales", "label": "売上高（百万円）", "category": "performance", "metricsKey": "sales", "inputUnit": "millionYen", "serverFilterKey": "sales" },
-    { "id": "operatingProfit", "label": "営業利益（百万円）", "category": "performance", "metricsKey": "operatingProfit", "inputUnit": "millionYen" },
-    { "id": "recurringProfit", "label": "経常利益（百万円）", "category": "performance", "metricsKey": "recurringProfit", "inputUnit": "millionYen" },
-    { "id": "operatingProfitRatio", "label": "営業利益率（%）", "category": "performance", "computedFrom": ["sales", "operatingProfit"], "inputUnit": "percent" },
-    { "id": "netIncome", "label": "当期純利益（百万円）", "category": "performance", "metricsKey": "netIncome", "inputUnit": "millionYen" },
-    { "id": "netProfitRatio", "label": "純利益率（%）", "category": "performance", "computedFrom": ["sales", "netIncome"], "inputUnit": "percent" },
-    { "id": "comprehensiveIncome", "label": "包括利益（百万円）", "category": "performance", "metricsKey": "comprehensiveIncome", "inputUnit": "millionYen" },
+    {
+      "id": "sales",
+      "label": "売上高（百万円）",
+      "category": "performance",
+      "metricsKey": "sales",
+      "inputUnit": "millionYen",
+      "serverFilterKey": "sales"
+    },
+    {
+      "id": "operatingProfit",
+      "label": "営業利益（百万円）",
+      "category": "performance",
+      "metricsKey": "operatingProfit",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "recurringProfit",
+      "label": "経常利益（百万円）",
+      "category": "performance",
+      "metricsKey": "recurringProfit",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "operatingProfitRatio",
+      "label": "営業利益率（%）",
+      "category": "performance",
+      "computedFrom": ["sales", "operatingProfit"],
+      "inputUnit": "percent"
+    },
+    {
+      "id": "netIncome",
+      "label": "当期純利益（百万円）",
+      "category": "performance",
+      "metricsKey": "netIncome",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "netProfitRatio",
+      "label": "純利益率（%）",
+      "category": "performance",
+      "computedFrom": ["sales", "netIncome"],
+      "inputUnit": "percent"
+    },
+    {
+      "id": "comprehensiveIncome",
+      "label": "包括利益（百万円）",
+      "category": "performance",
+      "metricsKey": "comprehensiveIncome",
+      "inputUnit": "millionYen"
+    },
 
-    { "id": "liabilities", "label": "負債（百万円）", "category": "balancesheet", "metricsKey": "liabilities", "inputUnit": "millionYen" },
-    { "id": "currentLiabilities", "label": "流動負債（百万円）", "category": "balancesheet", "metricsKey": "currentLiabilities", "inputUnit": "millionYen" },
-    { "id": "currentAssets", "label": "流動資産（百万円）", "category": "balancesheet", "metricsKey": "currentAssets", "inputUnit": "millionYen" },
-    { "id": "netAssets", "label": "純資産額（百万円）", "category": "balancesheet", "metricsKey": "netAssets", "inputUnit": "millionYen" },
-    { "id": "totalAssets", "label": "総資産額（百万円）", "category": "balancesheet", "metricsKey": "totalAssets", "inputUnit": "millionYen", "serverFilterKey": "totalAssets" },
-    { "id": "investmentSecurities", "label": "投資有価証券（百万円）", "category": "balancesheet", "metricsKey": "investmentSecurities", "inputUnit": "millionYen" },
-    { "id": "currentRatio", "label": "流動比率", "category": "balancesheet", "metricsKey": "currentRatio", "inputUnit": "multiple" },
-    { "id": "deRatio", "label": "D/Eレシオ", "category": "balancesheet", "metricsKey": "deRatio", "inputUnit": "multiple" },
+    {
+      "id": "liabilities",
+      "label": "負債（百万円）",
+      "category": "balancesheet",
+      "metricsKey": "liabilities",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "currentLiabilities",
+      "label": "流動負債（百万円）",
+      "category": "balancesheet",
+      "metricsKey": "currentLiabilities",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "currentAssets",
+      "label": "流動資産（百万円）",
+      "category": "balancesheet",
+      "metricsKey": "currentAssets",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "netAssets",
+      "label": "純資産額（百万円）",
+      "category": "balancesheet",
+      "metricsKey": "netAssets",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "totalAssets",
+      "label": "総資産額（百万円）",
+      "category": "balancesheet",
+      "metricsKey": "totalAssets",
+      "inputUnit": "millionYen",
+      "serverFilterKey": "totalAssets"
+    },
+    {
+      "id": "investmentSecurities",
+      "label": "投資有価証券（百万円）",
+      "category": "balancesheet",
+      "metricsKey": "investmentSecurities",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "currentRatio",
+      "label": "流動比率",
+      "category": "balancesheet",
+      "metricsKey": "currentRatio",
+      "inputUnit": "multiple"
+    },
+    {
+      "id": "deRatio",
+      "label": "D/Eレシオ",
+      "category": "balancesheet",
+      "metricsKey": "deRatio",
+      "inputUnit": "multiple"
+    },
 
-    { "id": "cashBalance", "label": "現金及び現金同等物（百万円）", "category": "cash", "metricsKey": "cashBalance", "inputUnit": "millionYen" },
-    { "id": "operatingCF", "label": "営業CF（百万円）", "category": "cash", "metricsKey": "operatingCF", "inputUnit": "millionYen" },
-    { "id": "investingCF", "label": "投資CF（百万円）", "category": "cash", "metricsKey": "investingCF", "inputUnit": "millionYen" },
-    { "id": "fcf", "label": "FCF（百万円）", "category": "cash", "metricsKey": "fcf", "inputUnit": "millionYen" },
-    { "id": "financingCF", "label": "財務CF（百万円）", "category": "cash", "metricsKey": "financingCF", "inputUnit": "millionYen" },
+    {
+      "id": "cashBalance",
+      "label": "現金及び現金同等物（百万円）",
+      "category": "cash",
+      "metricsKey": "cashBalance",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "operatingCF",
+      "label": "営業CF（百万円）",
+      "category": "cash",
+      "metricsKey": "operatingCF",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "investingCF",
+      "label": "投資CF（百万円）",
+      "category": "cash",
+      "metricsKey": "investingCF",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "fcf",
+      "label": "FCF（百万円）",
+      "category": "cash",
+      "metricsKey": "fcf",
+      "inputUnit": "millionYen"
+    },
+    {
+      "id": "financingCF",
+      "label": "財務CF（百万円）",
+      "category": "cash",
+      "metricsKey": "financingCF",
+      "inputUnit": "millionYen"
+    },
 
-    { "id": "salesGrowthYoY", "label": "売上高成長率(YoY)（%）", "category": "growth", "metricsKey": "salesGrowthYoY", "inputUnit": "percent" },
-    { "id": "opGrowthYoY", "label": "営業利益成長率(YoY)（%）", "category": "growth", "metricsKey": "opGrowthYoY", "inputUnit": "percent" },
-    { "id": "epsGrowthYoY", "label": "EPS成長率(YoY)（%）", "category": "growth", "metricsKey": "epsGrowthYoY", "inputUnit": "percent" },
-    { "id": "dividendGrowthYoY", "label": "配当成長率(YoY)（%）", "category": "growth", "metricsKey": "dividendGrowthYoY", "inputUnit": "percent" },
-    { "id": "salesCagr3y", "label": "売上高CAGR(3年)（%）", "category": "growth", "metricsKey": "salesCagr3y", "inputUnit": "percent" },
-    { "id": "salesCagr5y", "label": "売上高CAGR(5年)（%）", "category": "growth", "metricsKey": "salesCagr5y", "inputUnit": "percent" },
-    { "id": "consecutiveDivIncreases", "label": "連続増配年数", "category": "growth", "metricsKey": "consecutiveDivIncreases", "inputUnit": "count" }
+    {
+      "id": "salesGrowthYoY",
+      "label": "売上高成長率(YoY)（%）",
+      "category": "growth",
+      "metricsKey": "salesGrowthYoY",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "opGrowthYoY",
+      "label": "営業利益成長率(YoY)（%）",
+      "category": "growth",
+      "metricsKey": "opGrowthYoY",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "epsGrowthYoY",
+      "label": "EPS成長率(YoY)（%）",
+      "category": "growth",
+      "metricsKey": "epsGrowthYoY",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "dividendGrowthYoY",
+      "label": "配当成長率(YoY)（%）",
+      "category": "growth",
+      "metricsKey": "dividendGrowthYoY",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "salesCagr3y",
+      "label": "売上高CAGR(3年)（%）",
+      "category": "growth",
+      "metricsKey": "salesCagr3y",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "salesCagr5y",
+      "label": "売上高CAGR(5年)（%）",
+      "category": "growth",
+      "metricsKey": "salesCagr5y",
+      "inputUnit": "percent"
+    },
+    {
+      "id": "consecutiveDivIncreases",
+      "label": "連続増配年数",
+      "category": "growth",
+      "metricsKey": "consecutiveDivIncreases",
+      "inputUnit": "count"
+    }
   ]
 }
