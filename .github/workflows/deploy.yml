@@ -65,7 +65,10 @@ jobs:
           STAGING_WEB_URL: ${{ secrets.STAGING_WEB_URL }}
           PROD_WEB_URL: ${{ secrets.PROD_WEB_URL }}
         run: bash infra/render-wrangler-config.sh --target web --env ${{ github.event.inputs.env || 'staging' }}
-      - run: pnpm --filter @edinet/web build
+      - name: Build web Worker
+        env:
+          CLOUDFLARE_ENV: ${{ github.event.inputs.env || 'staging' }}
+        run: pnpm --filter @edinet/web build
       - name: Deploy web Worker
         uses: cloudflare/wrangler-action@v3
         with:
