@@ -39,7 +39,7 @@ jobs:
           PROD_KV_ID: ${{ secrets.KV_PRODUCTION_ID }}
           STAGING_WEB_URL: ${{ secrets.STAGING_WEB_URL }}
           PROD_WEB_URL: ${{ secrets.PROD_WEB_URL }}
-        run: bash infra/render-wrangler-config.sh --target api
+        run: bash infra/render-wrangler-config.sh --target api --env ${{ github.event.inputs.env || 'staging' }}
       - name: Deploy API Worker
         uses: cloudflare/wrangler-action@v3
         with:
@@ -64,7 +64,7 @@ jobs:
           PROD_API_URL: ${{ secrets.PROD_API_URL }}
           STAGING_WEB_URL: ${{ secrets.STAGING_WEB_URL }}
           PROD_WEB_URL: ${{ secrets.PROD_WEB_URL }}
-        run: bash infra/render-wrangler-config.sh --target web
+        run: bash infra/render-wrangler-config.sh --target web --env ${{ github.event.inputs.env || 'staging' }}
       - run: pnpm --filter @edinet/web build
       - name: Deploy web Worker
         uses: cloudflare/wrangler-action@v3
