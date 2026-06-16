@@ -12,13 +12,22 @@
     "staging": {
       "name": "edisuku-web-staging",
       "vars": {
-        "API_UPSTREAM_URL": "__STAGING_API_URL__"
+        "API_UPSTREAM_URL": "__STAGING_API_URL__",
+        "PUBLIC_ENV__SITE_URL": "__STAGING_WEB_URL__"
       }
     },
     "production": {
       "name": "edisuku-web",
+      "routes": [
+        {
+          "pattern": "edisuku.com",
+          "zone_name": "edisuku.com",
+          "custom_domain": true
+        }
+      ],
       "vars": {
-        "API_UPSTREAM_URL": "__PROD_API_URL__"
+        "API_UPSTREAM_URL": "__PROD_API_URL__",
+        "PUBLIC_ENV__SITE_URL": "__PROD_WEB_URL__"
       }
     }
   }

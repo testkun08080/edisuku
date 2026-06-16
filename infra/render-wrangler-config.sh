@@ -47,6 +47,8 @@ sed \
   -e "s|__PROD_D1_ID__|$S_PROD_D1_ID|g" \
   -e "s|__STAGING_API_URL__|$S_STAGING_API_URL|g" \
   -e "s|__PROD_API_URL__|$S_PROD_API_URL|g" \
+  -e "s|__STAGING_WEB_URL__|$S_STAGING_WEB_URL|g" \
+  -e "s|__PROD_WEB_URL__|$S_PROD_WEB_URL|g" \
   "$repo_root/apps/web/wrangler.jsonc.template" > "$repo_root/apps/web/wrangler.jsonc"
 
 echo "[render-wrangler-config] wrote apps/api/wrangler.toml and apps/web/wrangler.jsonc"

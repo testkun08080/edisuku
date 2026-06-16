@@ -50,7 +50,3 @@ database_id = "__PROD_D1_ID__"
 [[env.production.kv_namespaces]]
 binding = "EDISUKU_CACHE"
 id = "__PROD_KV_ID__"
-
-[[env.production.r2_buckets]]
-binding = "EDISUKU_DATA"
-bucket_name = "edisuku-data"

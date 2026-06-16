@@ -1,9 +1,14 @@
 import { apply, serve } from "@photonjs/srvx";
 import { getMiddlewares } from "vike-photon/universal-middlewares";
 import { apiProxyMiddleware } from "./api-proxy.js";
+import { sitemapMiddleware } from "./sitemap.js";
 
 function startServer() {
-  const app = apply([apiProxyMiddleware(), ...getMiddlewares({ compress: false })]);
+  const app = apply([
+    sitemapMiddleware(),
+    apiProxyMiddleware(),
+    ...getMiddlewares({ compress: false }),
+  ]);
   return serve(app);
 }
 

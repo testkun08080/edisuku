@@ -16,7 +16,7 @@ import {
 export function Head() {
   const siteTitle = SITE_NAME;
   const siteDescription = SITE_OG_DESCRIPTION;
-  const siteUrl = import.meta.env.PUBLIC_ENV__SITE_URL ?? "";
+  const siteUrl = import.meta.env.PUBLIC_ENV__SITE_URL || "https://edisuku.com";
   const ogImageUrl = siteUrl ? `${siteUrl}${SITE_OG_IMAGE_PATH}` : "";
   const ogImageSquareUrl = siteUrl ? `${siteUrl}${SITE_OG_IMAGE_SQUARE_PATH}` : "";
 
