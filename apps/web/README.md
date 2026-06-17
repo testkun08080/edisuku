@@ -11,7 +11,7 @@ pnpm --filter @edinet/web dev
 # http://localhost:3000
 ```
 
-API 呼び出しは同一オリジンの `/api/*` を使用します。web Worker は `.dev.vars`（`.dev.vars.example` 参照）の `API_UPSTREAM_URL` と `INTERNAL_API_KEY` を使って API Worker にプロキシします。
+API 呼び出しは同一オリジンの `/api/*` を使用します。ローカルでは `.dev.vars`（`.dev.vars.example` 参照）の `API_UPSTREAM_URL` と `INTERNAL_API_KEY` で API Worker にプロキシします。remote では wrangler の **service binding**（`API` → api Worker）を使用します。
 
 ## デプロイ
 

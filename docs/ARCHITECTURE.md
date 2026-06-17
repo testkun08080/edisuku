@@ -133,5 +133,5 @@ Cloudflare D1
 |---|---|---|
 | `ci.yml` | PR / push | biome + turbo typecheck/test + ruff/pytest |
 | `deploy.yml` | main push / 手動 | wrangler.toml をテンプレ生成 → api/web を Workers へ |
-| `daily-refresh.yml` | cron / 手動 | ingest_daily → publish_to_d1 → D1 → R2 snapshot |
+| `daily-refresh.yml` | cron / 手動 | ingest_daily → publish_to_d1 → D1 → company_metrics rebuild → KV 無効化 |
 | `release.yml` | main push | changesets で version bump + tag |

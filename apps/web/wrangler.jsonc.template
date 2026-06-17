@@ -11,13 +11,14 @@
   "env": {
     "staging": {
       "name": "edisuku-web-staging",
+      "services": [{ "binding": "API", "service": "edisuku-api-staging" }],
       "vars": {
-        "API_UPSTREAM_URL": "__STAGING_API_URL__",
         "PUBLIC_ENV__SITE_URL": "__STAGING_WEB_URL__"
       }
     },
     "production": {
       "name": "edisuku-web",
+      "services": [{ "binding": "API", "service": "edisuku-api" }],
       "routes": [
         {
           "pattern": "edisuku.com",
@@ -26,7 +27,6 @@
         }
       ],
       "vars": {
-        "API_UPSTREAM_URL": "__PROD_API_URL__",
         "PUBLIC_ENV__SITE_URL": "__PROD_WEB_URL__"
       }
     }

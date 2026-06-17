@@ -64,7 +64,8 @@ const res = await api.api.metrics.$get({ query: { limit: "2000" } });
 | 変数 | 用途 |
 |---|---|
 | `INTERNAL_API_KEY` | BFF が upstream API に付与する共有キー（`.dev.vars` / secret） |
-| `API_UPSTREAM_URL` | プロキシ先 API（ローカル `http://127.0.0.1:8787`、本番は wrangler vars） |
+| `API_UPSTREAM_URL` | ローカル / Docker のプロキシ先（`.dev.vars`。設定時は service binding より優先） |
+| `API` (service binding) | remote で web → api（`wrangler.jsonc.template` の `services`） |
 | `PUBLIC_ENV__SENTRY_DSN` | Sentry (任意) |
 | `PUBLIC_ENV__GOOGLE_ANALYTICS` | GA 測定 ID (任意) |
 | `PUBLIC_ENV__SITE_URL` | OGP / canonical (任意) |

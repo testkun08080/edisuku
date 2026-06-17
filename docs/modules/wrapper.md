@@ -31,7 +31,7 @@ apps/wrapper/
 2. 既知 `doc_id`（`--known-docs`）と doc_type（annual / quarterly / semiannual / large_holding）でフィルタ
 3. TSV ダウンロード → `parse_tsv` → `db.upsert_*`
 4. `publish_to_d1.py` が `updated_at` 差分を D1 用 SQL に変換
-5. GitHub Actions `daily-refresh.yml` が日次で上記 + `company_metrics` rebuild を実行
+5. GitHub Actions `daily-refresh.yml` が日次で上記 + `company_metrics` rebuild（`companies` テーブル起点）を実行
 
 指標計算（ROE / Piotroski 等）は **`packages/metrics`** が担当。wrapper は生の period_financials を D1 に載せる。
 

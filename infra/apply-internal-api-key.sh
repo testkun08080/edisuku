@@ -27,28 +27,11 @@ put_secret() {
   printf '%s' "$secret_value" | (cd "$app_dir" && npx wrangler secret put "$secret_name" --env "$env_name")
 }
 
-WORKERS_SUBDOMAIN="${WORKERS_SUBDOMAIN:-}"
-if [ -z "$WORKERS_SUBDOMAIN" ]; then
-  yellow() { printf "\033[33m%s\033[0m\n" "$1"; }
-  yellow "WORKERS_SUBDOMAIN is not set — skipping API_UPSTREAM_URL on web (set manually if needed)."
-  STAGING_API_URL=""
-  PROD_API_URL=""
-else
-  STAGING_API_URL="https://edisuku-api-staging.${WORKERS_SUBDOMAIN}.workers.dev"
-  PROD_API_URL="https://edisuku-api.${WORKERS_SUBDOMAIN}.workers.dev"
-fi
-
 echo "Uploading INTERNAL_API_KEY to api + web (staging + production)..."
 for env_name in staging production; do
   put_secret "$repo_root/apps/api" "$env_name" INTERNAL_API_KEY "$INTERNAL_API_KEY"
   put_secret "$repo_root/apps/web" "$env_name" INTERNAL_API_KEY "$INTERNAL_API_KEY"
 done
-
-if [ -n "$STAGING_API_URL" ]; then
-  echo "Uploading API_UPSTREAM_URL to web (staging + production)..."
-  put_secret "$repo_root/apps/web" staging API_UPSTREAM_URL "$STAGING_API_URL"
-  put_secret "$repo_root/apps/web" production API_UPSTREAM_URL "$PROD_API_URL"
-fi
 
 echo "Done. Optionally store the same value in GitHub for your records:"
 echo "  gh secret set INTERNAL_API_KEY --body \"<your-key>\""

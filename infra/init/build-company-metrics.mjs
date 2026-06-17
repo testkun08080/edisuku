@@ -73,7 +73,7 @@ const db = new Database(dbPath, { readonly: true });
 const latestRowsAll = db
   .prepare(
     `SELECT sec_code, edinet_code, filer_name
-     FROM sec_code_latest_periods
+     FROM companies
      WHERE sec_code IS NOT NULL AND sec_code != ''
      ORDER BY sec_code`,
   )

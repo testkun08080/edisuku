@@ -192,7 +192,7 @@ curl -H "X-Internal-Api-Key: <your-key>" \
 
 `rows[0].sales` と `rows[0].ROE` が null でなければ OK です。Web の `/screener` で指標列に数値が表示されます。
 
-日次パイプライン（`.github/workflows/daily-refresh.yml`）は delta 適用後に **全件** rebuild を自動実行します（本番用）。D1 名は GitHub Secret `D1_PRODUCTION_NAME`（未設定時は `edisuku-db`）で指定できます。
+日次パイプライン（`.github/workflows/daily-refresh.yml`）は delta 適用後に **全件** rebuild を自動実行します。提出日のデフォルトは **昨日 JST**（`ingest_daily.py` と同様）。D1 名は GitHub Secret で指定できます（未設定時: staging `edisuku-db-staging`、production `edisuku-db`）。
 
 ## 7. （任意）Python wrapper
 

@@ -45,10 +45,9 @@ export STAGING_D1_ID=<staging の database_id>
 export PROD_D1_ID=<production の database_id>
 export STAGING_KV_ID=00000000-0000-0000-0000-000000000001
 export PROD_KV_ID=00000000-0000-0000-0000-000000000002
-export STAGING_API_URL="https://edisuku-api-staging.${WORKERS_SUBDOMAIN}.workers.dev"
-export PROD_API_URL="https://edisuku-api.${WORKERS_SUBDOMAIN}.workers.dev"
 export STAGING_WEB_URL="https://edisuku-web-staging.${WORKERS_SUBDOMAIN}.workers.dev"
 export PROD_WEB_URL="https://edisuku-web.${WORKERS_SUBDOMAIN}.workers.dev"
+# カスタムドメイン利用時は PROD_WEB_URL を本番ドメインに（例: https://edisuku.com）
 
 bash infra/render-wrangler-config.sh
 ```
@@ -97,8 +96,6 @@ gh secret set D1_STAGING_ID --body "$STAGING_D1_ID"
 gh secret set D1_PRODUCTION_ID --body "$PROD_D1_ID"
 gh secret set KV_STAGING_ID --body "$STAGING_KV_ID"
 gh secret set KV_PRODUCTION_ID --body "$PROD_KV_ID"
-gh secret set STAGING_API_URL --body "$STAGING_API_URL"
-gh secret set PROD_API_URL --body "$PROD_API_URL"
 gh secret set STAGING_WEB_URL --body "$STAGING_WEB_URL"
 gh secret set PROD_WEB_URL --body "$PROD_WEB_URL"
 # EDINET 日次取り込みを使う場合
@@ -117,8 +114,8 @@ cp .internal-api-key.example .internal-api-key
 $EDITOR .internal-api-key
 # 例: my-fork-secret-8f3a...  （your-internal-api-key-change-me は使わない）
 
-# 2) Cloudflare に登録（staging + production、api + web + web の API_UPSTREAM_URL）
-WORKERS_SUBDOMAIN=<your-subdomain> bash infra/apply-internal-api-key.sh
+# 2) Cloudflare に登録（staging + production、api + web）
+bash infra/apply-internal-api-key.sh
 
 # 3) 任意 — GitHub に同じ値を記録（CI 用メモ。ランタイムは Worker secret）
 gh secret set INTERNAL_API_KEY --body "$(grep -v '^#' .internal-api-key | head -1)"
@@ -174,15 +171,17 @@ pnpm deploy:web:production
 |--------|----------------|
 | `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` | あなた |
 | `D1_*` / `KV_*` | あなた（手順 2.6） |
-| `STAGING_API_URL` / `PROD_API_URL` / `STAGING_WEB_URL` / `PROD_WEB_URL` | あなた（手順 2.6。カスタムドメイン可） |
+| `STAGING_WEB_URL` / `PROD_WEB_URL` | あなた（手順 2.6。カスタムドメイン可） |
 | `INTERNAL_API_KEY` | **あなた**（任意・記録用） |
 | `EDINET_API_KEY` | あなた（daily-refresh 用） |
+
+web → api の接続は `wrangler.jsonc.template` の **service binding**（`API` → `edisuku-api-staging` / `edisuku-api`）で行います。API の公開 URL を GitHub Secret に登録する必要はありません。
 
 Worker URL（手順 2.2 で export した値を Secret に登録）:
 
 ```
-$STAGING_API_URL
 $STAGING_WEB_URL
+$PROD_WEB_URL
 ```
 
 ## トラブルシュート
@@ -190,7 +189,7 @@ $STAGING_WEB_URL
 | 症状 | 確認 |
 |------|------|
 | スクリーナーが空 | `apply-internal-api-key.sh` 実行済みか、api/web でキーが同一か |
-| `proxy_misconfigured` (503) | web production に `API_UPSTREAM_URL` と `INTERNAL_API_KEY` を **secret** で設定（`WORKERS_SUBDOMAIN=... bash infra/apply-internal-api-key.sh`） |
+| `proxy_misconfigured` (503) | web に service binding `API` が設定されているか、`INTERNAL_API_KEY` が api/web で同一か（`bash infra/apply-internal-api-key.sh`） |
 | web の `/api/*` が Cloudflare「Page not found」 | `*.workers.dev` では `/api/*` や BFF 用パス・ヘッダーがブロックされる。`lib/api.ts` は `/screener?_q=metrics?...` 経由で `api-proxy` が upstream `/api/...` へ転送する |
 | API が 401 | キー不一致。プレースホルダ `your-internal-api-key-change-me` のままではないか |
 | `apply-internal-api-key.sh` が失敗 | `.internal-api-key` を編集したか |

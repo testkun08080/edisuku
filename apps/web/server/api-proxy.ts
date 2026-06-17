@@ -26,7 +26,6 @@ export function apiProxyMiddleware() {
         return;
       }
 
-      const apiBinding = env.API;
       const apiKey = env.INTERNAL_API_KEY;
 
       if (!apiKey) {
@@ -43,6 +42,16 @@ export function apiProxyMiddleware() {
       headers.set(API_KEY_HEADER, apiKey);
       headers.delete("host");
 
+      const upstreamBase = env.API_UPSTREAM_URL?.replace(/\/$/, "");
+      if (upstreamBase) {
+        return fetch(`${upstreamBase}${apiPath}`, {
+          method: request.method,
+          headers,
+          body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
+        });
+      }
+
+      const apiBinding = env.API;
       if (apiBinding) {
         return apiBinding.fetch(
           new Request(`https://internal${apiPath}`, {
@@ -52,23 +61,13 @@ export function apiProxyMiddleware() {
         );
       }
 
-      // フォールバック: URL 転送（vike dev 環境など service binding 未接続時）
-      const upstreamBase = env.API_UPSTREAM_URL?.replace(/\/$/, "");
-      if (!upstreamBase) {
-        return new Response(
-          JSON.stringify({
-            error: "proxy_misconfigured",
-            message: "API service binding or API_UPSTREAM_URL required",
-          }),
-          { status: 503, headers: { "Content-Type": "application/json" } },
-        );
-      }
-
-      return fetch(`${upstreamBase}${apiPath}`, {
-        method: request.method,
-        headers,
-        body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
-      });
+      return new Response(
+        JSON.stringify({
+          error: "proxy_misconfigured",
+          message: "API service binding or API_UPSTREAM_URL required",
+        }),
+        { status: 503, headers: { "Content-Type": "application/json" } },
+      );
     },
     {
       name: "api-proxy",

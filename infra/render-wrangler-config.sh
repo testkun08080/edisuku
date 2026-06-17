@@ -56,7 +56,6 @@ required=()
 needs_staging_d1=false; needs_prod_d1=false
 needs_staging_kv=false; needs_prod_kv=false
 needs_staging_web=false; needs_prod_web=false
-needs_staging_api=false; needs_prod_api=false
 
 if [ "$target" = api ] || [ "$target" = all ]; then
   if [ "$deploy_env" = staging  ] || [ "$deploy_env" = all ]; then
@@ -68,10 +67,10 @@ if [ "$target" = api ] || [ "$target" = all ]; then
 fi
 if [ "$target" = web ] || [ "$target" = all ]; then
   if [ "$deploy_env" = staging  ] || [ "$deploy_env" = all ]; then
-    needs_staging_api=true; needs_staging_web=true
+    needs_staging_web=true
   fi
   if [ "$deploy_env" = production ] || [ "$deploy_env" = all ]; then
-    needs_prod_api=true; needs_prod_web=true
+    needs_prod_web=true
   fi
 fi
 
@@ -81,8 +80,6 @@ $needs_staging_kv  && required+=(STAGING_KV_ID)
 $needs_prod_kv     && required+=(PROD_KV_ID)
 $needs_staging_web && required+=(STAGING_WEB_URL)
 $needs_prod_web    && required+=(PROD_WEB_URL)
-$needs_staging_api && required+=(STAGING_API_URL)
-$needs_prod_api    && required+=(PROD_API_URL)
 
 require_env "${required[@]}"
 
@@ -106,8 +103,6 @@ render_api() {
 
 render_web() {
   sed \
-    -e "s|__STAGING_API_URL__|$(_d STAGING_API_URL)|g" \
-    -e "s|__PROD_API_URL__|$(_d PROD_API_URL)|g" \
     -e "s|__STAGING_WEB_URL__|$(_d STAGING_WEB_URL)|g" \
     -e "s|__PROD_WEB_URL__|$(_d PROD_WEB_URL)|g" \
     "$repo_root/apps/web/wrangler.jsonc.template" >"$repo_root/apps/web/wrangler.jsonc"

@@ -34,7 +34,7 @@ docker compose -f infra/compose.yml up
 |---|---|
 | `db-init` | （任意）wrapper 用にローカルで `data/edinet.db` を生成。API はローカル D1 を使用 |
 | `api` | `prepare-local-d1.sh` で同梱 SQL をローカル D1 に初回投入 → `pnpm dev` |
-| `web` | `web.dev.vars.docker` をマウント（`API_UPSTREAM_URL=http://api:8787`）。ホストの `.dev.vars` は書き換えない |
+| `web` | `web.dev.vars.docker` をマウント（`API_UPSTREAM_URL=http://api:8787`）。`api-proxy` は URL 設定時は binding より HTTP を優先 |
 | `wrapper` | `profiles: [ingest]`。通常は起動せず手動取り込み用 |
 
 ```bash
@@ -60,7 +60,7 @@ Cloudflare リソースの作成・wrangler 設定・GitHub Secrets は [FORK.md
 |---|---|
 | Secret | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `EDINET_API_KEY` |
 | Secret | `D1_STAGING_ID`, `D1_PRODUCTION_ID`, `KV_STAGING_ID`, `KV_PRODUCTION_ID` |
-| Secret | `STAGING_API_URL`, `PROD_API_URL`, `STAGING_WEB_URL`, `PROD_WEB_URL` |
+| Secret | `STAGING_WEB_URL`, `PROD_WEB_URL` |
 | Secret | `INTERNAL_API_KEY`（任意・記録用。ランタイムは Worker secret） |
 
 ## fetch-sample-data.sh
@@ -73,6 +73,7 @@ Cloudflare リソースの作成・wrangler 設定・GitHub Secrets は [FORK.md
 |------|----------|---------|------------|----------------|
 | API Worker | `edisuku-api` | `edisuku-api-staging` | `edisuku-api` | — |
 | Web Worker | `edisuku-web` | `edisuku-web-staging` | `edisuku-web` | — |
+| Web → API | — | service `API` → `edisuku-api-staging` | service `API` → `edisuku-api` | `API`（web のみ） |
 | D1 | `edisuku-local` | `edisuku-db-staging` | `edisuku-db` | `EDISUKU_DB`（API のみ） |
 | KV | — | `EDISUKU_CACHE` | `EDISUKU_CACHE` | `EDISUKU_CACHE`（任意） |
 | R2 | — | — | `edisuku-data` | `EDISUKU_DATA`（任意） |

@@ -60,8 +60,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Render web wrangler config
         env:
-          STAGING_API_URL: ${{ secrets.STAGING_API_URL }}
-          PROD_API_URL: ${{ secrets.PROD_API_URL }}
           STAGING_WEB_URL: ${{ secrets.STAGING_WEB_URL }}
           PROD_WEB_URL: ${{ secrets.PROD_WEB_URL }}
         run: bash infra/render-wrangler-config.sh --target web --env ${{ github.event.inputs.env || 'staging' }}
