@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.12.0 }
       - uses: actions/setup-node@v5
         with: { node-version: 22, cache: pnpm }
@@ -41,7 +41,7 @@ jobs:
           PROD_WEB_URL: ${{ secrets.PROD_WEB_URL }}
         run: bash infra/render-wrangler-config.sh --target api --env ${{ github.event.inputs.env || 'staging' }}
       - name: Deploy API Worker
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with: { version: 9.12.0 }
       - uses: actions/setup-node@v5
         with: { node-version: 22, cache: pnpm }
@@ -68,7 +68,7 @@ jobs:
           CLOUDFLARE_ENV: ${{ github.event.inputs.env || 'staging' }}
         run: pnpm --filter @edinet/web build
       - name: Deploy web Worker
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
