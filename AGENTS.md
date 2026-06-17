@@ -157,13 +157,14 @@ cd apps/wrapper && uv run pytest         # Python
 | ワークフロー        | 役割                                         |
 | ------------------- | -------------------------------------------- |
 | `ci.yml`            | PR / push 時に lint + typecheck + test       |
-| `deploy.yml`        | main push で staging/production 自動デプロイ |
-| `daily-refresh.yml` | 日次 EDINET 取り込み → D1 → R2 snapshot      |
+| `deploy.yml`        | `workflow_dispatch` で staging/production デプロイ |
+| `daily-refresh.yml` | 日次 EDINET 取り込み → D1 → company_metrics rebuild → KV 無効化 |
 | `release.yml`       | changesets による version bump とタグ付け    |
 
 ### ドキュメント
 
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — 人間向けコントリビューション手順
+- [docs/ENV.md](./docs/ENV.md) — 環境変数・Secrets 一覧
 - [docs/FORK.md](./docs/FORK.md) — フォーク利用者の Cloudflare セットアップ
 - [docs/MANUAL_SETUP.md](./docs/MANUAL_SETUP.md) — Docker なしのローカル開発
 - [SECURITY.md](./SECURITY.md) — 脆弱性報告

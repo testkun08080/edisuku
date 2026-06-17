@@ -24,9 +24,8 @@ npx wrangler login
 cp .internal-api-key.example .internal-api-key   # 編集して自分の秘密に
 bash infra/apply-internal-api-key.sh             # Cloudflare に登録
 
-# 4. push → GitHub Actions が自動デプロイ (10 min)
-git push
-# → https://edisuku-api-staging.<your-subdomain>.workers.dev
+# 4. GitHub Actions から手動デプロイ (10 min)
+# Actions → deploy → Run workflow → staging
 # → https://edisuku-web-staging.<your-subdomain>.workers.dev
 ```
 
@@ -96,20 +95,13 @@ uv run python scripts/ingest_daily.py --help
 
 ## 環境変数
 
-| 変数名 | 用途 | 必要箇所 |
-|---|---|---|
-| `EDINET_API_KEY` | EDINET API キー | wrapper |
-| `CLOUDFLARE_API_TOKEN` | Workers / D1 デプロイ | CI |
-| `CLOUDFLARE_ACCOUNT_ID` | 同上 | CI |
-| `INTERNAL_API_KEY` | API 認証（web BFF → api） | 自分で設定（[docs/FORK.md](./docs/FORK.md)） |
-| `API_UPSTREAM_URL` | ローカル / Docker で web が API にプロキシ | `.dev.vars` のみ（remote は service binding） |
-| `STAGING_WEB_URL` / `PROD_WEB_URL` | CORS・OGP 用の公開 Web URL | GitHub Secret（CI デプロイ用） |
-| `PUBLIC_ENV__SENTRY_DSN` | Sentry DSN (任意) | web |
+必須・任意・設定場所の一覧は [docs/ENV.md](./docs/ENV.md) を参照。ローカルは `INTERNAL_API_KEY` + `API_UPSTREAM_URL`（web のみ）、Cloudflare は `apply-internal-api-key.sh` が必須。
 
 ## ドキュメント
 
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — 全体構造・依存グラフ・データフロー
 - [docs/modules/](./docs/modules/) — モジュール別ドキュメント (api / web / wrapper / db / metrics / types / infra)
+- [docs/ENV.md](./docs/ENV.md) — 環境変数・Secrets 一覧（必須 / 任意）
 - [docs/MANUAL_SETUP.md](./docs/MANUAL_SETUP.md) — Docker なしの手動ローカルセットアップ
 - [docs/FORK.md](./docs/FORK.md) — フォーク利用者向けセットアップ・セキュリティ
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — 開発フロー

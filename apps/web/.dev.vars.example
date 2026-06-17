@@ -1,4 +1,5 @@
 # Local development only. Copy to .dev.vars — INTERNAL_API_KEY must match apps/api/.dev.vars.
-# Production: use wrangler secret put (see docs/FORK.md) — do not reuse this sample.
+# Production: wrangler secret put (see docs/ENV.md) — do not reuse this sample.
+# API_UPSTREAM_URL is local/Docker only; omit on Cloudflare (use service binding API).
 INTERNAL_API_KEY=dev-local-key
 API_UPSTREAM_URL=http://127.0.0.1:8787

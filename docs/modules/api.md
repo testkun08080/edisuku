@@ -88,6 +88,8 @@ pnpm --filter @edinet/api test            # vitest
 - ローカル: `apps/api/.dev.vars`（`INTERNAL_API_KEY=dev-local-key`）。本番: `wrangler secret put INTERNAL_API_KEY`。
 - ブラウザは web Worker の同一オリジン `/api/*` プロキシ経由のみ（`apps/web/server/`）。
 
+環境変数の全体一覧: [ENV.md](../ENV.md)
+
 ## 注意
 
 - `EDISUKU_CACHE` (KV), `EDISUKU_DATA` (R2) は optional binding。未設定でも health は動く。

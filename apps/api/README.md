@@ -7,11 +7,14 @@ Cloudflare Workers 上の Hono API。drizzle 経由で D1 を読み、`apps/web`
 ```bash
 # 1. テンプレートをコピー（ローカル）または infra/render-wrangler-config.sh を実行（デプロイ）
 cp wrangler.toml.template wrangler.toml
+cp .dev.vars.example .dev.vars
 
-# 2. ローカル SQLite（miniflare）で起動
+# 2. ローカル D1（miniflare）で起動
 pnpm --filter @edinet/api dev
 # → http://localhost:8787/api/health
 ```
+
+環境変数: [docs/ENV.md](../../docs/ENV.md)（必須は `INTERNAL_API_KEY` のみ）
 
 ## エンドポイント
 

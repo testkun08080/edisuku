@@ -102,6 +102,8 @@ gh secret set PROD_WEB_URL --body "$PROD_WEB_URL"
 gh secret set EDINET_API_KEY
 ```
 
+Actions → **daily-refresh** → Run workflow（`target_date` 省略時は昨日 JST）。取り込み後は `apps/web/lib/brand.ts` の `DATA_LAST_UPDATED` を手動更新（[ENV.md](./ENV.md) 参照）。
+
 ## 3. INTERNAL_API_KEY を自分で設定（本番必須）
 
 api Worker と web Worker で **同じ値** にします。
@@ -141,11 +143,9 @@ printf '%s' 'あなたの秘密文字列' | (cd apps/web && wrangler secret put 
 
 ### GitHub Actions（推奨）
 
-```bash
-git push
-```
+Actions タブ → **deploy** workflow → **Run workflow** → `staging` または `production` を選択。
 
-[deploy ワークフロー](../.github/workflows/deploy.yml) が Worker をデプロイします。**main への push は staging のみ**。production は Actions の `workflow_dispatch` から選択してください。デプロイ**前**に手順 3 を完了してください。
+[deploy ワークフロー](../.github/workflows/deploy.yml) は **手動トリガーのみ**（`workflow_dispatch`）。デプロイ**前**に手順 3（`INTERNAL_API_KEY`）を完了してください。
 
 ### wrangler CLI から直接
 
@@ -159,30 +159,26 @@ pnpm deploy:web:production
 
 ## 環境ごとの設定まとめ
 
-| 環境 | ファイル / コマンド | サンプル値 |
-|------|---------------------|------------|
+詳細な必須 / 任意の一覧は [ENV.md](./ENV.md) を参照。
+
+| 環境 | ファイル / コマンド | 必須の値 |
+|------|---------------------|----------|
 | ローカル | `apps/api/.dev.vars` | `INTERNAL_API_KEY=dev-local-key` |
 | ローカル | `apps/web/.dev.vars` | 同上 + `API_UPSTREAM_URL=http://127.0.0.1:8787` |
-| Cloudflare | `.internal-api-key` → `apply-internal-api-key.sh` | **自分で決める**（example はプレースホルダのみ） |
+| Cloudflare | `.internal-api-key` → `apply-internal-api-key.sh` | **自分で決める** secret |
+| Cloudflare | `render-wrangler-config.sh` | D1 / KV ID、Web 公開 URL |
 
 ## GitHub Secrets（CI）
 
-| Secret | 誰が設定するか |
-|--------|----------------|
-| `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` | あなた |
-| `D1_*` / `KV_*` | あなた（手順 2.6） |
-| `STAGING_WEB_URL` / `PROD_WEB_URL` | あなた（手順 2.6。カスタムドメイン可） |
-| `INTERNAL_API_KEY` | **あなた**（任意・記録用） |
-| `EDINET_API_KEY` | あなた（daily-refresh 用） |
+[ENV.md](./ENV.md) の表を参照。要点:
+
+| Secret | 必須 |
+|--------|------|
+| `CLOUDFLARE_*`, `D1_*_ID`, `KV_*_ID`, `STAGING_WEB_URL`, `PROD_WEB_URL` | デプロイ時 |
+| `EDINET_API_KEY` | daily-refresh のみ |
+| `INTERNAL_API_KEY` | いいえ（記録用。ランタイムは wrangler secret） |
 
 web → api の接続は `wrangler.jsonc.template` の **service binding**（`API` → `edisuku-api-staging` / `edisuku-api`）で行います。API の公開 URL を GitHub Secret に登録する必要はありません。
-
-Worker URL（手順 2.2 で export した値を Secret に登録）:
-
-```
-$STAGING_WEB_URL
-$PROD_WEB_URL
-```
 
 ## トラブルシュート
 
@@ -196,6 +192,7 @@ $PROD_WEB_URL
 
 ## 関連ドキュメント
 
+- [ENV.md](./ENV.md) — 環境変数・Secrets 一覧
 - [infra モジュール](./modules/infra.md)
 - [api モジュール](./modules/api.md)
 - [web モジュール](./modules/web.md)

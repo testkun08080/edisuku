@@ -61,14 +61,16 @@ const res = await api.api.metrics.$get({ query: { limit: "2000" } });
 
 ## 環境変数
 
-| 変数 | 用途 |
-|---|---|
-| `INTERNAL_API_KEY` | BFF が upstream API に付与する共有キー（`.dev.vars` / secret） |
-| `API_UPSTREAM_URL` | ローカル / Docker のプロキシ先（`.dev.vars`。設定時は service binding より優先） |
-| `API` (service binding) | remote で web → api（`wrangler.jsonc.template` の `services`） |
-| `PUBLIC_ENV__SENTRY_DSN` | Sentry (任意) |
-| `PUBLIC_ENV__GOOGLE_ANALYTICS` | GA 測定 ID (任意) |
-| `PUBLIC_ENV__SITE_URL` | OGP / canonical (任意) |
+[ENV.md](../ENV.md) を参照。web 固有の要点:
+
+| 変数 | 必須 | 設定場所 |
+|---|---|---|
+| `INTERNAL_API_KEY` | はい（remote） | `.dev.vars` / wrangler secret |
+| `API_UPSTREAM_URL` | ローカルのみ | `.dev.vars`（remote では不要） |
+| `API` (service binding) | remote | `wrangler.jsonc` |
+| `PUBLIC_ENV__*` / `VITE_SCREENER_MODE` | いいえ | `.env`（ビルド時） |
+
+**データ最終更新日**: `lib/brand.ts` の `DATA_LAST_UPDATED` を D1 取り込み後に手動更新（環境変数ではない）。
 
 ## 起動・ビルド
 

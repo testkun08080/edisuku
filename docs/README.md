@@ -3,6 +3,7 @@
 | ドキュメント | 内容 |
 |---|---|
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | 全体構造・レイヤ・依存グラフ・データフロー（**まずここ**） |
+| [ENV.md](./ENV.md) | 環境変数・Secrets 一覧（必須 / 任意 / 設定場所） |
 | [MANUAL_SETUP.md](./MANUAL_SETUP.md) | Docker なしの手動ローカルセットアップ |
 | [FORK.md](./FORK.md) | フォーク利用者向けセットアップ・API キー・CI Secrets |
 

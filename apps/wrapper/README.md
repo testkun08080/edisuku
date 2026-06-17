@@ -42,4 +42,4 @@ uv run python scripts/publish_to_d1.py --source data/edinet.db --since 2026-05-2
 wrangler d1 execute edisuku-db --remote --file /tmp/delta.sql
 ```
 
-`.env` に `EDINET_API_KEY` を設定する。
+`.env` に `EDINET_API_KEY` を設定する（[docs/ENV.md](../../docs/ENV.md) 参照）。

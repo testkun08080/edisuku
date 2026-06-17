@@ -38,7 +38,7 @@ cp apps/web/.dev.vars.example apps/web/.dev.vars
 | `apps/api/.dev.vars` | `INTERNAL_API_KEY=dev-local-key`（開発専用） |
 | `apps/web/.dev.vars` | 同上 + `API_UPSTREAM_URL=http://127.0.0.1:8787` |
 
-`INTERNAL_API_KEY` は api と web で **同じ値** にしてください。本番用キーの設定は [FORK.md](./FORK.md) を参照。
+`INTERNAL_API_KEY` は api と web で **同じ値** にしてください。本番用キーとその他の変数は [ENV.md](./ENV.md) / [FORK.md](./FORK.md) を参照。
 
 ## 3. ローカル D1 にサンプルデータを投入
 
@@ -194,6 +194,8 @@ curl -H "X-Internal-Api-Key: <your-key>" \
 
 日次パイプライン（`.github/workflows/daily-refresh.yml`）は delta 適用後に **全件** rebuild を自動実行します。提出日のデフォルトは **昨日 JST**（`ingest_daily.py` と同様）。D1 名は GitHub Secret で指定できます（未設定時: staging `edisuku-db-staging`、production `edisuku-db`）。
 
+取り込み後は `apps/web/lib/brand.ts` の `DATA_LAST_UPDATED` を取り込み日に合わせて手動更新してください（[ENV.md](./ENV.md) 参照）。
+
 ## 7. （任意）Python wrapper
 
 EDINET からデータを取り込む場合:
@@ -229,6 +231,7 @@ uv run python scripts/ingest_daily.py --help
 
 ## 関連ドキュメント
 
+- [ENV.md](./ENV.md) — 環境変数・Secrets 一覧
 - [FORK.md](./FORK.md) — Cloudflare デプロイ・本番 API キー
 - [modules/api.md](./modules/api.md) — API エンドポイント詳細
 - [modules/web.md](./modules/web.md) — Web 環境変数・ビルド

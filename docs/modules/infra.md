@@ -56,12 +56,7 @@ Cloudflare リソースの作成・wrangler 設定・GitHub Secrets は [FORK.md
 
 ### GitHub Secrets（CI）
 
-| 種類 | 名前 |
-|---|---|
-| Secret | `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `EDINET_API_KEY` |
-| Secret | `D1_STAGING_ID`, `D1_PRODUCTION_ID`, `KV_STAGING_ID`, `KV_PRODUCTION_ID` |
-| Secret | `STAGING_WEB_URL`, `PROD_WEB_URL` |
-| Secret | `INTERNAL_API_KEY`（任意・記録用。ランタイムは Worker secret） |
+[ENV.md](../ENV.md) を参照。デプロイ必須: `CLOUDFLARE_*`, `D1_*_ID`, `KV_*_ID`, `STAGING_WEB_URL`, `PROD_WEB_URL`。日次取り込みのみ: `EDINET_API_KEY`。
 
 ## fetch-sample-data.sh
 
