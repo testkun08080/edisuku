@@ -52,15 +52,25 @@ def parse_major_shareholders_from_raw(raw: dict[str, Any]) -> list[MajorSharehol
         if rank is None:
             continue
 
-        entry = acc.setdefault(rank, {"rank": rank, "name": None, "address": None, "shares": None, "ratio": None})
+        entry = acc.setdefault(
+            rank, {"rank": rank, "name": None, "address": None, "shares": None, "ratio": None}
+        )
 
         if elem_id == _ELEM_NAME:
             entry["name"] = value
         elif elem_id == _ELEM_ADDRESS:
             entry["address"] = value
-        elif elem_id == _ELEM_SHARES and item_name == _ITEM_SHARES and "MajorShareholders" in context_id:
+        elif (
+            elem_id == _ELEM_SHARES
+            and item_name == _ITEM_SHARES
+            and "MajorShareholders" in context_id
+        ):
             entry["shares"] = value
-        elif elem_id == _ELEM_RATIO and item_name == _ITEM_RATIO and "MajorShareholders" in context_id:
+        elif (
+            elem_id == _ELEM_RATIO
+            and item_name == _ITEM_RATIO
+            and "MajorShareholders" in context_id
+        ):
             entry["ratio"] = value
 
     out: list[MajorShareholderEntry] = []
