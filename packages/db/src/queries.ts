@@ -5,7 +5,6 @@ import {
   companyMetrics,
   documents,
   periodFinancials,
-  secCodeLatestPeriods,
   shareholderSnapshots,
 } from "./schema.js";
 import type * as schema from "./schema.js";
@@ -195,17 +194,4 @@ export async function searchCompanies(db: DB, q: string, limit = 20) {
     )
     .limit(limit)
     .all();
-}
-
-export async function getDocumentIds(db: DB) {
-  return db.select({ docId: documents.docId }).from(documents).all();
-}
-
-export async function countAll(db: DB) {
-  const [companyCount] = await db.select({ c: sql<number>`count(*)` }).from(companies).all();
-  const [docCount] = await db.select({ c: sql<number>`count(*)` }).from(documents).all();
-  return {
-    companies: companyCount?.c ?? 0,
-    documents: docCount?.c ?? 0,
-  };
 }

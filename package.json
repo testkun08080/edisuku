@@ -22,7 +22,11 @@
     "db:migrate:production": "pnpm --filter @edinet/api db:migrate:production",
     "db:backfill:metrics": "pnpm --filter @edinet/metrics exec tsx ../../infra/init/build-company-metrics.mjs",
     "db:backfill:shareholders": "pnpm --filter @edinet/metrics exec tsx ../../infra/init/build-shareholder-snapshots.mjs",
+    "db:backfill:shareholders-corpus": "pnpm --filter @edinet/metrics exec tsx ../../infra/init/build-shareholder-from-corpus.mjs",
     "sample:regenerate": "bash infra/init/regenerate-sample.sh",
+    "audit:staging-db": "bash infra/audit/staging-db-audit.sh",
+    "audit:knip": "knip",
+    "audit:dead-code": "pnpm audit:knip && cd apps/wrapper && uv run ruff check --select F401,F841 .",
     "deploy:api:staging": "pnpm --filter @edinet/api deploy:staging",
     "deploy:api:production": "pnpm --filter @edinet/api deploy:production",
     "deploy:web:staging": "pnpm --filter @edinet/web deploy:staging",
@@ -32,6 +36,7 @@
     "better-sqlite3": "^11.7.0",
     "@biomejs/biome": "1.9.4",
     "@changesets/cli": "^2.27.9",
+    "knip": "^5.62.0",
     "turbo": "^2.3.0",
     "typescript": "^5.9.3"
   }

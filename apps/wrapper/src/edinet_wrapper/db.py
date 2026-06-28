@@ -13,7 +13,9 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
-SCHEMA_PATH = REPO_ROOT / "packages" / "db" / "migrations" / "0000_init.sql"
+MIGRATIONS_DIR = REPO_ROOT / "packages" / "db" / "migrations"
+SCHEMA_PATH = MIGRATIONS_DIR / "0000_init.sql"
+SCHEMA_PATH_0001 = MIGRATIONS_DIR / "0001_company_metrics.sql"
 
 
 def open_db(path: Path) -> sqlite3.Connection:
@@ -25,11 +27,16 @@ def open_db(path: Path) -> sqlite3.Connection:
     return conn
 
 
-def apply_schema(conn: sqlite3.Connection, schema_path: Path = SCHEMA_PATH) -> None:
-    if not schema_path.exists():
-        raise FileNotFoundError(f"schema not found: {schema_path}")
-    sql = schema_path.read_text(encoding="utf-8").replace("--> statement-breakpoint", "")
-    conn.executescript(sql)
+def apply_schema(
+    conn: sqlite3.Connection,
+    schema_paths: Iterable[Path] | None = None,
+) -> None:
+    paths = list(schema_paths or (SCHEMA_PATH, SCHEMA_PATH_0001))
+    for schema_path in paths:
+        if not schema_path.exists():
+            raise FileNotFoundError(f"schema not found: {schema_path}")
+        sql = schema_path.read_text(encoding="utf-8").replace("--> statement-breakpoint", "")
+        conn.executescript(sql)
     conn.commit()
 
 
@@ -150,6 +157,29 @@ def upsert_period_financial(
     )
 
 
+def upsert_shareholder_snapshot(
+    conn: sqlite3.Connection,
+    *,
+    sec_code: str,
+    period_end: str,
+    doc_id: str | None,
+    entries: list[dict[str, Any]],
+) -> None:
+    if not sec_code or not entries:
+        return
+    conn.execute(
+        """
+        INSERT INTO shareholder_snapshots (sec_code, period_end, doc_id, entries_json)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(sec_code, period_end) DO UPDATE SET
+          doc_id=excluded.doc_id,
+          entries_json=excluded.entries_json,
+          updated_at=CURRENT_TIMESTAMP
+        """,
+        (sec_code, period_end, doc_id, json.dumps(entries, ensure_ascii=False)),
+    )
+
+
 def known_doc_ids(conn: sqlite3.Connection) -> set[str]:
     rows = conn.execute("SELECT doc_id FROM documents").fetchall()
     return {r["doc_id"] for r in rows}
@@ -161,7 +191,7 @@ def export_inserts_after(conn: sqlite3.Connection, since_ts: str) -> Iterable[st
     Used by publish_to_d1.py to emit a delta SQL file that `wrangler d1 execute`
     can apply against the remote D1 instance.
     """
-    for table in ("companies", "documents", "period_financials"):
+    for table in ("companies", "documents", "period_financials", "shareholder_snapshots"):
         cursor = conn.execute(
             f"SELECT * FROM {table} WHERE updated_at >= ?",
             (since_ts,),

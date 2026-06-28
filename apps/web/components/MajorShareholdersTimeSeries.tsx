@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/lib/api";
-import { formatMajorShareholderCell } from "@/lib/parse-major-shareholders";
+import { formatMajorShareholderCell } from "@edinet/metrics";
 import type { ShareholdersResponse } from "@edinet/types";
 import { AlertCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";

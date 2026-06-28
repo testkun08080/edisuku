@@ -9,11 +9,12 @@ D1 / SQLite 共通のスキーマ定義とクエリ層。**スキーマの正本
 ```
 packages/db/
 ├── src/
-│   ├── schema.ts      drizzle テーブル定義（7 テーブル）+ 型 export
+│   ├── schema.ts      drizzle テーブル定義 + 型 export
 │   ├── queries.ts     型安全なクエリ関数
 │   └── index.ts       schema + queries の re-export
 ├── migrations/
 │   ├── 0000_init.sql  drizzle-kit 生成 SQL（apps/wrapper も読む）
+│   ├── 0001_company_metrics.sql  company_metrics / shareholder_snapshots
 │   └── meta/          drizzle-kit のスナップショット
 └── drizzle.config.ts  dialect: sqlite, driver: d1-http
 ```
@@ -25,10 +26,12 @@ packages/db/
 | `companies` | edinet_code | 企業マスタ |
 | `documents` | doc_id | 提出書類メタ |
 | `period_financials` | (edinet_code, period_end, doc_type) | 期ごとの財務 JSON (summary/pl/bs/cf) |
+| `company_metrics` | sec_code | スクリーナー用指標スナップショット |
+| `shareholder_snapshots` | (sec_code, period_end) | 大株主時系列 |
 | `raw_files_index` | file_id | R2 上の生ファイル索引 |
 | `pipeline_runs` | run_id | 取り込みジョブ記録 |
 | `daily_metrics` | snapshot_date | 日次集計カウント |
-| `sec_code_latest_periods` | sec_code | 証券コードごとの最新提出（一覧の高速参照） |
+| `sec_code_latest_periods` | sec_code | **deprecated** — `company_metrics` で代替。seed 残骸のみ |
 
 型は `$inferSelect` から導出して export（`Company`, `Document`, `PeriodFinancial` ...）。
 
@@ -39,10 +42,10 @@ packages/db/
 | `listCompanies(db, {limit, offset, industry})` | 企業一覧 |
 | `getCompanyBySecCode` / `getCompanyByEdinetCode` | 単一企業 |
 | `getSummaryBySecCode(db, secCode)` | 時系列財務（period_end 降順） |
-| `getLatestMetrics(db, {limit, offset})` | 一覧表用スナップショット（join） |
+| `getCompanyMetrics` / `getAllCompanyMetrics` / `queryCompanyMetrics` | スクリーナー指標 |
+| `getShareholdersBySecCode(db, secCode)` | 大株主スナップショット |
 | `searchCompanies(db, q, limit)` | 名称・証券コード LIKE 検索 |
-| `getDocumentIds(db)` | 取り込み済み doc_id 一覧 |
-| `countAll(db)` | companies / documents 件数 |
+| `countCompanies` / `countCompanyMetrics` | 件数 |
 
 `DB` 型 = `DrizzleD1Database<typeof schema>`。`apps/api` がこれを import して D1 を叩く。
 
@@ -60,9 +63,10 @@ pnpm --filter @edinet/api db:migrate:staging
 pnpm --filter @edinet/api db:migrate:production
 ```
 
-`migrations/0000_init.sql` は Python (`apps/wrapper/src/edinet_wrapper/db.py`) も読むため、スキーマ変更時はこの生成物を必ずコミットする。
+`migrations/0000_init.sql` と `0001_company_metrics.sql` は Python (`apps/wrapper/src/edinet_wrapper/db.py`) も読むため、スキーマ変更時は生成物を必ずコミットする。
 
 ## 設計上のポイント
 
 - schema.ts を単一の正本とし、D1・ローカル SQLite・Python の 3 者が同じ DDL を共有する。
 - D1 にトリガがない等の差分は drizzle が吸収する。
+- `sec_code_latest_periods` は daily-refresh で更新されない。新規コードは `company_metrics` を参照すること。

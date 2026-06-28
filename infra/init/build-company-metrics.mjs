@@ -72,7 +72,7 @@ const db = new Database(dbPath, { readonly: true });
 
 const latestRowsAll = db
   .prepare(
-    `SELECT sec_code, edinet_code, filer_name
+    `SELECT sec_code, edinet_code, filer_name, listed_category, industry
      FROM companies
      WHERE sec_code IS NOT NULL AND sec_code != ''
      ORDER BY sec_code`,
@@ -140,6 +140,9 @@ for (const row of latestRows) {
 
   const metrics = metricsFromPeriods(company);
   if (!metrics) continue;
+
+  if (row.industry != null) metrics.industry = row.industry;
+  if (row.listed_category != null) metrics.listedCategory = row.listed_category;
 
   const denorm = metricsToDenormalizedColumns(metrics);
   const metricsJson = escSql(JSON.stringify(metrics));

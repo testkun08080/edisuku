@@ -25,6 +25,7 @@ pnpm --filter @edinet/api dev
 | GET    | `/api/companies/:secCode`     | 企業詳細（secCode または edinetCode）     |
 | GET    | `/api/summaries/:secCode`     | 時系列財務サマリー                              |
 | GET    | `/api/metrics`                | スクリーナーテーブル用の最新スナップショット     |
+| GET    | `/api/metrics/query`          | フィルタ・ソート付き指標クエリ（ページネーション） |
 | GET    | `/api/search?q=`              | 社名 / secCode の全文検索     |
 | GET    | `/api/shareholders/:secCode`  | 大株主                         |
 | GET    | `/api/manifest`               | カラムマニフェスト（UI メタデータ）              |

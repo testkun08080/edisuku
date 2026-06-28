@@ -12,10 +12,19 @@ from typing import Any
 import polars as pl
 from loguru import logger
 
-from edinet_wrapper.db import upsert_company, upsert_document, upsert_period_financial
+from edinet_wrapper.db import (
+    upsert_company,
+    upsert_document,
+    upsert_period_financial,
+    upsert_shareholder_snapshot,
+)
 from edinet_wrapper.downloader import Downloader
 from edinet_wrapper.parser import parse_tsv
 from edinet_wrapper.schema import Result
+from edinet_wrapper.shareholders import (
+    major_shareholders_to_api_entries,
+    parse_major_shareholders_from_tsv,
+)
 
 DOC_TYPES_DEFAULT = frozenset({"annual", "quarterly", "semiannual", "large_holding"})
 
@@ -231,6 +240,18 @@ def ingest_date(
                 cf=to_flat_dict(parsed.cf),
                 raw_tsv_path=tsv_path.as_posix(),
             )
+            if doc_type in ("annual", "semiannual") and sec_code:
+                entries = major_shareholders_to_api_entries(
+                    parse_major_shareholders_from_tsv(tsv_path)
+                )
+                if entries:
+                    upsert_shareholder_snapshot(
+                        conn,
+                        sec_code=sec_code,
+                        period_end=str(period_end),
+                        doc_id=result.docID,
+                        entries=entries,
+                    )
             stats.ingested += 1
             known_doc_ids.add(result.docID)
         except Exception:

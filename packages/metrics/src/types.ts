@@ -66,6 +66,8 @@ export type CompanyMetricsRow = {
   deRatio?: number | null;
   roic?: number | null;
   piotroskiFScore?: number | null;
+  industry?: string | null;
+  listedCategory?: string | null;
 };
 
 export type CompanyMetricsDbRow = {

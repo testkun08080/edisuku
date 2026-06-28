@@ -67,6 +67,27 @@ export function parseMajorShareholdersFromRaw(raw: { rows?: string[][] }): Major
     }));
 }
 
+export function formatMajorShareholderCell(shares: string | null, ratio: string | null): string {
+  const parts: string[] = [];
+  if (shares) {
+    const n = Number.parseInt(shares.replace(/,/g, ""), 10);
+    if (!Number.isNaN(n)) {
+      parts.push(`${(n / 1000).toLocaleString("ja-JP", { maximumFractionDigits: 0 })}千株`);
+    } else {
+      parts.push(shares);
+    }
+  }
+  if (ratio) {
+    const r = Number.parseFloat(ratio);
+    if (!Number.isNaN(r)) {
+      parts.push(`(${((r <= 1 ? r : r / 100) * 100).toFixed(2)}%)`);
+    } else {
+      parts.push(`(${ratio})`);
+    }
+  }
+  return parts.length ? parts.join(" ") : "―";
+}
+
 export function majorShareholdersToApiEntries(entries: MajorShareholderEntry[]) {
   return entries.map((e) => ({
     name: e.name,

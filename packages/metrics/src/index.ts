@@ -26,6 +26,7 @@ export { computeConsecutiveDivIncreases } from "./consecutiveDiv.js";
 export { computePiotroskiFScore } from "./piotroski.js";
 export { compareSubmitDateTime } from "./helpers.js";
 export {
+  formatMajorShareholderCell,
   majorShareholdersToApiEntries,
   parseMajorShareholdersFromRaw,
   type MajorShareholderEntry,

@@ -29,7 +29,7 @@ apps/web/
 │   ├── metricFormat.ts         円→百万円・比率→% などの表示換算
 │   ├── routes.ts               analyzePath などの URL ヘルパ
 │   ├── analytics.ts            Google Analytics
-│   ├── parse-major-shareholders.ts / financial-pickers.ts / ...
+│   ├── financial-pickers.ts / ...
 │   └── landing/                LP 用デモデータ
 ├── assets/                     logo
 ├── wrangler.jsonc.template     D1 binding の placeholder

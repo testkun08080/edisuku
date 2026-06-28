@@ -1,0 +1,45 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    "apps/api": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts"]
+    },
+    "apps/web": {
+      "entry": [
+        "pages/**/+Page.tsx",
+        "pages/**/+config.ts",
+        "pages/**/+Layout.tsx",
+        "pages/**/+Head.tsx",
+        "pages/**/+client.ts",
+        "pages/**/+onPageTransitionStart.ts",
+        "pages/**/+onPageTransitionEnd.ts",
+        "server/index.ts",
+        "scripts/**/*.tsx"
+      ],
+      "project": ["**/*.{ts,tsx}"],
+      "wrangler": false,
+      "ignoreDependencies": ["daisyui", "tw-animate-css", "@photonjs/srvx"]
+    },
+    "packages/db": {
+      "entry": ["src/index.ts", "src/queries.ts", "src/schema.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts"]
+    },
+    "packages/metrics": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts"]
+    },
+    "packages/types": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.ts"]
+    }
+  },
+  "ignore": [
+    "**/*.test.ts",
+    "**/*.test-d.ts",
+    "**/worker-configuration.d.ts",
+    "apps/web/wrangler.jsonc",
+    "apps/web/wrangler.jsonc.template",
+    "infra/init/**"
+  ]
+}
