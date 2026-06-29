@@ -15,6 +15,7 @@ packages/db/
 ├── migrations/
 │   ├── 0000_init.sql  drizzle-kit 生成 SQL（apps/wrapper も読む）
 │   ├── 0001_company_metrics.sql  company_metrics / shareholder_snapshots
+│   ├── 0002_drop_legacy_tables.sql  DROP raw_files_index / sec_code_latest_periods
 │   └── meta/          drizzle-kit のスナップショット
 └── drizzle.config.ts  dialect: sqlite, driver: d1-http
 ```
@@ -28,10 +29,8 @@ packages/db/
 | `period_financials` | (edinet_code, period_end, doc_type) | 期ごとの財務 JSON (summary/pl/bs/cf) |
 | `company_metrics` | sec_code | スクリーナー用指標スナップショット |
 | `shareholder_snapshots` | (sec_code, period_end) | 大株主時系列 |
-| `raw_files_index` | file_id | R2 上の生ファイル索引 |
-| `pipeline_runs` | run_id | 取り込みジョブ記録 |
-| `daily_metrics` | snapshot_date | 日次集計カウント |
-| `sec_code_latest_periods` | sec_code | **deprecated** — `company_metrics` で代替。seed 残骸のみ |
+| `pipeline_runs` | run_id | 日次取り込みジョブ記録（daily-refresh 終了時に書込） |
+| `daily_metrics` | snapshot_date | コーパス全体件数の日次スナップショット（提出日キー） |
 
 型は `$inferSelect` から導出して export（`Company`, `Document`, `PeriodFinancial` ...）。
 
@@ -63,10 +62,10 @@ pnpm --filter @edinet/api db:migrate:staging
 pnpm --filter @edinet/api db:migrate:production
 ```
 
-`migrations/0000_init.sql` と `0001_company_metrics.sql` は Python (`apps/wrapper/src/edinet_wrapper/db.py`) も読むため、スキーマ変更時は生成物を必ずコミットする。
+`migrations/0000_init.sql` と `0001_company_metrics.sql` は Python (`apps/wrapper/src/edinet_wrapper/db.py`) も読むため、スキーマ変更時は生成物を必ずコミットする。既存 DB の legacy テーブル削除は `0002_drop_legacy_tables.sql` を `pnpm db:migrate:staging` / `production` で適用する。
 
 ## 設計上のポイント
 
 - schema.ts を単一の正本とし、D1・ローカル SQLite・Python の 3 者が同じ DDL を共有する。
 - D1 にトリガがない等の差分は drizzle が吸収する。
-- `sec_code_latest_periods` は daily-refresh で更新されない。新規コードは `company_metrics` を参照すること。
+- `pipeline_runs` / `daily_metrics` は `emit_pipeline_meta.py` 経由で daily-refresh 終了時に D1 へ書込む。

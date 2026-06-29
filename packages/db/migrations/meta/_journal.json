@@ -15,6 +15,13 @@
       "when": 1779800000000,
       "tag": "0001_company_metrics",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1780000000000,
+      "tag": "0002_drop_legacy_tables",
+      "breakpoints": true
     }
   ]
 }

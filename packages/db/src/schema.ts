@@ -1,13 +1,5 @@
 import { sql } from "drizzle-orm";
-import {
-  index,
-  integer,
-  primaryKey,
-  real,
-  sqliteTable,
-  text,
-  unique,
-} from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const companies = sqliteTable("companies", {
   edinetCode: text("edinet_code").primaryKey(),
@@ -73,29 +65,6 @@ export const periodFinancials = sqliteTable(
   }),
 );
 
-export const rawFilesIndex = sqliteTable(
-  "raw_files_index",
-  {
-    fileId: text("file_id").primaryKey(),
-    docId: text("doc_id")
-      .notNull()
-      .references(() => documents.docId),
-    edinetCode: text("edinet_code")
-      .notNull()
-      .references(() => companies.edinetCode),
-    docType: text("doc_type").notNull(),
-    fileType: text("file_type").notNull(),
-    objectKey: text("object_key").notNull(),
-    fileHash: text("file_hash"),
-    fileSizeBytes: integer("file_size_bytes"),
-    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-  },
-  (t) => ({
-    uniqDocFile: unique("uq_raw_files_doc_file").on(t.docId, t.fileType),
-    docFileTypeIdx: index("idx_raw_files_doc_file_type").on(t.docId, t.fileType),
-  }),
-);
-
 export const pipelineRuns = sqliteTable("pipeline_runs", {
   runId: text("run_id").primaryKey(),
   scope: text("scope").notNull(),
@@ -117,26 +86,6 @@ export const dailyMetrics = sqliteTable("daily_metrics", {
   periodFinancialCount: integer("period_financial_count").notNull(),
   generatedAt: text("generated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
-
-export const secCodeLatestPeriods = sqliteTable(
-  "sec_code_latest_periods",
-  {
-    secCode: text("sec_code").primaryKey(),
-    edinetCode: text("edinet_code")
-      .notNull()
-      .references(() => companies.edinetCode),
-    filerName: text("filer_name").notNull(),
-    latestDocId: text("latest_doc_id")
-      .notNull()
-      .references(() => documents.docId),
-    latestPeriodEnd: text("latest_period_end").notNull(),
-    latestSubmitDateTime: text("latest_submit_date_time"),
-    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-  },
-  (t) => ({
-    periodEndIdx: index("idx_sec_code_latest_periods_period_end").on(t.latestPeriodEnd),
-  }),
-);
 
 export const companyMetrics = sqliteTable(
   "company_metrics",
@@ -182,6 +131,5 @@ export type CompanyInsert = typeof companies.$inferInsert;
 export type Document = typeof documents.$inferSelect;
 export type PeriodFinancial = typeof periodFinancials.$inferSelect;
 export type DailyMetric = typeof dailyMetrics.$inferSelect;
-export type SecCodeLatestPeriod = typeof secCodeLatestPeriods.$inferSelect;
 export type CompanyMetric = typeof companyMetrics.$inferSelect;
 export type ShareholderSnapshot = typeof shareholderSnapshots.$inferSelect;

@@ -1,4 +1,4 @@
--- CI fixture: company present in companies + period_financials but absent from sec_code_latest_periods.
+-- CI fixture: company present in companies + period_financials for metrics backfill coverage.
 PRAGMA foreign_keys = ON;
 
 INSERT OR REPLACE INTO companies (

@@ -18,6 +18,7 @@
 |---|---|
 | `scripts/ingest_daily.py` | 当日分の EDINET 取得 → ローカル SQLite |
 | `scripts/publish_to_d1.py` | SQLite 差分 → Cloudflare D1 用 SQL 出力 |
+| `scripts/emit_pipeline_meta.py` | pipeline_runs / daily_metrics 用 SQL 出力 |
 | `scripts/backfill.py` | 過去 N 年バルク取り込み |
 
 ## 開発

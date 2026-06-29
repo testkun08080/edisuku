@@ -13,6 +13,8 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
+from dataclasses import asdict
 from pathlib import Path
 
 from edinet_wrapper.db import apply_schema, open_db
@@ -35,6 +37,12 @@ def main() -> int:
     parser.add_argument("--known-docs", type=Path, default=None)
     parser.add_argument("--api-key", default=None, help="Falls back to EDINET_API_KEY env var")
     parser.add_argument("--raw-root", type=Path, default=Path("data/raw"))
+    parser.add_argument(
+        "--stats-out",
+        type=Path,
+        default=None,
+        help="Write ingest stats JSON (fetched, ingested, skipped, errors)",
+    )
     args = parser.parse_args()
 
     target = resolve_target_date(args.date)
@@ -53,6 +61,13 @@ def main() -> int:
     )
 
     conn.close()
+    if args.stats_out is not None:
+        payload = {
+            "target_date": target.isoformat(),
+            **asdict(stats),
+        }
+        args.stats_out.parent.mkdir(parents=True, exist_ok=True)
+        args.stats_out.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
     print(
         f"[ingest] {target.isoformat()} fetched={stats.fetched} "
         f"ingested={stats.ingested} skipped={stats.skipped} errors={stats.errors} "

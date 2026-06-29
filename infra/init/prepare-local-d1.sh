@@ -39,6 +39,9 @@ else
   echo "[prepare-local-d1] company_metrics table already present, skipping 0001"
 fi
 
+echo "[prepare-local-d1] applying migration packages/db/migrations/0002_drop_legacy_tables.sql"
+pnpm exec wrangler d1 execute edisuku-local --local --file "$REPO_ROOT/packages/db/migrations/0002_drop_legacy_tables.sql"
+
 count=$(metrics_count 2>/dev/null || echo "0")
 if [ "${count:-0}" -ge 11 ] 2>/dev/null; then
   echo "[prepare-local-d1] sample data already loaded (${count} company_metrics rows), skipping"

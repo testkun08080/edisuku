@@ -401,18 +401,6 @@ for (let i = 1; i < companyProfiles.length; i++) {
   }
 }
 
-for (const company of sampleCompanies) {
-  const latestDocId =
-    company.secCode === "9999" ? "SAMPLE-ANNUAL-2025" : `SAMPLE-ANNUAL-2025-${company.secCode}`;
-  lines.push(`INSERT OR REPLACE INTO sec_code_latest_periods (
-  sec_code, edinet_code, filer_name, latest_doc_id, latest_period_end, latest_submit_date_time
-) VALUES (
-  '${company.secCode}', '${company.edinetCode}', '${escSql(company.filerName)}',
-  '${latestDocId}', '2025-03-31', '2025-06-28T09:00:00Z'
-);`);
-  lines.push("");
-}
-
 lines.push(`INSERT OR REPLACE INTO daily_metrics (
   snapshot_date, company_count, document_count, period_financial_count
 ) VALUES (

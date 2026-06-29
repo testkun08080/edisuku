@@ -69,6 +69,12 @@ jobs:
           echo "TARGET_DATE=$TARGET_DATE" >> "$GITHUB_ENV"
           echo "Using submission date: $TARGET_DATE (JST)"
 
+      - name: Record pipeline run id and start time
+        run: |
+          echo "PIPELINE_RUN_ID=${{ github.run_id }}" >> "$GITHUB_ENV"
+          echo "PIPELINE_STARTED_AT=$(date -u +%FT%T)" >> "$GITHUB_ENV"
+          echo "PIPELINE_SCOPE=daily-refresh-staging" >> "$GITHUB_ENV"
+
       - name: Fetch known doc_ids from D1
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -89,7 +95,8 @@ jobs:
           uv run python scripts/ingest_daily.py \
             --date "$TARGET_DATE" \
             --known-docs /tmp/known.json \
-            --output data/edinet.db
+            --output data/edinet.db \
+            --stats-out /tmp/ingest-stats.json
 
       - name: Emit delta SQL
         working-directory: apps/wrapper
@@ -159,3 +166,69 @@ jobs:
           else
             echo "KV_NAMESPACE_ID not set, skipping KV invalidation"
           fi
+
+      - name: Record pipeline metadata
+        if: success()
+        working-directory: apps/wrapper
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          FINISHED_AT=$(date -u +%FT%T)
+          INGEST_FETCHED=$(jq -r '.fetched // 0' /tmp/ingest-stats.json 2>/dev/null || echo 0)
+          INGEST_INGESTED=$(jq -r '.ingested // 0' /tmp/ingest-stats.json 2>/dev/null || echo 0)
+          INGEST_SKIPPED=$(jq -r '.skipped // 0' /tmp/ingest-stats.json 2>/dev/null || echo 0)
+          INGEST_ERRORS=$(jq -r '.errors // 0' /tmp/ingest-stats.json 2>/dev/null || echo 0)
+          COMPANY_COUNT=$(sqlite3 /tmp/corpus.db "SELECT COUNT(*) FROM companies")
+          DOCUMENT_COUNT=$(sqlite3 /tmp/corpus.db "SELECT COUNT(*) FROM documents")
+          PERIOD_COUNT=$(sqlite3 /tmp/corpus.db "SELECT COUNT(*) FROM period_financials")
+          uv run python scripts/emit_pipeline_meta.py \
+            --target-date "$TARGET_DATE" \
+            --scope "$PIPELINE_SCOPE" \
+            --run-id "$PIPELINE_RUN_ID" \
+            --status success \
+            --started-at "$PIPELINE_STARTED_AT" \
+            --finished-at "$FINISHED_AT" \
+            --fetched "$INGEST_FETCHED" \
+            --ingested "$INGEST_INGESTED" \
+            --skipped "$INGEST_SKIPPED" \
+            --errors "$INGEST_ERRORS" \
+            --company-count "$COMPANY_COUNT" \
+            --document-count "$DOCUMENT_COUNT" \
+            --period-financial-count "$PERIOD_COUNT" \
+            --output /tmp/pipeline_meta.sql
+          npx -y wrangler@4 d1 execute "$D1_NAME" --remote \
+            --config apps/api/wrangler.toml \
+            --env staging \
+            --file /tmp/pipeline_meta.sql
+
+      - name: Record failed pipeline run
+        if: failure()
+        working-directory: apps/wrapper
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          FINISHED_AT=$(date -u +%FT%T)
+          INGEST_FETCHED=$(jq -r '.fetched // 0' /tmp/ingest-stats.json 2>/dev/null || echo 0)
+          INGEST_INGESTED=$(jq -r '.ingested // 0' /tmp/ingest-stats.json 2>/dev/null || echo 0)
+          INGEST_SKIPPED=$(jq -r '.skipped // 0' /tmp/ingest-stats.json 2>/dev/null || echo 0)
+          INGEST_ERRORS=$(jq -r '.errors // 0' /tmp/ingest-stats.json 2>/dev/null || echo 0)
+          uv run python scripts/emit_pipeline_meta.py \
+            --target-date "$TARGET_DATE" \
+            --scope "$PIPELINE_SCOPE" \
+            --run-id "$PIPELINE_RUN_ID" \
+            --status failed \
+            --started-at "$PIPELINE_STARTED_AT" \
+            --finished-at "$FINISHED_AT" \
+            --fetched "$INGEST_FETCHED" \
+            --ingested "$INGEST_INGESTED" \
+            --skipped "$INGEST_SKIPPED" \
+            --errors "$INGEST_ERRORS" \
+            --notes "workflow failed" \
+            --skip-daily-metrics \
+            --output /tmp/pipeline_meta.sql
+          npx -y wrangler@4 d1 execute "$D1_NAME" --remote \
+            --config apps/api/wrangler.toml \
+            --env staging \
+            --file /tmp/pipeline_meta.sql
