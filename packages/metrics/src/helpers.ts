@@ -46,6 +46,17 @@ export function isAnnualPeriod(period: CompanySummary["periods"][0]): boolean {
   return false;
 }
 
+/** EDINET docDescription から開示種別キー（分析ページの四半期/半期/通期と対応） */
+export function reportKindKey(
+  docDescription: string | undefined,
+): "quarter" | "semiAnnual" | "annual" | "other" {
+  const d = docDescription ?? "";
+  if (d.includes("四半期報告書")) return "quarter";
+  if (d.includes("半期報告書")) return "semiAnnual";
+  if (d.includes("有価証券報告書")) return "annual";
+  return "other";
+}
+
 export function annualPeriodsSortedDesc(
   periods: CompanySummary["periods"],
 ): CompanySummary["periods"] {

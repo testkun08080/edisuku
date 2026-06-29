@@ -57,6 +57,7 @@ import { SITE_NAME } from "../../../../lib/brand";
 import {
   ANALYZE_HEADCOUNT_ROW_KEYS,
   formatAnalyzeFinancialTableCell,
+  formatDecimalAsPercent,
   formatRatioDecimalStringAsPercent,
   formatSharesCountString,
   formatYenStringAsMillionYen,
@@ -305,8 +306,6 @@ function IndicatorsTable({ metrics }: { metrics: CompanyMetricsRow | null }) {
                 display = `${val}年`;
               } else if ((key === "currentRatio" || key === "deRatio") && typeof val === "number") {
                 display = val.toFixed(2);
-              } else if (key === "roic" && typeof val === "number") {
-                display = (val * 100).toFixed(2) + "%";
               } else if (
                 (key === "ROE" ||
                   key === "equityRatio" ||
@@ -325,16 +324,16 @@ function IndicatorsTable({ metrics }: { metrics: CompanyMetricsRow | null }) {
               ) {
                 display = formatRatioDecimalStringAsPercent(val);
               } else if (key === "netCashRatio" && typeof val === "number") {
-                display = (val * 100).toFixed(2) + "%";
+                display = formatDecimalAsPercent(val);
               } else if (key === "dividendYield" && typeof val === "number") {
-                display = val.toFixed(2) + "%";
+                display = formatDecimalAsPercent(val);
+              } else if (key === "roic" && typeof val === "number") {
+                display = formatDecimalAsPercent(val);
               } else if (typeof val === "number") {
                 if (key === "PER") {
                   display = val.toFixed(1);
                 } else if (key === "PBR") {
                   display = val.toFixed(2);
-                } else if (key === "dividendYield") {
-                  display = val.toFixed(2) + "%";
                 } else if (key === "marketCap" || key === "netCash") {
                   display = formatYenStringAsMillionYen(String(val));
                 } else {
@@ -374,7 +373,6 @@ export default function Page() {
   const pageContext = usePageContext();
   const secCode = pageContext.routeParams?.secCode;
   const [company, setCompany] = useState<CompanySummary | null>(null);
-  const [metrics, setMetrics] = useState<CompanyMetricsRow | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const config = useConfig();
@@ -396,7 +394,6 @@ export default function Page() {
       if (!secCode) {
         if (!cancelled) {
           setCompany(null);
-          setMetrics(null);
           setError("証券コードが指定されていません");
           setLoading(false);
         }
@@ -412,7 +409,6 @@ export default function Page() {
           if (res.status === 404) {
             if (!cancelled) {
               setCompany(null);
-              setMetrics(null);
               setError(
                 `証券コード ${secCode} のデータが見つかりません。企業一覧から選択してください。`,
               );
@@ -423,10 +419,8 @@ export default function Page() {
           throw new Error(`HTTP ${res.status}`);
         }
         const nextCompany = normalizeCompanySummary(await res.json(), secCode);
-        const nextMetrics = metricsFromPeriods(nextCompany);
         if (!cancelled) {
           setCompany(nextCompany);
-          setMetrics(nextMetrics);
           setError(null);
           setLoading(false);
         }
@@ -434,7 +428,6 @@ export default function Page() {
         const msg = e instanceof Error ? e.message : String(e);
         if (!cancelled) {
           setCompany(null);
-          setMetrics(null);
           setError(`データの取得に失敗しました: ${msg}`);
           setLoading(false);
         }
@@ -474,6 +467,13 @@ export default function Page() {
   const reportFilteredPeriods = useMemo(
     () => periods.filter((p) => reportMatchesKind(p.docDescription, analyzeReportKind)),
     [periods, analyzeReportKind],
+  );
+  const metrics = useMemo(
+    () =>
+      company
+        ? metricsFromPeriods(company, { periods: reportFilteredPeriods })
+        : null,
+    [company, reportFilteredPeriods],
   );
   const filteredPeriods = useMemo(
     () => filterPeriodsByVisibleYears(reportFilteredPeriods, analyzeVisibleYears),
@@ -522,7 +522,7 @@ export default function Page() {
               </CardTitle>
               <CardDescription className="flex items-center gap-2 mt-1">
                 <Badge variant="outline">{companySecCode}</Badge>
-                <span>EDINET 四半期報告書データ</span>
+                <span>EDINET {analyzeReportKindLabel[analyzeReportKind]}報告書データ</span>
               </CardDescription>
             </div>
             <CardAction>
@@ -633,7 +633,11 @@ export default function Page() {
 
           <div className="flex-1 min-h-0 overflow-auto mt-4">
             <TabsContent value="summary" className="min-h-0 space-y-6">
-              <SummaryCharts periods={filteredPeriods} metrics={metrics} />
+              <SummaryCharts
+                periods={filteredPeriods}
+                metrics={metrics}
+                reportKind={analyzeReportKind}
+              />
               <DataTable
                 data={filteredPeriods.map((p) => p.summary)}
                 periods={filteredPeriods}

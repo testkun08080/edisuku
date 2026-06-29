@@ -3,11 +3,13 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import type { NameType, Payload, ValueType } from "recharts/types/component/DefaultTooltipContent";
+import type { AnalyzeReportKind } from "../lib/analyze-report-kind.js";
 import {
   pickCfDividendPaid,
   pickPlRevenueForChart,
   pickSummaryRevenueForChart,
 } from "../lib/financial-pickers.js";
+import { formatDecimalAsPercent } from "../lib/metricFormat.js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import {
   type ChartConfig,
@@ -147,7 +149,12 @@ const bsChartConfig = {
 export function SummaryCharts({
   periods,
   metrics,
-}: { periods: Period[]; metrics: DividendMetricsSnapshot }) {
+  reportKind,
+}: {
+  periods: Period[];
+  metrics: DividendMetricsSnapshot;
+  reportKind?: AnalyzeReportKind;
+}) {
   const list = periods ?? [];
   const [mounted, setMounted] = useState(false);
 
@@ -242,6 +249,11 @@ export function SummaryCharts({
 
   const chartMargins = { left: 4, right: 8, top: 8, bottom: 4 } as const;
 
+  const quarterlyCumulativeNote =
+    reportKind === "quarter"
+      ? "四半期報告書の金額は会計年度内累計のことが多く、棒の高さは単独四半期ではありません。"
+      : null;
+
   if (!mounted) {
     return (
       <div className="grid gap-4 sm:grid-cols-2">
@@ -254,6 +266,11 @@ export function SummaryCharts({
 
   return (
     <div className="space-y-4">
+      {quarterlyCumulativeNote ? (
+        <p className="text-muted-foreground rounded-md border border-amber-200/80 bg-amber-50/60 px-3 py-2 text-xs leading-relaxed dark:border-amber-900/50 dark:bg-amber-950/20">
+          {quarterlyCumulativeNote}
+        </p>
+      ) : null}
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader className="pb-2">
@@ -474,7 +491,7 @@ export function SummaryCharts({
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">配当まわり（最新スナップショット）</CardTitle>
-              <CardDescription>企業指標（company_metrics）の最新値</CardDescription>
+              <CardDescription>選択中の開示種別に基づく最新指標</CardDescription>
             </CardHeader>
             <CardContent>
               <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3 text-sm">
@@ -489,7 +506,7 @@ export function SummaryCharts({
                 <div className="rounded-lg border bg-muted/30 p-3">
                   <dt className="text-muted-foreground text-xs">配当利回り</dt>
                   <dd className="mt-1 font-semibold tabular-nums">
-                    {metrics.dividendYield != null ? `${metrics.dividendYield.toFixed(2)}%` : "―"}
+                    {formatDecimalAsPercent(metrics.dividendYield)}
                   </dd>
                 </div>
                 <div className="rounded-lg border bg-muted/30 p-3">

@@ -1,13 +1,33 @@
 import { computeConsecutiveDivIncreases } from "./consecutiveDiv.js";
-import { cagrRatio, growthRatio, parseDecimal, parseYen, pickFromPeriod } from "./helpers.js";
+import {
+  cagrRatio,
+  growthRatio,
+  parseDecimal,
+  parseYen,
+  pickFromPeriod,
+  reportKindKey,
+} from "./helpers.js";
 import { computePiotroskiFScore } from "./piotroski.js";
 import type { CompanyMetricsRow, CompanySummary } from "./types.js";
 
+export type MetricsFromPeriodsOptions = {
+  /** 指標算出に使う期間。未指定時は company.periods 全体 */
+  periods?: CompanySummary["periods"];
+};
+
 /** API の period_financials から指標タブ用のスナップショットを組み立てる */
-export function metricsFromPeriods(company: CompanySummary): CompanyMetricsRow | null {
-  const sorted = [...company.periods].sort((a, b) => a.periodEnd.localeCompare(b.periodEnd));
+export function metricsFromPeriods(
+  company: CompanySummary,
+  options?: MetricsFromPeriodsOptions,
+): CompanyMetricsRow | null {
+  const sourcePeriods = options?.periods?.length ? options.periods : company.periods;
+  const sorted = [...sourcePeriods].sort((a, b) => a.periodEnd.localeCompare(b.periodEnd));
   const latest = sorted.at(-1);
   if (!latest) return null;
+
+  const kindSorted = sorted.filter(
+    (p) => reportKindKey(p.docDescription) === reportKindKey(latest.docDescription),
+  );
 
   const s = latest.summary;
   const pl = latest.pl;
@@ -50,7 +70,7 @@ export function metricsFromPeriods(company: CompanySummary): CompanyMetricsRow |
   const icfYen = parseYen(investingCF);
   const fcfYen = ocfYen != null && icfYen != null ? String(ocfYen + icfYen) : null;
 
-  const prev = sorted.length >= 2 ? sorted.at(-2) : undefined;
+  const prev = kindSorted.length >= 2 ? kindSorted.at(-2) : undefined;
   const prevSales = prev ? parseYen(pickFromPeriod(prev, "売上高", "売上収益（IFRS）")) : null;
   const prevOp = prev ? parseYen(pickFromPeriod(prev, "営業利益")) : null;
   const prevEps = prev
@@ -67,8 +87,8 @@ export function metricsFromPeriods(company: CompanySummary): CompanyMetricsRow |
   const dps = pick("１株当たり配当額");
   const dpsNum = parseDecimal(dps);
 
-  const past3 = sorted.length >= 4 ? sorted.at(-4) : undefined;
-  const past5 = sorted.length >= 6 ? sorted.at(-6) : undefined;
+  const past3 = kindSorted.length >= 4 ? kindSorted.at(-4) : undefined;
+  const past5 = kindSorted.length >= 6 ? kindSorted.at(-6) : undefined;
   const sales3 = past3 ? parseYen(pickFromPeriod(past3, "売上高", "売上収益（IFRS）")) : null;
   const sales5 = past5 ? parseYen(pickFromPeriod(past5, "売上高", "売上収益（IFRS）")) : null;
 
@@ -88,7 +108,9 @@ export function metricsFromPeriods(company: CompanySummary): CompanyMetricsRow |
   const netCashYen =
     cashYen != null && liabYen != null ? cashYen - Math.round(liabYen * 0.35) : null;
 
-  const annualSorted = sorted.filter((p) => p.docDescription === "有価証券報告書");
+  const annualSorted = [...company.periods]
+    .filter((p) => p.docDescription?.includes("有価証券報告書"))
+    .sort((a, b) => a.periodEnd.localeCompare(b.periodEnd));
   const latestAnnual = annualSorted.at(-1);
   const priorAnnual = annualSorted.length >= 2 ? annualSorted.at(-2) : undefined;
 
@@ -154,7 +176,7 @@ export function metricsFromPeriods(company: CompanySummary): CompanyMetricsRow |
     dividendGrowthYoY: growthRatio(dpsNum, prevDps),
     salesCagr3y: cagrRatio(salesYen, sales3, 3),
     salesCagr5y: cagrRatio(salesYen, sales5, 5),
-    consecutiveDivIncreases: computeConsecutiveDivIncreases(sorted),
+    consecutiveDivIncreases: computeConsecutiveDivIncreases(company.periods),
     currentRatio: caYen != null && clYen != null && clYen !== 0 ? caYen / clYen : null,
     deRatio: liabYen != null && eqYen != null && eqYen !== 0 ? liabYen / eqYen : null,
     roic:

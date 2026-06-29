@@ -61,10 +61,13 @@ function escSql(s) {
 
 function resolveTsvPath(rawPath, dbDir) {
   if (!rawPath) return null;
+  const wrapperRoot = join(root, "apps/wrapper");
   const candidates = [
     rawPath,
     resolve(dbDir, rawPath),
     resolve(root, rawPath),
+    resolve(wrapperRoot, rawPath),
+    join(wrapperRoot, rawPath),
   ];
   if (isAbsolute(rawPath)) {
     candidates.unshift(rawPath);

@@ -163,6 +163,26 @@ jobs:
             echo "No company_metrics SQL generated"
           fi
 
+      - name: Backfill shareholder_snapshots from corpus
+        run: |
+          pnpm --filter @edinet/metrics exec tsx ../../infra/init/build-shareholder-from-corpus.mjs \
+            /tmp/corpus.db /tmp/shareholder_backfill.sql
+          wc -l /tmp/shareholder_backfill.sql || true
+
+      - name: Apply shareholder_snapshots backfill to D1
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -s /tmp/shareholder_backfill.sql ] && grep -q "INSERT OR REPLACE INTO shareholder_snapshots" /tmp/shareholder_backfill.sql; then
+            npx -y wrangler@4 d1 execute "$D1_NAME" --remote \
+              --config apps/api/wrangler.toml \
+              --env "$TARGET_ENV" \
+              --file /tmp/shareholder_backfill.sql
+          else
+            echo "No shareholder_snapshots backfill SQL to apply (TSV paths may be missing on corpus export)"
+          fi
+
       - name: Invalidate metrics KV snapshot
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
