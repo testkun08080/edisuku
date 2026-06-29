@@ -1,4 +1,5 @@
 export type { CompanyMetricsDbRow, CompanyMetricsRow, CompanySummary } from "./types.js";
+export type { MetricsFromPeriodsOptions } from "./metricsFromPeriods.js";
 export { metricsFromPeriods } from "./metricsFromPeriods.js";
 export {
   flattenMetricsRow,

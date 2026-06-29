@@ -158,4 +158,41 @@ describe("metricsFromPeriods", () => {
     expect(row!.consecutiveDivIncreases).toBeNull();
     expect(row!.piotroskiFScore).toBeNull();
   });
+
+  it("computes YoY from same report kind only (not mixed semi-annual periods)", () => {
+    const company: CompanySummary = {
+      edinetCode: "E00000",
+      secCode: "9999",
+      filerName: "サンプル株式会社",
+      periods: [
+        {
+          ...buildBlocks(0.5),
+          periodStart: "2023-04-01",
+          periodEnd: "2024-03-31",
+          docID: "SEMI-1",
+          docDescription: "半期報告書",
+          submitDateTime: "2024-11-07T09:00:00Z",
+        },
+        {
+          ...buildBlocks(1.0),
+          periodStart: "2024-04-01",
+          periodEnd: "2025-03-31",
+          docID: "SEMI-2",
+          docDescription: "半期報告書",
+          submitDateTime: "2025-11-07T09:00:00Z",
+        },
+      ],
+    };
+    const row = metricsFromPeriods(company);
+    const yoy = Number.parseFloat(row!.salesGrowthYoY!);
+    expect(yoy).toBeCloseTo(1.0, 2);
+  });
+
+  it("uses filtered periods when options.periods is passed", () => {
+    const company = buildGoldenCompany();
+    const annualOnly = company.periods.filter((p) => p.docDescription?.includes("有価証券報告書"));
+    const row = metricsFromPeriods(company, { periods: annualOnly });
+    expect(row!.calcDate).toBe("2025-03-31");
+    expect(row!.sales).toBe("1000000000000");
+  });
 });

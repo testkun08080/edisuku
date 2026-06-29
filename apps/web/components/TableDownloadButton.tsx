@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { CSV_EXPORT_ENABLED } from "../lib/features.js";
 import { passesFilter } from "../lib/filterEngine.js";
 import {
+  formatDecimalAsPercent,
   formatRatioDecimalStringAsPercent,
   formatYenStringAsMillionYen,
 } from "../lib/metricFormat.js";
@@ -50,7 +51,7 @@ function getCellValueForExport(m: CompanyMetric, colId: ColumnId): string {
     case "PBR":
       return m.PBR != null ? m.PBR.toFixed(2) : "－";
     case "dividendYield":
-      return m.dividendYield != null ? m.dividendYield.toFixed(2) + "%" : "－";
+      return formatDecimalAsPercent(m.dividendYield);
     case "marketCap":
       return m.marketCap != null ? formatSales(String(m.marketCap)) : "－";
     case "netCash":

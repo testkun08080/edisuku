@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Star } from "lucide-reac
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { passesFilter } from "../lib/filterEngine.js";
 import {
+  formatDecimalAsPercent,
   formatRatioDecimalStringAsPercent,
   formatYenStringAsMillionYen,
 } from "../lib/metricFormat.js";
@@ -121,7 +122,7 @@ function getCellValue(
     case "PBR":
       return m.PBR != null ? m.PBR.toFixed(2) : "－";
     case "dividendYield":
-      return m.dividendYield != null ? m.dividendYield.toFixed(2) + "%" : "－";
+      return formatDecimalAsPercent(m.dividendYield);
     case "marketCap":
       return m.marketCap != null ? formatSales(String(m.marketCap)) : "－";
     case "netCash":
