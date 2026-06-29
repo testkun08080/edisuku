@@ -142,7 +142,7 @@
 
 **提出日**: `target_date` 未指定時は **昨日 JST**（`ingest_daily.py` と同じ）。
 
-**処理の流れ**: EDINET 取得 → D1 delta 適用 → `company_metrics` 全件 rebuild → KV `screener:metrics:v2` 無効化。
+**処理の流れ**: EDINET 取得 → D1 delta 適用 → `company_metrics` 全件 rebuild → KV `screener:metrics:v2` 無効化 → `pipeline_runs` / `daily_metrics` 記録。
 
 **UI のデータ最終更新日**: D1 反映後、`apps/web/lib/brand.ts` の `DATA_LAST_UPDATED`（`YYYY-MM-DD`）を **手動で更新** してください。プライバシーページ等の「データ最終更新日」表示に使われます（環境変数ではなくコード内定数）。
 
@@ -195,12 +195,13 @@ cp apps/web/.dev.vars.example apps/web/.dev.vars
 3. 任意: ビルド時 `.env` で `PUBLIC_ENV__*`
 4. Actions から `deploy` workflow を手動実行
 
-詳細手順: [FORK.md](./FORK.md)
+詳細手順: [FORK_SETUP.md](./FORK_SETUP.md)（推奨） / [FORK.md](./FORK.md)（CI 向け）
 
 ---
 
 ## 関連ドキュメント
 
-- [FORK.md](./FORK.md) — Cloudflare セットアップ手順
+- [FORK_SETUP.md](./FORK_SETUP.md) — Cloudflare セットアップ手順ナビ
+- [FORK.md](./FORK.md) — CI 向け一括設定
 - [MANUAL_SETUP.md](./MANUAL_SETUP.md) — Docker なしローカル開発
 - [modules/api.md](./modules/api.md) / [modules/web.md](./modules/web.md) — モジュール詳細

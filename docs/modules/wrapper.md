@@ -18,6 +18,7 @@ apps/wrapper/
 ├── scripts/
 │   ├── ingest_daily.py      当日提出分を取得 → ローカル SQLite
 │   ├── publish_to_d1.py     SQLite 差分 → D1 用 SQL ファイル
+│   ├── emit_pipeline_meta.py  pipeline_runs / daily_metrics 用 SQL 出力
 │   └── backfill.py          過去 N 年バルク取り込み
 ├── tests/
 │   └── test_ingest.py       ingest ヘルパのユニットテスト
@@ -31,7 +32,7 @@ apps/wrapper/
 2. 既知 `doc_id`（`--known-docs`）と doc_type（annual / quarterly / semiannual / large_holding）でフィルタ
 3. TSV ダウンロード → `parse_tsv` → `db.upsert_*`
 4. `publish_to_d1.py` が `updated_at` 差分を D1 用 SQL に変換
-5. GitHub Actions `daily-refresh.yml` が日次で上記 + `company_metrics` rebuild（`companies` テーブル起点）を実行
+5. GitHub Actions `daily-refresh.yml` が日次で上記 + `company_metrics` rebuild + `emit_pipeline_meta.py`（`pipeline_runs` / `daily_metrics`）を実行
 
 指標計算（ROE / Piotroski 等）は **`packages/metrics`** が担当。wrapper は生の period_financials を D1 に載せる。
 
@@ -55,6 +56,14 @@ uv run python scripts/publish_to_d1.py \
 
 # D1 へ反映（リポジトリルートから）
 wrangler d1 execute edisuku-db --remote --file /tmp/delta.sql
+
+# 日次メタ（pipeline_runs / daily_metrics）
+uv run python scripts/emit_pipeline_meta.py \
+    --target-date 2026-05-25 --scope daily-refresh-staging --run-id local-1 \
+    --status success --started-at 2026-05-26T00:00:00 --finished-at 2026-05-26T00:30:00 \
+    --fetched 10 --ingested 8 --skipped 2 --errors 0 \
+    --company-count 4000 --document-count 50000 --period-financial-count 35000 \
+    --output /tmp/pipeline_meta.sql
 
 # 過去 N 年
 uv run python scripts/backfill.py --years 5 --output data/edinet.db

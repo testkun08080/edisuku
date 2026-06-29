@@ -70,33 +70,3 @@ CREATE TABLE `pipeline_runs` (
 	`error_count` integer DEFAULT 0 NOT NULL,
 	`notes` text
 );
---> statement-breakpoint
-CREATE TABLE `raw_files_index` (
-	`file_id` text PRIMARY KEY NOT NULL,
-	`doc_id` text NOT NULL,
-	`edinet_code` text NOT NULL,
-	`doc_type` text NOT NULL,
-	`file_type` text NOT NULL,
-	`object_key` text NOT NULL,
-	`file_hash` text,
-	`file_size_bytes` integer,
-	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	FOREIGN KEY (`doc_id`) REFERENCES `documents`(`doc_id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`edinet_code`) REFERENCES `companies`(`edinet_code`) ON UPDATE no action ON DELETE no action
-);
---> statement-breakpoint
-CREATE INDEX `idx_raw_files_doc_file_type` ON `raw_files_index` (`doc_id`,`file_type`);--> statement-breakpoint
-CREATE UNIQUE INDEX `uq_raw_files_doc_file` ON `raw_files_index` (`doc_id`,`file_type`);--> statement-breakpoint
-CREATE TABLE `sec_code_latest_periods` (
-	`sec_code` text PRIMARY KEY NOT NULL,
-	`edinet_code` text NOT NULL,
-	`filer_name` text NOT NULL,
-	`latest_doc_id` text NOT NULL,
-	`latest_period_end` text NOT NULL,
-	`latest_submit_date_time` text,
-	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	FOREIGN KEY (`edinet_code`) REFERENCES `companies`(`edinet_code`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`latest_doc_id`) REFERENCES `documents`(`doc_id`) ON UPDATE no action ON DELETE no action
-);
---> statement-breakpoint
-CREATE INDEX `idx_sec_code_latest_periods_period_end` ON `sec_code_latest_periods` (`latest_period_end`);

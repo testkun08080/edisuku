@@ -16,6 +16,15 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 MIGRATIONS_DIR = REPO_ROOT / "packages" / "db" / "migrations"
 SCHEMA_PATH = MIGRATIONS_DIR / "0000_init.sql"
 SCHEMA_PATH_0001 = MIGRATIONS_DIR / "0001_company_metrics.sql"
+SCHEMA_PATH_0002 = MIGRATIONS_DIR / "0002_drop_legacy_tables.sql"
+
+
+def _table_exists(conn: sqlite3.Connection, name: str) -> bool:
+    row = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
+        (name,),
+    ).fetchone()
+    return row is not None
 
 
 def open_db(path: Path) -> sqlite3.Connection:
@@ -27,16 +36,28 @@ def open_db(path: Path) -> sqlite3.Connection:
     return conn
 
 
+def _run_migration_sql(conn: sqlite3.Connection, schema_path: Path) -> None:
+    if not schema_path.exists():
+        raise FileNotFoundError(f"schema not found: {schema_path}")
+    sql = schema_path.read_text(encoding="utf-8").replace("--> statement-breakpoint", "")
+    conn.executescript(sql)
+
+
 def apply_schema(
     conn: sqlite3.Connection,
     schema_paths: Iterable[Path] | None = None,
 ) -> None:
-    paths = list(schema_paths or (SCHEMA_PATH, SCHEMA_PATH_0001))
-    for schema_path in paths:
-        if not schema_path.exists():
-            raise FileNotFoundError(f"schema not found: {schema_path}")
-        sql = schema_path.read_text(encoding="utf-8").replace("--> statement-breakpoint", "")
-        conn.executescript(sql)
+    if schema_paths is not None:
+        for schema_path in schema_paths:
+            _run_migration_sql(conn, schema_path)
+        conn.commit()
+        return
+
+    if not _table_exists(conn, "companies"):
+        _run_migration_sql(conn, SCHEMA_PATH)
+    if not _table_exists(conn, "company_metrics"):
+        _run_migration_sql(conn, SCHEMA_PATH_0001)
+    _run_migration_sql(conn, SCHEMA_PATH_0002)
     conn.commit()
 
 

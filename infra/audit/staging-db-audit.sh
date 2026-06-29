@@ -88,16 +88,17 @@ fi
 
 ensure_wrangler_config
 
-TABLES="companies documents period_financials company_metrics shareholder_snapshots sec_code_latest_periods daily_metrics raw_files_index pipeline_runs"
+TABLES="companies documents period_financials company_metrics shareholder_snapshots daily_metrics pipeline_runs"
 
 count_rows() {
   local table="$1"
   extract_scalar "$(run_query "SELECT COUNT(*) AS c FROM ${table}")" c
 }
 
-RESULT_raw_files_index="$(run_query "SELECT COUNT(*) AS c FROM raw_files_index")"
 RESULT_pipeline_runs="$(run_query "SELECT COUNT(*) AS c FROM pipeline_runs")"
-RESULT_sec_latest_max="$(run_query "SELECT MAX(updated_at) AS v FROM sec_code_latest_periods")"
+RESULT_pipeline_latest="$(run_query "SELECT run_id, scope, target_date, status, finished_at FROM pipeline_runs ORDER BY started_at DESC LIMIT 1")"
+RESULT_daily_metrics="$(run_query "SELECT COUNT(*) AS c FROM daily_metrics")"
+RESULT_daily_latest="$(run_query "SELECT snapshot_date, company_count, document_count, period_financial_count FROM daily_metrics ORDER BY snapshot_date DESC LIMIT 1")"
 RESULT_company_metrics_max="$(run_query "SELECT MAX(updated_at) AS v FROM company_metrics")"
 RESULT_period_financials_max="$(run_query "SELECT MAX(updated_at) AS v FROM period_financials")"
 RESULT_shareholders="$(run_query "SELECT COUNT(DISTINCT sec_code) AS distinct_sec_codes, MAX(updated_at) AS max_updated_at FROM shareholder_snapshots")"
@@ -128,9 +129,10 @@ EOF
 
 | Check | Value |
 | --- | --- |
-| raw_files_index rows | $(extract_scalar "$RESULT_raw_files_index" c) |
 | pipeline_runs rows | $(extract_scalar "$RESULT_pipeline_runs" c) |
-| sec_code_latest_periods max(updated_at) | $(extract_scalar "$RESULT_sec_latest_max" v) |
+| latest pipeline run | $(extract_scalar "$RESULT_pipeline_latest" run_id) / $(extract_scalar "$RESULT_pipeline_latest" status) / $(extract_scalar "$RESULT_pipeline_latest" target_date) |
+| daily_metrics rows | $(extract_scalar "$RESULT_daily_metrics" c) |
+| latest daily_metrics | $(extract_scalar "$RESULT_daily_latest" snapshot_date) — companies=$(extract_scalar "$RESULT_daily_latest" company_count) docs=$(extract_scalar "$RESULT_daily_latest" document_count) periods=$(extract_scalar "$RESULT_daily_latest" period_financial_count) |
 | company_metrics max(updated_at) | $(extract_scalar "$RESULT_company_metrics_max" v) |
 | period_financials max(updated_at) | $(extract_scalar "$RESULT_period_financials_max" v) |
 | shareholder_snapshots distinct sec_code | $(extract_scalar "$RESULT_shareholders" distinct_sec_codes) |
@@ -148,9 +150,10 @@ else
     printf "  %-24s %s\n" "$t" "$(count_rows "$t")"
   done
   echo "Checks:"
-  echo "  raw_files_index: $(extract_scalar "$RESULT_raw_files_index" c)"
   echo "  pipeline_runs: $(extract_scalar "$RESULT_pipeline_runs" c)"
-  echo "  sec_code_latest_periods max(updated_at): $(extract_scalar "$RESULT_sec_latest_max" v)"
+  echo "  latest pipeline run: $(extract_scalar "$RESULT_pipeline_latest" run_id) / $(extract_scalar "$RESULT_pipeline_latest" status) / $(extract_scalar "$RESULT_pipeline_latest" target_date)"
+  echo "  daily_metrics: $(extract_scalar "$RESULT_daily_metrics" c)"
+  echo "  latest daily_metrics: $(extract_scalar "$RESULT_daily_latest" snapshot_date) companies=$(extract_scalar "$RESULT_daily_latest" company_count) docs=$(extract_scalar "$RESULT_daily_latest" document_count) periods=$(extract_scalar "$RESULT_daily_latest" period_financial_count)"
   echo "  company_metrics max(updated_at): $(extract_scalar "$RESULT_company_metrics_max" v)"
   echo "  period_financials max(updated_at): $(extract_scalar "$RESULT_period_financials_max" v)"
   echo "  shareholder_snapshots distinct sec_code: $(extract_scalar "$RESULT_shareholders" distinct_sec_codes)"
