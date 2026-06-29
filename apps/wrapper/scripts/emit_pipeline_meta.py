@@ -52,19 +52,24 @@ def build_pipeline_meta_sql(
         "INSERT OR REPLACE INTO pipeline_runs ("
         "run_id, scope, target_date, status, started_at, finished_at, "
         "fetched_documents, ingested_documents, skipped_documents, error_count, notes"
-        f") VALUES ({', '.join(_sql_literal(v) for v in (
-            run_id,
-            scope,
-            target_date,
-            status,
-            started_at,
-            finished_at,
-            fetched,
-            ingested,
-            skipped,
-            errors,
-            notes,
-        ))});"
+        f") VALUES ({
+            ', '.join(
+                _sql_literal(v)
+                for v in (
+                    run_id,
+                    scope,
+                    target_date,
+                    status,
+                    started_at,
+                    finished_at,
+                    fetched,
+                    ingested,
+                    skipped,
+                    errors,
+                    notes,
+                )
+            )
+        });"
     )
     if include_daily_metrics:
         if company_count is None or document_count is None or period_financial_count is None:
@@ -75,12 +80,17 @@ def build_pipeline_meta_sql(
         stmts.append(
             "INSERT OR REPLACE INTO daily_metrics ("
             "snapshot_date, company_count, document_count, period_financial_count"
-            f") VALUES ({', '.join(_sql_literal(v) for v in (
-                target_date,
-                company_count,
-                document_count,
-                period_financial_count,
-            ))});"
+            f") VALUES ({
+                ', '.join(
+                    _sql_literal(v)
+                    for v in (
+                        target_date,
+                        company_count,
+                        document_count,
+                        period_financial_count,
+                    )
+                )
+            });"
         )
     return stmts
 
