@@ -11,6 +11,7 @@
 - [ ] `apps/wrapper`
 - [ ] `packages/*`
 - [ ] `infra/`
+- [ ] `e2e/`
 - [ ] `.github/workflows/`
 - [ ] docs
 
@@ -22,6 +23,7 @@
 - [ ] `pnpm -r typecheck`
 - [ ] `pnpm turbo test`
 - [ ] (該当する場合) `cd apps/wrapper && uv run pytest`
+- [ ] (該当する場合) `pnpm test:e2e`
 - [ ] (該当する場合) `docker compose -f infra/compose.yml up` で UI 確認
 
 ## Changeset

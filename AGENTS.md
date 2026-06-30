@@ -9,10 +9,12 @@ CI（`.github/workflows/ci.yml`）と一致する検証コマンド:
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm biome check apps/api packages/db packages/types packages/metrics apps/web/lib
+pnpm biome check apps/api packages/db packages/types packages/metrics apps/web/lib e2e
 pnpm turbo typecheck
 pnpm turbo test
 cd apps/wrapper && uv sync --frozen && uv run ruff check . && uv run ruff format --check . && uv run pytest
+pnpm exec playwright install --with-deps chromium  # E2E 初回のみ
+pnpm test:e2e
 ```
 
 ローカル開発:
