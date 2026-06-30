@@ -26,3 +26,8 @@ apps/wrapper/raw/
 .qodo/
 .codex/
 .pnpm-store/
+
+# Playwright E2E
+e2e/playwright-report/
+e2e/test-results/
+e2e/test-results.json
