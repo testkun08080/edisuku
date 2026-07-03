@@ -1,8 +1,8 @@
 name: daily-refresh
 
 on:
-  # schedule:
-  #   - cron: "10 20 * * *" # 05:10 JST
+  schedule:
+    - cron: "10 20 * * *" # 05:10 JST
   workflow_dispatch:
     inputs:
       environment:
