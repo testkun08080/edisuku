@@ -13,8 +13,9 @@ pnpm biome check apps/api packages/db packages/types packages/metrics apps/web/l
 pnpm turbo typecheck
 pnpm turbo test
 cd apps/wrapper && uv sync --frozen && uv run ruff check . && uv run ruff format --check . && uv run pytest
-pnpm exec playwright install --with-deps chromium  # E2E 初回のみ
-pnpm test:e2e
+pnpm test:e2e   # Chromium は pnpm install 時に e2e postinstall で取得
+# UI デバッグ: cd e2e && pnpm test:ui
+# ブラウザ未導入時: cd e2e && pnpm exec playwright install --with-deps chromium
 ```
 
 ローカル開発:

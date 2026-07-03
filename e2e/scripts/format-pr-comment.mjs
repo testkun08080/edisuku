@@ -60,7 +60,7 @@ ${runUrl ? `**Workflow run:** ${runUrl}\n` : ""}
 **ローカル再現:**
 \`\`\`bash
 pnpm install --frozen-lockfile
-pnpm exec playwright install --with-deps chromium
+cd e2e && pnpm exec playwright install --with-deps chromium
 pnpm test:e2e
 \`\`\`
 `;
