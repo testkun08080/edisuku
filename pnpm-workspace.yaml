@@ -2,4 +2,5 @@ packages:
   - "apps/web"
   - "apps/api"
   - "packages/*"
+  - "e2e"
 # apps/wrapper は Python (uv 管理) のため pnpm workspace 外

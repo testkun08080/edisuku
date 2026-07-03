@@ -15,6 +15,7 @@
     "format": "biome format --write .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "test:e2e": "pnpm --filter @edinet/e2e test:e2e",
     "clean": "turbo run clean && rm -rf node_modules .turbo",
     "db:generate": "pnpm --filter @edinet/db drizzle-kit generate",
     "db:migrate:local": "pnpm --filter @edinet/db db:migrate:local",

@@ -1,0 +1,14 @@
+{
+  "name": "@edinet/e2e",
+  "version": "2.0.0-alpha.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:ui": "playwright test --ui",
+    "postinstall": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0"
+  }
+}
