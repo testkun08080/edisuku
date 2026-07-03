@@ -1,7 +1,10 @@
 // https://vike.dev/Head
 
-import logoUrl from "../assets/logo.svg";
 import {
+  SITE_APPLE_TOUCH_ICON_PATH,
+  SITE_FAVICON_48_PATH,
+  SITE_FAVICON_192_PATH,
+  SITE_FAVICON_PATH,
   SITE_KEYWORDS,
   SITE_NAME,
   SITE_OG_DESCRIPTION,
@@ -11,6 +14,7 @@ import {
   SITE_OG_IMAGE_SQUARE_PATH,
   SITE_OG_IMAGE_SQUARE_SIZE,
   SITE_OG_IMAGE_WIDTH,
+  SITE_WEB_MANIFEST_PATH,
 } from "../lib/brand";
 
 export function Head() {
@@ -59,9 +63,12 @@ export function Head() {
       {/* Canonical */}
       {siteUrl && <link rel="canonical" href={siteUrl} />}
 
-      {/* Favicon */}
-      <link rel="icon" href={logoUrl} />
-      <link rel="apple-touch-icon" href={logoUrl} />
+      {/* Favicon — 安定パス（Google 検索のサイトアイコン向け） */}
+      <link rel="icon" href={SITE_FAVICON_PATH} sizes="48x48" />
+      <link rel="icon" type="image/png" href={SITE_FAVICON_48_PATH} sizes="48x48" />
+      <link rel="icon" type="image/png" href={SITE_FAVICON_192_PATH} sizes="192x192" />
+      <link rel="apple-touch-icon" href={SITE_APPLE_TOUCH_ICON_PATH} />
+      <link rel="manifest" href={SITE_WEB_MANIFEST_PATH} />
 
       <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400&display=swap"

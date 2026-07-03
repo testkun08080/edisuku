@@ -24,6 +24,13 @@ export const SITE_OG_IMAGE_SQUARE_SIZE = 1200;
 /** og:image:alt */
 export const SITE_OG_IMAGE_ALT = "エディスク — オープンソース EDINETスクリーナー";
 
+/** Favicon（安定パス・検索エンジン向け） */
+export const SITE_FAVICON_PATH = "/favicon.ico";
+export const SITE_FAVICON_48_PATH = "/favicon-48.png";
+export const SITE_FAVICON_192_PATH = "/favicon-192.png";
+export const SITE_APPLE_TOUCH_ICON_PATH = "/apple-touch-icon.png";
+export const SITE_WEB_MANIFEST_PATH = "/site.webmanifest";
+
 /** OGP 画像内の訴求1行（短め・正方形でも読める） */
 export const SITE_OG_IMAGE_TAGLINE = "有報10年分を検索・比較";
 
