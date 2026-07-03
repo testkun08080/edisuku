@@ -2,6 +2,9 @@
 
 このリポジトリをフォークして自分の Cloudflare アカウントで動かす手順です。**API キーは自動生成しません。** サンプルをコピーして、自分で値を決めて設定してください。
 
+> **推奨**: [FORK_SETUP.md](./FORK_SETUP.md) — staging / production を **1 リソースずつ** 設定してデプロイまで進める手順ナビ。  
+> このページの §2 は **CI 向け** `render-wrangler-config.sh` による一括設定です。
+
 ## 1. ローカルで UI を確認
 
 サンプルキー `dev-local-key` は **開発専用** です（本番では使わない）。
@@ -17,7 +20,11 @@ docker compose -f infra/compose.yml up
 
 Docker を使わずホストでセットアップする場合は [MANUAL_SETUP.md](./MANUAL_SETUP.md) を参照。
 
-## 2. Cloudflare リソースの作成（wrangler CLI）
+## 2. Cloudflare リソースの作成（CI 向け render）
+
+手動で設定ファイルを編集しながら進める場合は [FORK_SETUP.md](./FORK_SETUP.md) を先に読んでください。
+
+以下は `infra/render-wrangler-config.sh` で `wrangler.toml` / `wrangler.jsonc` を一括生成する手順です（GitHub Actions デプロイと同じ）。
 
 ```bash
 pnpm install
@@ -192,6 +199,7 @@ web → api の接続は `wrangler.jsonc.template` の **service binding**（`AP
 
 ## 関連ドキュメント
 
+- [FORK_SETUP.md](./FORK_SETUP.md) — staging / production の手順ナビ（設定ファイル手編集）
 - [ENV.md](./ENV.md) — 環境変数・Secrets 一覧
 - [infra モジュール](./modules/infra.md)
 - [api モジュール](./modules/api.md)

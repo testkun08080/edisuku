@@ -5,7 +5,8 @@
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | 全体構造・レイヤ・依存グラフ・データフロー（**まずここ**） |
 | [ENV.md](./ENV.md) | 環境変数・Secrets 一覧（必須 / 任意 / 設定場所） |
 | [MANUAL_SETUP.md](./MANUAL_SETUP.md) | Docker なしの手動ローカルセットアップ |
-| [FORK.md](./FORK.md) | フォーク利用者向けセットアップ・API キー・CI Secrets |
+| [FORK_SETUP.md](./FORK_SETUP.md) | **推奨** — staging / production の手順ナビ（設定を 1 つずつ） |
+| [FORK.md](./FORK.md) | フォーク概要・CI 向け render スクリプト・Secrets |
 
 ## モジュール別
 

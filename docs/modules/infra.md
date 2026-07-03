@@ -1,6 +1,6 @@
 # infra — ローカル開発・デプロイ補助
 
-Docker Compose スタックとデプロイ補助スクリプト。Docker なしの手動セットアップは [MANUAL_SETUP.md](../MANUAL_SETUP.md)。Cloudflare へのデプロイは [FORK.md](../FORK.md)。
+Docker Compose スタックとデプロイ補助スクリプト。Docker なしの手動セットアップは [MANUAL_SETUP.md](../MANUAL_SETUP.md)。Cloudflare へのデプロイは [FORK_SETUP.md](../FORK_SETUP.md) を参照。
 
 ## ファイル構成
 
@@ -46,7 +46,10 @@ docker compose -f infra/compose.yml --profile ingest run wrapper
 
 ## フォーク利用者向けデプロイ
 
-Cloudflare リソースの作成・wrangler 設定・GitHub Secrets は [FORK.md](../FORK.md) の wrangler CLI 手順を参照。
+Cloudflare リソースの作成・wrangler 設定・GitHub Secrets:
+
+- **推奨** 手順ナビ（staging + production）: [FORK_SETUP.md](../FORK_SETUP.md)
+- CI 向け render スクリプト: [FORK.md](../FORK.md)
 
 | スクリプト | 用途 |
 |---|---|

@@ -17,15 +17,15 @@ docker compose -f infra/compose.yml up
 # → http://localhost:3000
 # Docker なし: docs/MANUAL_SETUP.md
 
-# 3. 自分の Cloudflare アカウントへセットアップ (10 min)
+# 3. Cloudflare へセットアップ (15 min)
 pnpm install
 npx wrangler login
-# → docs/FORK.md の wrangler CLI 手順（D1/KV 作成、render-wrangler-config.sh）
-cp .internal-api-key.example .internal-api-key   # 編集して自分の秘密に
-bash infra/apply-internal-api-key.sh             # Cloudflare に登録
+# → docs/FORK_SETUP.md（staging / production を 1 つずつ設定してデプロイ）
 
-# 4. GitHub Actions から手動デプロイ (10 min)
-# Actions → deploy → Run workflow → staging
+# 4. デプロイ (5 min)
+pnpm deploy:api:staging && pnpm deploy:web:staging
+# production も: pnpm deploy:api:production && pnpm deploy:web:production
+# または Actions → deploy
 # → https://edisuku-web-staging.<your-subdomain>.workers.dev
 ```
 
@@ -103,7 +103,8 @@ uv run python scripts/ingest_daily.py --help
 - [docs/modules/](./docs/modules/) — モジュール別ドキュメント (api / web / wrapper / db / metrics / types / infra)
 - [docs/ENV.md](./docs/ENV.md) — 環境変数・Secrets 一覧（必須 / 任意）
 - [docs/MANUAL_SETUP.md](./docs/MANUAL_SETUP.md) — Docker なしの手動ローカルセットアップ
-- [docs/FORK.md](./docs/FORK.md) — フォーク利用者向けセットアップ・セキュリティ
+- [docs/FORK_SETUP.md](./docs/FORK_SETUP.md) — フォーク利用者向け Cloudflare セットアップ（手順ナビ）
+- [docs/FORK.md](./docs/FORK.md) — CI 向け一括設定
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — 開発フロー
 - [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) — 行動規範
 - [SECURITY.md](./SECURITY.md) — 脆弱性報告
