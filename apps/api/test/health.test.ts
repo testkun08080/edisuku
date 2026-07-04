@@ -1,5 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import app from "../src/index.js";
+
+vi.mock("@edinet/db/queries", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@edinet/db/queries")>();
+  return {
+    ...actual,
+    getLatestDataSnapshotDate: vi.fn().mockResolvedValue(null),
+  };
+});
 
 const env = {
   EDISUKU_DB: undefined as unknown as D1Database,
@@ -29,8 +37,9 @@ describe("api", () => {
   it("GET /api/manifest with api key returns manifest stub", async () => {
     const res = await app.request("/api/manifest", { headers: authHeaders }, env);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { schemaVersion: string };
+    const body = (await res.json()) as { schemaVersion: string; dataLastUpdated: string | null };
     expect(body.schemaVersion).toBe("test");
+    expect(body).toHaveProperty("dataLastUpdated");
   });
 
   it("GET /api/unknown returns 404 with structured body", async () => {

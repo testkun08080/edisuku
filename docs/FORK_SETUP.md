@@ -302,7 +302,7 @@ CI のデプロイは `render-wrangler-config.sh` で wrangler 設定を生成�
 - Actions → **daily-refresh** → `environment: staging` または `production`
 - `EDINET_API_KEY` が必要
 
-取り込み後、`apps/web/lib/brand.ts` の `DATA_LAST_UPDATED` を手動更新（[ENV.md](./ENV.md)）。
+取り込み成功後、プライバシーページのデータ最終更新日は D1 から自動反映されます（[ENV.md](./ENV.md)）。
 
 ---
 

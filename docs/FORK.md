@@ -109,7 +109,7 @@ gh secret set PROD_WEB_URL --body "$PROD_WEB_URL"
 gh secret set EDINET_API_KEY
 ```
 
-Actions → **daily-refresh** → Run workflow（`target_date` 省略時は昨日 JST）。取り込み後は `apps/web/lib/brand.ts` の `DATA_LAST_UPDATED` を手動更新（[ENV.md](./ENV.md) 参照）。
+Actions → **daily-refresh** → Run workflow（`target_date` 省略時は昨日 JST）。成功後、プライバシーページのデータ最終更新日は D1 から自動反映されます（[ENV.md](./ENV.md) 参照）。
 
 ## 3. INTERNAL_API_KEY を自分で設定（本番必須）
 

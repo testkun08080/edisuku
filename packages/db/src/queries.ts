@@ -3,6 +3,7 @@ import type { DrizzleD1Database } from "drizzle-orm/d1";
 import {
   companies,
   companyMetrics,
+  dailyMetrics,
   documents,
   periodFinancials,
   shareholderSnapshots,
@@ -176,6 +177,16 @@ export async function getShareholdersBySecCode(db: DB, secCode: string) {
     .where(eq(shareholderSnapshots.secCode, secCode))
     .orderBy(desc(shareholderSnapshots.periodEnd))
     .all();
+}
+
+export async function getLatestDataSnapshotDate(db: DB): Promise<string | null> {
+  const row = await db
+    .select({ snapshotDate: dailyMetrics.snapshotDate })
+    .from(dailyMetrics)
+    .orderBy(desc(dailyMetrics.snapshotDate))
+    .limit(1)
+    .get();
+  return row?.snapshotDate ?? null;
 }
 
 export async function searchCompanies(db: DB, q: string, limit = 20) {
