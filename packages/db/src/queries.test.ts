@@ -6,7 +6,7 @@ import Database from "better-sqlite3";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { type DB, queryCompanyMetrics } from "./queries.js";
+import { type DB, getLatestDataSnapshotDate, queryCompanyMetrics } from "./queries.js";
 import * as schema from "./schema.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -151,6 +151,10 @@ describe("queryCompanyMetrics", () => {
     expect(page2.rows).toHaveLength(1);
   });
 
+  it("getLatestDataSnapshotDate returns null when daily_metrics is empty", async () => {
+    expect(await getLatestDataSnapshotDate(db)).toBeNull();
+  });
+
   it("flattenMetricsRow preserves sales and ROE", async () => {
     const [row] = await db
       .select()
@@ -161,5 +165,37 @@ describe("queryCompanyMetrics", () => {
     const flat = flattenMetricsRow(row!);
     expect(flat.sales).toBe("1000000000000");
     expect(flat.ROE).toBe("0.0667");
+  });
+});
+
+describe("getLatestDataSnapshotDate", () => {
+  let sqlite: Database.Database;
+  let db: DB;
+
+  beforeAll(() => {
+    sqlite = new Database(":memory:");
+    sqlite.exec(readFileSync(join(root, "packages/db/migrations/0000_init.sql"), "utf8"));
+    db = drizzle(sqlite, { schema }) as unknown as DB;
+  });
+
+  afterAll(() => {
+    sqlite.close();
+  });
+
+  it("returns the latest snapshot_date", async () => {
+    sqlite
+      .prepare(
+        `INSERT INTO daily_metrics (snapshot_date, company_count, document_count, period_financial_count, generated_at)
+         VALUES ('2026-07-01', 100, 1000, 900, '2026-07-02T00:00:00')`,
+      )
+      .run();
+    sqlite
+      .prepare(
+        `INSERT INTO daily_metrics (snapshot_date, company_count, document_count, period_financial_count, generated_at)
+         VALUES ('2026-07-02', 101, 1001, 901, '2026-07-03T00:00:00')`,
+      )
+      .run();
+
+    expect(await getLatestDataSnapshotDate(db)).toBe("2026-07-02");
   });
 });

@@ -1,3 +1,4 @@
+import { useData } from "vike-react/useData";
 import { DataAttributionBlock } from "../../components/DataAttributionBlock";
 import {
   Card,
@@ -7,9 +8,11 @@ import {
   CardTitle,
 } from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
-import { DATA_LAST_UPDATED, SITE_NAME } from "../../lib/brand";
+import { SITE_NAME } from "../../lib/brand";
+import type { Data } from "./+data";
 
 export default function Page() {
+  const { dataLastUpdated } = useData<Data>();
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 overflow-auto p-4 lg:p-8">
       <div>
@@ -111,7 +114,7 @@ export default function Page() {
         </CardContent>
       </Card>
 
-      <DataAttributionBlock lastUpdated={DATA_LAST_UPDATED} />
+      <DataAttributionBlock lastUpdated={dataLastUpdated ?? undefined} />
     </div>
   );
 }

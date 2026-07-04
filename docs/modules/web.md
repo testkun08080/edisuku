@@ -70,7 +70,7 @@ const res = await api.api.metrics.$get({ query: { limit: "2000" } });
 | `API` (service binding) | remote | `wrangler.jsonc` |
 | `PUBLIC_ENV__*` / `VITE_SCREENER_MODE` | いいえ | `.env`（ビルド時） |
 
-**データ最終更新日**: `lib/brand.ts` の `DATA_LAST_UPDATED` を D1 取り込み後に手動更新（環境変数ではない）。
+**データ最終更新日**: プライバシーページが `/api/manifest` の `dataLastUpdated`（D1 `daily_metrics.snapshot_date`）を SSR 表示。daily-refresh 後の Web 再デプロイは不要。
 
 ## 起動・ビルド
 

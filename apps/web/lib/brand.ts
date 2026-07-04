@@ -37,9 +37,6 @@ export const SITE_OG_IMAGE_TAGLINE = "有報10年分を検索・比較";
 /** OGP 画像内バッジ */
 export const SITE_OG_IMAGE_BADGE = "オープンソース";
 
-/** スクリーナーデータの最終更新日（D1 更新後に手動更新） */
-export const DATA_LAST_UPDATED = "2026-05-21";
-
 /** お問い合わせ Google Form（埋め込み用） */
 export const CONTACT_FORM_EMBED_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSfhrl1VGzhcKf0LFcOyhhjH5CI9fd61FNdFdxAOOZvtbhbtVg/viewform?embedded=true";

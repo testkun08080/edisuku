@@ -114,6 +114,8 @@ export interface ManifestResponse {
   columns: ColumnDefinition[];
   generatedAt: string;
   schemaVersion: string;
+  /** Latest EDINET submission date ingested (from daily_metrics.snapshot_date). */
+  dataLastUpdated: string | null;
 }
 
 export interface HealthResponse {

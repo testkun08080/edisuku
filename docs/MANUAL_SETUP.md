@@ -194,7 +194,7 @@ curl -H "X-Internal-Api-Key: <your-key>" \
 
 日次パイプライン（`.github/workflows/daily-refresh.yml`）は delta 適用後に **全件** rebuild を自動実行します。提出日のデフォルトは **昨日 JST**（`ingest_daily.py` と同様）。D1 名は GitHub Secret で指定できます（未設定時: staging `edisuku-db-staging`、production `edisuku-db`）。
 
-取り込み後は `apps/web/lib/brand.ts` の `DATA_LAST_UPDATED` を取り込み日に合わせて手動更新してください（[ENV.md](./ENV.md) 参照）。
+成功後、プライバシーページのデータ最終更新日は D1 の `daily_metrics` から自動表示されます（[ENV.md](./ENV.md) 参照）。
 
 ## 7. （任意）Python wrapper
 

@@ -144,7 +144,7 @@
 
 **処理の流れ**: EDINET 取得 → D1 delta 適用 → `company_metrics` 全件 rebuild → KV `screener:metrics:v2` 無効化 → `pipeline_runs` / `daily_metrics` 記録。
 
-**UI のデータ最終更新日**: D1 反映後、`apps/web/lib/brand.ts` の `DATA_LAST_UPDATED`（`YYYY-MM-DD`）を **手動で更新** してください。プライバシーページ等の「データ最終更新日」表示に使われます（環境変数ではなくコード内定数）。
+**UI のデータ最終更新日**: daily-refresh 成功時に D1 の `daily_metrics.snapshot_date` へ記録され、プライバシーページは `/api/manifest` の `dataLastUpdated` を SSR で表示します。**Web 再デプロイは不要**です。
 
 ### 記録用（ランタイムには使わない）
 
