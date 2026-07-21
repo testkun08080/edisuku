@@ -19,6 +19,7 @@ import { Separator } from "../components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
 import { TooltipProvider } from "../components/ui/tooltip";
 import { initializeGA, trackPageView } from "../lib/analytics";
+import { SITE_NAME } from "../lib/brand";
 import { SCREENER } from "../lib/routes";
 
 function useSidebarShell(urlPathname: string): boolean {
@@ -27,7 +28,9 @@ function useSidebarShell(urlPathname: string): boolean {
     urlPathname === SCREENER ||
     urlPathname.startsWith(`${SCREENER}/`) ||
     urlPathname === "/privacy" ||
-    urlPathname === "/contact"
+    urlPathname === "/contact" ||
+    urlPathname === "/faq" ||
+    urlPathname === "/about"
   );
 }
 
@@ -47,9 +50,13 @@ function AppHeader() {
       ? "プライバシーポリシー"
       : urlPathname === "/contact"
         ? "お問い合わせ"
-        : isAnalyzePage
-          ? `企業分析 (${secCode})`
-          : "企業一覧";
+        : urlPathname === "/faq"
+          ? "よくある質問"
+          : urlPathname === "/about"
+            ? `${SITE_NAME}について`
+            : isAnalyzePage
+              ? `企業分析 (${secCode})`
+              : "企業一覧";
 
   return (
     <header className="flex h-12 shrink-0 items-center justify-between gap-2 border-b px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
