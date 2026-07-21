@@ -3,7 +3,9 @@
 import {
   BarChart3,
   Clock,
+  HelpCircle,
   Home,
+  Info,
   Mail,
   Search,
   Shield,
@@ -313,6 +315,32 @@ export function AppSidebar() {
                   <a href="/contact">
                     <Mail className="size-3.5" />
                     <span>お問い合わせ</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={urlPathname === "/faq"}
+                  size="sm"
+                  tooltip="よくある質問"
+                >
+                  <a href="/faq">
+                    <HelpCircle className="size-3.5" />
+                    <span>よくある質問</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={urlPathname === "/about"}
+                  size="sm"
+                  tooltip={`${SITE_NAME}について`}
+                >
+                  <a href="/about">
+                    <Info className="size-3.5" />
+                    <span>{SITE_NAME}について</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>

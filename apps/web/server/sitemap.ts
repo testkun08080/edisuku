@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { enhance } from "@universal-middleware/core";
 
-const STATIC_PATHS = ["/", "/screener", "/contact", "/privacy"] as const;
+const STATIC_PATHS = ["/", "/screener", "/contact", "/privacy", "/faq", "/about"] as const;
 
 function resolveSiteUrl(request: Request): string {
   const configured = env.PUBLIC_ENV__SITE_URL?.trim();

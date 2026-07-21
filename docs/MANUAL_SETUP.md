@@ -173,6 +173,8 @@ pnpm exec wrangler kv key delete "screener:metrics:v2" \
 
 ### 6-4. 大株主スナップショット（任意）
 
+edinet-wagatoushi から歴史データを一括投入する場合は [SHAREHOLDER_IMPORT_WAGATOUSHI.md](./SHAREHOLDER_IMPORT_WAGATOUSHI.md) を参照。
+
 `infra/init/sample/shareholders/*.json` から D1 へ投入する場合:
 
 ```bash

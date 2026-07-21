@@ -11,6 +11,12 @@ export function LandingFooter() {
           <span className="text-xs font-semibold text-white/30">{SITE_NAME}</span>
         </div>
         <div className="flex flex-wrap justify-center gap-6">
+          <a href="/about" className="text-xs text-white/27 transition-colors hover:text-white/60">
+            {SITE_NAME}について
+          </a>
+          <a href="/faq" className="text-xs text-white/27 transition-colors hover:text-white/60">
+            よくある質問
+          </a>
           <a
             href="/privacy"
             className="text-xs text-white/27 transition-colors hover:text-white/60"

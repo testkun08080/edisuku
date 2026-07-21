@@ -25,6 +25,7 @@
     "db:backfill:shareholders": "pnpm --filter @edinet/metrics exec tsx ../../infra/init/build-shareholder-snapshots.mjs",
     "db:backfill:shareholders-corpus": "pnpm --filter @edinet/metrics exec tsx ../../infra/init/build-shareholder-from-corpus.mjs",
     "db:export:shareholders": "pnpm --filter @edinet/metrics exec tsx ../../infra/init/export-shareholder-snapshots-sqlite.mjs",
+    "db:import:shareholders-wagatoushi": "pnpm --filter @edinet/metrics exec tsx ../../infra/init/import-shareholders-from-wagatoushi.mjs",
     "sample:regenerate": "bash infra/init/regenerate-sample.sh",
     "audit:staging-db": "bash infra/audit/staging-db-audit.sh",
     "audit:knip": "knip",
