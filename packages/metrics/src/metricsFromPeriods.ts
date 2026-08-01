@@ -1,7 +1,9 @@
 import { computeConsecutiveDivIncreases } from "./consecutiveDiv.js";
 import {
   cagrRatio,
+  compareSubmitDateTime,
   growthRatio,
+  isAnnualPeriod,
   parseDecimal,
   parseYen,
   pickFromPeriod,
@@ -13,7 +15,32 @@ import type { CompanyMetricsRow, CompanySummary } from "./types.js";
 export type MetricsFromPeriodsOptions = {
   /** 指標算出に使う期間。未指定時は company.periods 全体 */
   periods?: CompanySummary["periods"];
+  /**
+   * true の場合、渡された periods をそのまま使う（分析ページの四半期/半期/通期トグル用）。
+   * false/未指定なら通期→半期→四半期の順に探索して種別を1つに揃える。
+   */
+  useProvidedPeriodsAsIs?: boolean;
 };
+
+/** 種別の優先順位。通期があれば必ず通期を使う */
+const KIND_PRIORITY = ["annual", "semiAnnual", "quarter"] as const;
+
+/**
+ * 同一 periodEnd・同一種別の重複を除く。
+ * 重複が残ると at(-4)/at(-6) の遡及が縮み「5年CAGRが実質3年」になる。
+ */
+function dedupePeriods(periods: CompanySummary["periods"]): CompanySummary["periods"] {
+  const seen = new Map<string, CompanySummary["periods"][0]>();
+  for (const p of periods) {
+    const key = `${p.periodEnd}|${reportKindKey(p.docDescription)}`;
+    const prev = seen.get(key);
+    // 同一キーなら提出日時が新しい方を採る
+    if (!prev || compareSubmitDateTime(p.submitDateTime ?? "", prev.submitDateTime ?? "") > 0) {
+      seen.set(key, p);
+    }
+  }
+  return [...seen.values()];
+}
 
 /** API の period_financials から指標タブ用のスナップショットを組み立てる */
 export function metricsFromPeriods(
@@ -21,13 +48,35 @@ export function metricsFromPeriods(
   options?: MetricsFromPeriodsOptions,
 ): CompanyMetricsRow | null {
   const sourcePeriods = options?.periods?.length ? options.periods : company.periods;
-  const sorted = [...sourcePeriods].sort((a, b) => a.periodEnd.localeCompare(b.periodEnd));
-  const latest = sorted.at(-1);
-  if (!latest) return null;
+  if (sourcePeriods.length === 0) return null;
 
-  const kindSorted = sorted.filter(
-    (p) => reportKindKey(p.docDescription) === reportKindKey(latest.docDescription),
-  );
+  const deduped = dedupePeriods(sourcePeriods);
+
+  // 半期報告書の periodEnd は「半期末」ではなく「期末日」なので、通期と同値になる。
+  // periodEnd のソート順では両者を区別できないため、必ず種別で絞ってから最新を採る。
+  const sortByPeriodEnd = (ps: CompanySummary["periods"]) =>
+    [...ps].sort(
+      (a, b) =>
+        a.periodEnd.localeCompare(b.periodEnd) ||
+        compareSubmitDateTime(a.submitDateTime ?? "", b.submitDateTime ?? ""),
+    );
+
+  let kindSorted: CompanySummary["periods"];
+  if (options?.useProvidedPeriodsAsIs) {
+    kindSorted = sortByPeriodEnd(deduped);
+  } else {
+    kindSorted = [];
+    for (const kind of KIND_PRIORITY) {
+      const ofKind = deduped.filter((p) => reportKindKey(p.docDescription) === kind);
+      if (ofKind.length > 0) {
+        kindSorted = sortByPeriodEnd(ofKind);
+        break;
+      }
+    }
+  }
+
+  const latest = kindSorted.at(-1);
+  if (!latest) return null;
 
   const s = latest.summary;
   const pl = latest.pl;
@@ -108,9 +157,8 @@ export function metricsFromPeriods(
   const netCashYen =
     cashYen != null && liabYen != null ? cashYen - Math.round(liabYen * 0.35) : null;
 
-  const annualSorted = [...company.periods]
-    .filter((p) => p.docDescription?.includes("有価証券報告書"))
-    .sort((a, b) => a.periodEnd.localeCompare(b.periodEnd));
+  // 通期判定は isAnnualPeriod に一本化（インライン includes の重複を排除）
+  const annualSorted = sortByPeriodEnd(deduped.filter(isAnnualPeriod));
   const latestAnnual = annualSorted.at(-1);
   const priorAnnual = annualSorted.length >= 2 ? annualSorted.at(-2) : undefined;
 
@@ -120,6 +168,9 @@ export function metricsFromPeriods(
     filerName: company.filerName,
     calcDate: latest.periodEnd,
     fiscalMonth: latest.periodEnd.length >= 7 ? latest.periodEnd.slice(5, 7) : null,
+    /** この行の数値がどの開示種別のものか（通期/半期/四半期）。混在の判別に使う */
+    reportKind: reportKindKey(latest.docDescription),
+    latestSubmitDateTime: latest.submitDateTime || null,
     sales,
     operatingProfit,
     recurringProfit,
@@ -153,12 +204,10 @@ export function metricsFromPeriods(
         ? String((dpsNum * shares) / netYen)
         : null,
     dividendPerShare: dps,
+    // dps/(eps*per) は代数的に dps/株価 と等価。PER が無い場合に株価を
+    // 決め打ちすると捏造値になるため、算出できないときは null を返す。
     dividendYield:
-      dpsNum != null && epsNum != null && per != null && per > 0
-        ? dpsNum / (epsNum * per)
-        : dpsNum != null
-          ? dpsNum / 2500
-          : null,
+      dpsNum != null && epsNum != null && per != null && per > 0 ? dpsNum / (epsNum * per) : null,
     sharesOutstanding: pick("発行済株式総数（普通株式）", "発行済株式総数"),
     currentAssets: pick("流動資産"),
     currentLiabilities: pick("流動負債"),
@@ -176,7 +225,7 @@ export function metricsFromPeriods(
     dividendGrowthYoY: growthRatio(dpsNum, prevDps),
     salesCagr3y: cagrRatio(salesYen, sales3, 3),
     salesCagr5y: cagrRatio(salesYen, sales5, 5),
-    consecutiveDivIncreases: computeConsecutiveDivIncreases(company.periods),
+    consecutiveDivIncreases: computeConsecutiveDivIncreases(deduped),
     currentRatio: caYen != null && clYen != null && clYen !== 0 ? caYen / clYen : null,
     deRatio: liabYen != null && eqYen != null && eqYen !== 0 ? liabYen / eqYen : null,
     roic:

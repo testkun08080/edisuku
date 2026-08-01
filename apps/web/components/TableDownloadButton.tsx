@@ -48,16 +48,10 @@ function getCellValueForExport(m: CompanyMetric, colId: ColumnId): string {
       return m.fiscalMonth ?? "－";
     case "PER":
       return m.PER != null ? m.PER.toFixed(1) : "－";
-    case "PBR":
-      return m.PBR != null ? m.PBR.toFixed(2) : "－";
     case "dividendYield":
       return formatDecimalAsPercent(m.dividendYield);
     case "marketCap":
       return m.marketCap != null ? formatSales(String(m.marketCap)) : "－";
-    case "netCash":
-      return m.netCash != null ? formatSales(String(m.netCash)) : "－";
-    case "netCashRatio":
-      return m.netCashRatio != null ? (m.netCashRatio * 100).toFixed(2) + "%" : "－";
     case "equityRatio":
       return formatRatio(m.equityRatio);
     case "ROE":

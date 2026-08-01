@@ -17,7 +17,7 @@ export function formatRatioDecimalStringAsPercent(s: string | null | undefined):
   return `${(n * 100).toFixed(2)}%`;
 }
 
-/** 内部小数（0.026 = 2.6%）を % 表示。dividendYield / roic / netCashRatio 等の number 型指標用 */
+/** 内部小数（0.026 = 2.6%）を % 表示。dividendYield 等の number 型指標用 */
 export function formatDecimalAsPercent(n: number | null | undefined): string {
   if (n == null || !Number.isFinite(n)) return "－";
   return `${(n * 100).toFixed(2)}%`;

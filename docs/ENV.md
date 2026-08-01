@@ -142,7 +142,7 @@
 
 **提出日**: `target_date` 未指定時は **昨日 JST**（`ingest_daily.py` と同じ）。
 
-**処理の流れ**: EDINET 取得 → D1 delta 適用 → `company_metrics` 全件 rebuild → KV `screener:metrics:v2` 無効化 → `pipeline_runs` / `daily_metrics` 記録。
+**処理の流れ**: EDINET 取得 → D1 delta 適用 → `company_metrics` 全件 rebuild → KV `screener:metrics:<METRICS_SCHEMA_VERSION>` 無効化 → `pipeline_runs` / `daily_metrics` 記録。
 
 **UI のデータ最終更新日**: daily-refresh 成功時に D1 の `daily_metrics.snapshot_date` へ記録され、プライバシーページは `/api/manifest` の `dataLastUpdated` を SSR で表示します。**Web 再デプロイは不要**です。
 

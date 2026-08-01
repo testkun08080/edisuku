@@ -1,3 +1,4 @@
+import { METRICS_SCHEMA_VERSION } from "@edinet/metrics";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import app from "../src/index.js";
 
@@ -90,7 +91,7 @@ describe("GET /api/metrics", () => {
     };
 
     expect(body.total).toBe(1);
-    expect(body.schemaVersion).toBe("v2");
+    expect(body.schemaVersion).toBe(METRICS_SCHEMA_VERSION);
     expect(body.columns.length).toBeGreaterThan(0);
     expect(body.rows).toHaveLength(1);
     expect(body.rows[0].sales).toBe("1000000000000");

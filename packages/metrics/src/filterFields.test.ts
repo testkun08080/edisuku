@@ -8,8 +8,18 @@ describe("filter_fields.json", () => {
     (screenerColumnsJson as { columns: { id: string }[] }).columns.map((c) => c.id),
   );
 
-  it("has 47 filterable fields", () => {
-    expect(getFilterFields()).toHaveLength(47);
+  // roic / netCash / netCashRatio / PBR は EDINET のデータでは正しく算出できないため
+  // UI から除外した（値は metrics_json に保持）
+  it("has 43 filterable fields", () => {
+    expect(getFilterFields()).toHaveLength(43);
+  });
+
+  it("does not expose metrics that cannot be derived from EDINET data", () => {
+    const ids = new Set(getFilterFields().map((f) => f.id));
+    for (const removed of ["roic", "netCash", "netCashRatio", "PBR"]) {
+      expect(ids.has(removed), `${removed} should not be filterable`).toBe(false);
+      expect(screenerIds.has(removed), `${removed} should not be a column`).toBe(false);
+    }
   });
 
   it("every filter field id exists in screener_columns", () => {

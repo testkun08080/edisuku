@@ -25,7 +25,7 @@ export {
 } from "./filterEngine.js";
 export { computeConsecutiveDivIncreases } from "./consecutiveDiv.js";
 export { computePiotroskiFScore } from "./piotroski.js";
-export { compareSubmitDateTime } from "./helpers.js";
+export { compareSubmitDateTime, isAnnualPeriod, reportKindKey } from "./helpers.js";
 export {
   formatMajorShareholderCell,
   majorShareholdersToApiEntries,

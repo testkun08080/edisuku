@@ -42,15 +42,22 @@ export function pickFromPeriod(
 }
 
 export function isAnnualPeriod(period: CompanySummary["periods"][0]): boolean {
-  if (period.docDescription === "有価証券報告書") return true;
-  return false;
+  return reportKindKey(period.docDescription) === "annual";
 }
 
-/** EDINET docDescription から開示種別キー（分析ページの四半期/半期/通期と対応） */
+/**
+ * EDINET docDescription から開示種別キー（分析ページの四半期/半期/通期と対応）
+ *
+ * 実データの docDescription は「有価証券報告書－第78期(2025/04/01－2026/03/31)」の
+ * ような形式なので、前方一致ではなく includes で判定する。
+ * 四半期/半期を有価証券報告書より先に判定する順序は変更しないこと。
+ */
 export function reportKindKey(
   docDescription: string | undefined,
 ): "quarter" | "semiAnnual" | "annual" | "other" {
   const d = docDescription ?? "";
+  // 訂正報告書は同一期の重複となり CAGR の遡及を壊すため通期扱いしない
+  if (d.includes("訂正")) return "other";
   if (d.includes("四半期報告書")) return "quarter";
   if (d.includes("半期報告書")) return "semiAnnual";
   if (d.includes("有価証券報告書")) return "annual";

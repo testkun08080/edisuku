@@ -1,13 +1,6 @@
 {
   "fields": [
     {
-      "id": "PBR",
-      "label": "PBR（倍）",
-      "category": "valuation",
-      "metricsKey": "PBR",
-      "inputUnit": "multiple"
-    },
-    {
       "id": "PER",
       "label": "PER（倍）",
       "category": "valuation",
@@ -41,20 +34,6 @@
       "category": "valuation",
       "metricsKey": "marketCap",
       "inputUnit": "millionYen"
-    },
-    {
-      "id": "netCash",
-      "label": "ネットキャッシュ（百万円）",
-      "category": "valuation",
-      "metricsKey": "netCash",
-      "inputUnit": "millionYen"
-    },
-    {
-      "id": "netCashRatio",
-      "label": "ネットキャッシュ比率（%）",
-      "category": "valuation",
-      "metricsKey": "netCashRatio",
-      "inputUnit": "percent"
     },
     {
       "id": "EPS",
@@ -127,13 +106,6 @@
       "category": "valuation",
       "metricsKey": "sharesOutstanding",
       "inputUnit": "count"
-    },
-    {
-      "id": "roic",
-      "label": "ROIC（%）",
-      "category": "valuation",
-      "metricsKey": "roic",
-      "inputUnit": "percent"
     },
     {
       "id": "piotroskiFScore",

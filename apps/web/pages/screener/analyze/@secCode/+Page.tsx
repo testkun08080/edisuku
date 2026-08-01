@@ -234,7 +234,6 @@ const INDICATOR_KEYS: { key: keyof CompanyMetricsRow; label: string }[] = [
   { key: "roa", label: "ROA（%）" },
   { key: "equityRatioCalculated", label: "自己資本比率（算出・%）" },
   { key: "PER", label: "PER（倍）" },
-  { key: "PBR", label: "PBR（倍）" },
   { key: "netAssets", label: "純資産額（百万円）" },
   { key: "totalAssets", label: "総資産額（百万円）" },
   { key: "equityRatio", label: "自己資本比率（%）" },
@@ -251,8 +250,6 @@ const INDICATOR_KEYS: { key: keyof CompanyMetricsRow; label: string }[] = [
   { key: "dividendPerShare", label: "1株当たり配当金（円）" },
   { key: "dividendYield", label: "配当利回り（%）" },
   { key: "marketCap", label: "時価総額（百万円）" },
-  { key: "netCash", label: "ネットキャッシュ（百万円）" },
-  { key: "netCashRatio", label: "ネットキャッシュ比率（%）" },
   { key: "sharesOutstanding", label: "発行済株式総数（株）" },
   { key: "investmentSecurities", label: "投資有価証券（百万円）" },
   { key: "salesGrowthYoY", label: "売上高成長率(YoY)（%）" },
@@ -264,7 +261,6 @@ const INDICATOR_KEYS: { key: keyof CompanyMetricsRow; label: string }[] = [
   { key: "consecutiveDivIncreases", label: "連続増配年数" },
   { key: "currentRatio", label: "流動比率" },
   { key: "deRatio", label: "D/Eレシオ" },
-  { key: "roic", label: "ROIC（%）" },
   { key: "piotroskiFScore", label: "Piotroski F-Score" },
 ];
 
@@ -282,8 +278,8 @@ function IndicatorsTable({ metrics }: { metrics: CompanyMetricsRow | null }) {
     <Card>
       <CardContent className="p-0">
         <p className="text-muted-foreground border-b px-4 py-2 text-xs leading-relaxed">
-          金額は百万円（元データは円÷1,000,000）。比率・成長率・ROIC は小数を×100して %
-          表示。PER・PBR は倍。EPS・BPS・1株配当は円。発行済株式総数は株。
+          金額は百万円（元データは円÷1,000,000）。比率・成長率は小数を×100して % 表示。PER
+          は倍。EPS・BPS・1株配当は円。発行済株式総数は株。
         </p>
         <Table>
           <TableHeader>
@@ -323,18 +319,12 @@ function IndicatorsTable({ metrics }: { metrics: CompanyMetricsRow | null }) {
                 typeof val === "string"
               ) {
                 display = formatRatioDecimalStringAsPercent(val);
-              } else if (key === "netCashRatio" && typeof val === "number") {
-                display = formatDecimalAsPercent(val);
               } else if (key === "dividendYield" && typeof val === "number") {
-                display = formatDecimalAsPercent(val);
-              } else if (key === "roic" && typeof val === "number") {
                 display = formatDecimalAsPercent(val);
               } else if (typeof val === "number") {
                 if (key === "PER") {
                   display = val.toFixed(1);
-                } else if (key === "PBR") {
-                  display = val.toFixed(2);
-                } else if (key === "marketCap" || key === "netCash") {
+                } else if (key === "marketCap") {
                   display = formatYenStringAsMillionYen(String(val));
                 } else {
                   display = val.toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -471,7 +461,11 @@ export default function Page() {
   const metrics = useMemo(
     () =>
       company
-        ? metricsFromPeriods(company, { periods: reportFilteredPeriods })
+        ? metricsFromPeriods(company, {
+            periods: reportFilteredPeriods,
+            // 種別トグルで絞り込み済みなので、通期フォールバックを効かせずそのまま使う
+            useProvidedPeriodsAsIs: true,
+          })
         : null,
     [company, reportFilteredPeriods],
   );

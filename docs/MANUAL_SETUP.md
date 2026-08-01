@@ -164,10 +164,12 @@ pnpm exec wrangler d1 execute "$D1_NAME" --remote --env staging \
   --file ../../infra/init/company_metrics.sql
 ```
 
-投入後、KV キャッシュ（設定済みの場合）を無効化します。
+投入後、KV キャッシュ（設定済みの場合）を無効化します。キーの版数は
+`packages/metrics/src/flattenMetricsRow.ts` の `METRICS_SCHEMA_VERSION` と一致させること
+（現在は `v3`）。
 
 ```bash
-pnpm exec wrangler kv key delete "screener:metrics:v2" \
+pnpm exec wrangler kv key delete "screener:metrics:v3" \
   --namespace-id "<KV_STAGING_ID>"
 ```
 

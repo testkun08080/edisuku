@@ -77,10 +77,10 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "どのような指標で企業を検索・比較できますか？",
     answerText:
-      "ROE・ROA・ROIC・PER・PBR・自己資本比率・配当利回り・Piotroski F-Scoreなど20種類以上の指標でスクリーニングできます。プリセット条件も用意しており、条件を保存して再利用することも可能です。",
+      "ROE・ROA・PER・自己資本比率・配当利回り・Piotroski F-Scoreなど20種類以上の指標でスクリーニングできます。プリセット条件も用意しており、条件を保存して再利用することも可能です。",
     answer: (
       <p>
-        ROE・ROA・ROIC・PER・PBR・自己資本比率・配当利回り・Piotroski
+        ROE・ROA・PER・自己資本比率・配当利回り・Piotroski
         F-Scoreなど20種類以上の指標でスクリーニングできます。「ROEが高い」「堅実な企業」「成長中」などのプリセット条件も用意しており、条件を保存して再利用することも可能です。
       </p>
     ),
