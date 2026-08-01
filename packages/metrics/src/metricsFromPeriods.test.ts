@@ -351,6 +351,22 @@ describe("metricsFromPeriods", () => {
     expect(row!.sales).toBe(yen(1_000_000_000_000 * 0.52));
   });
 
+  // 分析ページで半期・四半期に切り替えても、通期のみで定義される指標は
+  // 通期の履歴から算出し続ける必要がある（種別トグルの部分集合に引きずられない）
+  it("computes annual-only metrics from full history even when given an interim subset", () => {
+    const company = buildMixedFilingCompany();
+    const semiOnly = company.periods.filter((p) => p.docDescription.includes("半期報告書"));
+    const row = metricsFromPeriods(company, {
+      periods: semiOnly,
+      useProvidedPeriodsAsIs: true,
+    });
+    const annualRow = metricsFromPeriods(company);
+    expect(row!.reportKind).toBe("semiAnnual");
+    expect(row!.consecutiveDivIncreases).toBe(annualRow!.consecutiveDivIncreases);
+    expect(row!.piotroskiFScore).toBe(annualRow!.piotroskiFScore);
+    expect(row!.piotroskiFScore).not.toBeNull();
+  });
+
   it("reports latestSubmitDateTime instead of always null", () => {
     const row = metricsFromPeriods(buildGoldenCompany());
     expect(row!.latestSubmitDateTime).toBe("2025-06-28T09:00:00Z");

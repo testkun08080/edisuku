@@ -87,3 +87,17 @@ export function formatAnalyzeFinancialTableCell(
   const millions = n / 1_000_000;
   return millions.toLocaleString("ja-JP", { maximumFractionDigits: 2 });
 }
+
+/** reportKind の内部値を一覧・CSV 共通の表示ラベルへ */
+export function formatReportKind(kind: string | number | null | undefined): string {
+  switch (kind) {
+    case "annual":
+      return "通期";
+    case "semiAnnual":
+      return "半期";
+    case "quarter":
+      return "四半期";
+    default:
+      return "－";
+  }
+}

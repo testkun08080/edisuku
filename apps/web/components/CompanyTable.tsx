@@ -6,6 +6,7 @@ import { passesFilter } from "../lib/filterEngine.js";
 import {
   formatDecimalAsPercent,
   formatRatioDecimalStringAsPercent,
+  formatReportKind,
   formatYenStringAsMillionYen,
 } from "../lib/metricFormat.js";
 import {
@@ -29,12 +30,6 @@ export type { CompanyMetric };
 const formatSales = formatYenStringAsMillionYen;
 const formatRatio = formatRatioDecimalStringAsPercent;
 const ROW_LIMIT_OPTIONS = ["50", "100", "200", "500"] as const;
-/** 各行の数値がどの開示種別のものかの表示ラベル */
-const REPORT_KIND_LABELS: Record<string, string> = {
-  annual: "通期",
-  semiAnnual: "半期",
-  quarter: "四半期",
-};
 const SERVER_MODE = getScreenerMode() === "server";
 const SERVER_SORT_COLUMNS = new Set<ColumnId>([
   "filerName",
@@ -124,7 +119,7 @@ function getCellValue(
     case "fiscalMonth":
       return m.fiscalMonth ?? "－";
     case "reportKind":
-      return REPORT_KIND_LABELS[String(m.reportKind ?? "")] ?? "－";
+      return formatReportKind(m.reportKind);
     case "PER":
       return m.PER != null ? m.PER.toFixed(1) : "－";
     case "dividendYield":

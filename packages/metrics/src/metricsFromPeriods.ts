@@ -51,6 +51,10 @@ export function metricsFromPeriods(
   if (sourcePeriods.length === 0) return null;
 
   const deduped = dedupePeriods(sourcePeriods);
+  // 通期のみで定義される指標（Piotroski F-Score / 連続増配）は、分析ページの
+  // 種別トグルで半期・四半期に絞られても通期の履歴から算出する必要がある。
+  // sourcePeriods ではなく常に company.periods 全体を参照すること。
+  const allDeduped = options?.periods?.length ? dedupePeriods(company.periods) : deduped;
 
   // 半期報告書の periodEnd は「半期末」ではなく「期末日」なので、通期と同値になる。
   // periodEnd のソート順では両者を区別できないため、必ず種別で絞ってから最新を採る。
@@ -158,7 +162,7 @@ export function metricsFromPeriods(
     cashYen != null && liabYen != null ? cashYen - Math.round(liabYen * 0.35) : null;
 
   // 通期判定は isAnnualPeriod に一本化（インライン includes の重複を排除）
-  const annualSorted = sortByPeriodEnd(deduped.filter(isAnnualPeriod));
+  const annualSorted = sortByPeriodEnd(allDeduped.filter(isAnnualPeriod));
   const latestAnnual = annualSorted.at(-1);
   const priorAnnual = annualSorted.length >= 2 ? annualSorted.at(-2) : undefined;
 
@@ -225,7 +229,7 @@ export function metricsFromPeriods(
     dividendGrowthYoY: growthRatio(dpsNum, prevDps),
     salesCagr3y: cagrRatio(salesYen, sales3, 3),
     salesCagr5y: cagrRatio(salesYen, sales5, 5),
-    consecutiveDivIncreases: computeConsecutiveDivIncreases(deduped),
+    consecutiveDivIncreases: computeConsecutiveDivIncreases(allDeduped),
     currentRatio: caYen != null && clYen != null && clYen !== 0 ? caYen / clYen : null,
     deRatio: liabYen != null && eqYen != null && eqYen !== 0 ? liabYen / eqYen : null,
     roic:

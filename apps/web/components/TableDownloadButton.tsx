@@ -7,6 +7,7 @@ import { passesFilter } from "../lib/filterEngine.js";
 import {
   formatDecimalAsPercent,
   formatRatioDecimalStringAsPercent,
+  formatReportKind,
   formatYenStringAsMillionYen,
 } from "../lib/metricFormat.js";
 import { loadCompanyMetrics } from "../lib/metricsLoader.js";
@@ -46,6 +47,8 @@ function getCellValueForExport(m: CompanyMetric, colId: ColumnId): string {
       return m.calcDate ?? "－";
     case "fiscalMonth":
       return m.fiscalMonth ?? "－";
+    case "reportKind":
+      return formatReportKind(m.reportKind);
     case "PER":
       return m.PER != null ? m.PER.toFixed(1) : "－";
     case "dividendYield":

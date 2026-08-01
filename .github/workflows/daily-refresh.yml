@@ -196,10 +196,15 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           if [ -n "$KV_NAMESPACE_ID" ]; then
-            # バージョンはソースの METRICS_SCHEMA_VERSION から導出する。
+            # バージョンはパッケージの METRICS_SCHEMA_VERSION から導出する。
             # ここにリテラルを書くと定数を上げたときに乖離し、
             # 実際に読まれているキーが二度と無効化されなくなる。
-            SCHEMA_VERSION=$(node -e "const s=require('fs').readFileSync('packages/metrics/src/flattenMetricsRow.ts','utf8');const m=s.match(/METRICS_SCHEMA_VERSION\s*=\s*[\"']([^\"']+)[\"']/);if(!m){console.error('METRICS_SCHEMA_VERSION not found');process.exit(1)}process.stdout.write(m[1])")
+            SCHEMA_VERSION=$(pnpm --filter @edinet/metrics exec tsx \
+              ../../infra/init/print-metrics-schema-version.mjs)
+            if [ -z "$SCHEMA_VERSION" ]; then
+              echo "Failed to resolve METRICS_SCHEMA_VERSION"
+              exit 1
+            fi
             KV_KEY="screener:metrics:${SCHEMA_VERSION}"
             npx -y wrangler@4 kv key delete "$KV_KEY" \
               --namespace-id "$KV_NAMESPACE_ID" || true
