@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { reportKindKey } from "./helpers.js";
 import { metricsFromPeriods } from "./metricsFromPeriods.js";
 import type { CompanySummary } from "./types.js";
 
@@ -320,7 +321,7 @@ describe("metricsFromPeriods", () => {
     const company = buildMixedFilingCompany();
     const noAnnual: CompanySummary = {
       ...company,
-      periods: company.periods.filter((p) => !p.docDescription.includes("有価証券報告書")),
+      periods: company.periods.filter((p) => reportKindKey(p.docDescription) !== "annual"),
     };
     const row = metricsFromPeriods(noAnnual);
     expect(row).not.toBeNull();
@@ -331,7 +332,7 @@ describe("metricsFromPeriods", () => {
     const company = buildMixedFilingCompany();
     const quarterOnly: CompanySummary = {
       ...company,
-      periods: company.periods.filter((p) => p.docDescription.includes("四半期報告書")),
+      periods: company.periods.filter((p) => reportKindKey(p.docDescription) === "quarter"),
     };
     const row = metricsFromPeriods(quarterOnly);
     expect(row).not.toBeNull();
@@ -340,7 +341,9 @@ describe("metricsFromPeriods", () => {
 
   it("keeps the analyze page toggle working via useProvidedPeriodsAsIs", () => {
     const company = buildMixedFilingCompany();
-    const semiOnly = company.periods.filter((p) => p.docDescription.includes("半期報告書"));
+    const semiOnly = company.periods.filter(
+      (p) => reportKindKey(p.docDescription) === "semiAnnual",
+    );
     const row = metricsFromPeriods(company, {
       periods: semiOnly,
       useProvidedPeriodsAsIs: true,
@@ -355,7 +358,9 @@ describe("metricsFromPeriods", () => {
   // 通期の履歴から算出し続ける必要がある（種別トグルの部分集合に引きずられない）
   it("computes annual-only metrics from full history even when given an interim subset", () => {
     const company = buildMixedFilingCompany();
-    const semiOnly = company.periods.filter((p) => p.docDescription.includes("半期報告書"));
+    const semiOnly = company.periods.filter(
+      (p) => reportKindKey(p.docDescription) === "semiAnnual",
+    );
     const row = metricsFromPeriods(company, {
       periods: semiOnly,
       useProvidedPeriodsAsIs: true,

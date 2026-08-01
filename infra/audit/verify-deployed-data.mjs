@@ -20,12 +20,29 @@ const PAGE_SIZE = 500;
 
 function parseArgs(argv) {
   const opts = { base: DEFAULT_BASE, sample: 20, seed: null, json: null, all: false };
+  /** 値を伴うオプションで、値が無い／数値でない場合に黙って進まないようにする */
+  const value = (i, name) => {
+    const v = argv[i];
+    if (v == null || v.startsWith("--")) {
+      console.error(`[verify] ${name} に値が指定されていません`);
+      process.exit(1);
+    }
+    return v;
+  };
+  const intValue = (i, name) => {
+    const n = Number.parseInt(value(i, name), 10);
+    if (!Number.isFinite(n)) {
+      console.error(`[verify] ${name} には整数を指定してください: ${argv[i]}`);
+      process.exit(1);
+    }
+    return n;
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === "--base") opts.base = argv[++i];
-    else if (a === "--sample") opts.sample = Number.parseInt(argv[++i], 10);
-    else if (a === "--seed") opts.seed = Number.parseInt(argv[++i], 10);
-    else if (a === "--json") opts.json = argv[++i];
+    if (a === "--base") opts.base = value(++i, "--base");
+    else if (a === "--sample") opts.sample = intValue(++i, "--sample");
+    else if (a === "--seed") opts.seed = intValue(++i, "--seed");
+    else if (a === "--json") opts.json = value(++i, "--json");
     else if (a === "--all") opts.all = true;
     else if (a === "-h" || a === "--help") {
       console.log(
@@ -174,7 +191,7 @@ function checkCompany(row, periods, shareholderSnapshots) {
           id: "marketcap-inconsistent",
           severity: "medium",
           detail:
-            `時価総額 PER×EPS×株数=${(mc / 1e6).toFixed(0)}百万 vs ` +
+            `時価総額(配信値)=${(mc / 1e6).toFixed(0)}百万 vs ` +
             `PBR×BPS×株数=${(alt / 1e6).toFixed(0)}百万 (乖離 ${(gap * 100).toFixed(1)}%)`,
         });
       }
