@@ -62,6 +62,9 @@ describe("queryCompanyMetrics", () => {
     sqlite.exec(
       readFileSync(join(root, "packages/db/migrations/0001_company_metrics.sql"), "utf8"),
     );
+    sqlite.exec(
+      readFileSync(join(root, "packages/db/migrations/0003_company_profile.sql"), "utf8"),
+    );
 
     sqlite
       .prepare(

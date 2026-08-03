@@ -17,6 +17,7 @@ MIGRATIONS_DIR = REPO_ROOT / "packages" / "db" / "migrations"
 SCHEMA_PATH = MIGRATIONS_DIR / "0000_init.sql"
 SCHEMA_PATH_0001 = MIGRATIONS_DIR / "0001_company_metrics.sql"
 SCHEMA_PATH_0002 = MIGRATIONS_DIR / "0002_drop_legacy_tables.sql"
+SCHEMA_PATH_0003 = MIGRATIONS_DIR / "0003_company_profile.sql"
 
 
 def _table_exists(conn: sqlite3.Connection, name: str) -> bool:
@@ -58,6 +59,8 @@ def apply_schema(
     if not _table_exists(conn, "company_metrics"):
         _run_migration_sql(conn, SCHEMA_PATH_0001)
     _run_migration_sql(conn, SCHEMA_PATH_0002)
+    if not _table_exists(conn, "officer_snapshots"):
+        _run_migration_sql(conn, SCHEMA_PATH_0003)
     conn.commit()
 
 
@@ -69,19 +72,52 @@ def upsert_company(
     filer_name: str,
     listed_category: str | None = None,
     industry: str | None = None,
+    corporate_number: str | None = None,
+    filer_name_en: str | None = None,
+    filer_name_kana: str | None = None,
+    address: str | None = None,
+    head_office_address: str | None = None,
+    phone: str | None = None,
+    representative: str | None = None,
 ) -> None:
     conn.execute(
         """
-        INSERT INTO companies (edinet_code, sec_code, filer_name, listed_category, industry)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO companies (
+          edinet_code, sec_code, filer_name, listed_category, industry,
+          corporate_number, filer_name_en, filer_name_kana, address,
+          head_office_address, phone, representative
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(edinet_code) DO UPDATE SET
           sec_code=excluded.sec_code,
           filer_name=excluded.filer_name,
           listed_category=excluded.listed_category,
           industry=excluded.industry,
+          corporate_number=COALESCE(excluded.corporate_number, companies.corporate_number),
+          filer_name_en=COALESCE(excluded.filer_name_en, companies.filer_name_en),
+          filer_name_kana=COALESCE(excluded.filer_name_kana, companies.filer_name_kana),
+          address=COALESCE(excluded.address, companies.address),
+          head_office_address=COALESCE(
+            excluded.head_office_address, companies.head_office_address
+          ),
+          phone=COALESCE(excluded.phone, companies.phone),
+          representative=COALESCE(excluded.representative, companies.representative),
           updated_at=CURRENT_TIMESTAMP
         """,
-        (edinet_code, sec_code, filer_name, listed_category, industry),
+        (
+            edinet_code,
+            sec_code,
+            filer_name,
+            listed_category,
+            industry,
+            corporate_number,
+            filer_name_en,
+            filer_name_kana,
+            address,
+            head_office_address,
+            phone,
+            representative,
+        ),
     )
 
 
@@ -201,6 +237,29 @@ def upsert_shareholder_snapshot(
     )
 
 
+def upsert_officer_snapshot(
+    conn: sqlite3.Connection,
+    *,
+    sec_code: str,
+    period_end: str,
+    doc_id: str | None,
+    entries: list[dict[str, Any]],
+) -> None:
+    if not sec_code or not entries:
+        return
+    conn.execute(
+        """
+        INSERT INTO officer_snapshots (sec_code, period_end, doc_id, entries_json)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(sec_code, period_end) DO UPDATE SET
+          doc_id=excluded.doc_id,
+          entries_json=excluded.entries_json,
+          updated_at=CURRENT_TIMESTAMP
+        """,
+        (sec_code, period_end, doc_id, json.dumps(entries, ensure_ascii=False)),
+    )
+
+
 def known_doc_ids(conn: sqlite3.Connection) -> set[str]:
     rows = conn.execute("SELECT doc_id FROM documents").fetchall()
     return {r["doc_id"] for r in rows}
@@ -212,7 +271,13 @@ def export_inserts_after(conn: sqlite3.Connection, since_ts: str) -> Iterable[st
     Used by publish_to_d1.py to emit a delta SQL file that `wrangler d1 execute`
     can apply against the remote D1 instance.
     """
-    for table in ("companies", "documents", "period_financials", "shareholder_snapshots"):
+    for table in (
+        "companies",
+        "documents",
+        "period_financials",
+        "shareholder_snapshots",
+        "officer_snapshots",
+    ):
         cursor = conn.execute(
             f"SELECT * FROM {table} WHERE updated_at >= ?",
             (since_ts,),

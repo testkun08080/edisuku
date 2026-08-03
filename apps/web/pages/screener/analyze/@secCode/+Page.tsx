@@ -15,6 +15,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useConfig } from "vike-react/useConfig";
 import { usePageContext } from "vike-react/usePageContext";
+import { CompanyProfileSection } from "../../../../components/CompanyProfileSection.js";
 import { useFavorites } from "../../../../components/FavoritesContext.js";
 import { MajorShareholdersTimeSeries } from "../../../../components/MajorShareholdersTimeSeries.js";
 import { useRecentCompanies } from "../../../../components/RecentCompaniesContext.js";
@@ -54,6 +55,7 @@ import {
 } from "../../../../lib/analyze-report-kind.js";
 import { api } from "../../../../lib/api.js";
 import { SITE_NAME } from "../../../../lib/brand";
+import { COMPANY_PROFILE_ENABLED } from "../../../../lib/features.js";
 import {
   ANALYZE_HEADCOUNT_ROW_KEYS,
   formatAnalyzeFinancialTableCell,
@@ -536,6 +538,11 @@ export default function Page() {
               </Button>
             </CardAction>
           </CardHeader>
+          {COMPANY_PROFILE_ENABLED ? (
+            <CardContent>
+              <CompanyProfileSection secCode={companySecCode} />
+            </CardContent>
+          ) : null}
         </Card>
       </div>
 

@@ -16,6 +16,7 @@ packages/db/
 │   ├── 0000_init.sql  drizzle-kit 生成 SQL（apps/wrapper も読む）
 │   ├── 0001_company_metrics.sql  company_metrics / shareholder_snapshots
 │   ├── 0002_drop_legacy_tables.sql  DROP raw_files_index / sec_code_latest_periods
+│   ├── 0003_company_profile.sql  companies プロフィール列 / officer_snapshots
 │   └── meta/          drizzle-kit のスナップショット
 └── drizzle.config.ts  dialect: sqlite, driver: d1-http
 ```
@@ -24,11 +25,12 @@ packages/db/
 
 | テーブル | 主キー | 用途 |
 |---|---|---|
-| `companies` | edinet_code | 企業マスタ |
+| `companies` | edinet_code | 企業マスタ（所在地・代表者・本店・電話等を含む） |
 | `documents` | doc_id | 提出書類メタ |
 | `period_financials` | (edinet_code, period_end, doc_type) | 期ごとの財務 JSON (summary/pl/bs/cf) |
 | `company_metrics` | sec_code | スクリーナー用指標スナップショット |
 | `shareholder_snapshots` | (sec_code, period_end) | 大株主時系列 |
+| `officer_snapshots` | (sec_code, period_end) | 役員（氏名・役職・生年月日）時系列 |
 | `pipeline_runs` | run_id | 日次取り込みジョブ記録（daily-refresh 終了時に書込） |
 | `daily_metrics` | snapshot_date | コーパス全体件数の日次スナップショット（提出日キー） |
 
@@ -43,6 +45,7 @@ packages/db/
 | `getSummaryBySecCode(db, secCode)` | 時系列財務（period_end 降順） |
 | `getCompanyMetrics` / `getAllCompanyMetrics` / `queryCompanyMetrics` | スクリーナー指標 |
 | `getShareholdersBySecCode(db, secCode)` | 大株主スナップショット |
+| `getOfficersBySecCode(db, secCode)` | 役員スナップショット |
 | `searchCompanies(db, q, limit)` | 名称・証券コード LIKE 検索 |
 | `countCompanies` / `countCompanyMetrics` | 件数 |
 
@@ -62,7 +65,7 @@ pnpm --filter @edinet/api db:migrate:staging
 pnpm --filter @edinet/api db:migrate:production
 ```
 
-`migrations/0000_init.sql` と `0001_company_metrics.sql` は Python (`apps/wrapper/src/edinet_wrapper/db.py`) も読むため、スキーマ変更時は生成物を必ずコミットする。既存 DB の legacy テーブル削除は `0002_drop_legacy_tables.sql` を `pnpm db:migrate:staging` / `production` で適用する。
+`migrations/0000_init.sql`〜`0003_company_profile.sql` は Python (`apps/wrapper/src/edinet_wrapper/db.py`) も読むため、スキーマ変更時は生成物を必ずコミットする。既存 DB の legacy テーブル削除は `0002_drop_legacy_tables.sql`、企業プロフィール列追加は `0003_company_profile.sql` を `pnpm db:migrate:staging` / `production` で適用する。
 
 ## 設計上のポイント
 

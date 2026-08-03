@@ -5,6 +5,7 @@ import {
   companyMetrics,
   dailyMetrics,
   documents,
+  officerSnapshots,
   periodFinancials,
   shareholderSnapshots,
 } from "./schema.js";
@@ -176,6 +177,15 @@ export async function getShareholdersBySecCode(db: DB, secCode: string) {
     .from(shareholderSnapshots)
     .where(eq(shareholderSnapshots.secCode, secCode))
     .orderBy(desc(shareholderSnapshots.periodEnd))
+    .all();
+}
+
+export async function getOfficersBySecCode(db: DB, secCode: string) {
+  return db
+    .select()
+    .from(officerSnapshots)
+    .where(eq(officerSnapshots.secCode, secCode))
+    .orderBy(desc(officerSnapshots.periodEnd))
     .all();
 }
 

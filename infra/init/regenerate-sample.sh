@@ -13,6 +13,7 @@ CORPUS=/tmp/edisuku-sample-corpus.db
 rm -f "$CORPUS"
 sqlite3 "$CORPUS" < packages/db/migrations/0000_init.sql
 sqlite3 "$CORPUS" < packages/db/migrations/0001_company_metrics.sql
+sqlite3 "$CORPUS" < packages/db/migrations/0003_company_profile.sql
 sqlite3 "$CORPUS" < infra/init/seed-local-d1.sql
 
 echo "[regenerate-sample] building company_metrics.sql"

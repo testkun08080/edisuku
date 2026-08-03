@@ -9,6 +9,7 @@ import { companiesRoutes } from "./routes/companies.js";
 import { healthRoutes } from "./routes/health.js";
 import { manifestRoutes } from "./routes/manifest.js";
 import { metricsRoutes } from "./routes/metrics.js";
+import { officersRoutes } from "./routes/officers.js";
 import { searchRoutes } from "./routes/search.js";
 import { shareholdersRoutes } from "./routes/shareholders.js";
 import { summariesRoutes } from "./routes/summaries.js";
@@ -31,6 +32,7 @@ const app = new Hono<AppEnv>()
   .route("/api/metrics", metricsRoutes)
   .route("/api/search", searchRoutes)
   .route("/api/shareholders", shareholdersRoutes)
+  .route("/api/officers", officersRoutes)
   .route("/api/manifest", manifestRoutes)
   .notFound((c) => c.json({ error: "not_found", path: c.req.path }, 404))
   .onError((err, c) => {

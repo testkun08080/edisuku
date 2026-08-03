@@ -15,10 +15,12 @@ from loguru import logger
 from edinet_wrapper.db import (
     upsert_company,
     upsert_document,
+    upsert_officer_snapshot,
     upsert_period_financial,
     upsert_shareholder_snapshot,
 )
 from edinet_wrapper.downloader import Downloader
+from edinet_wrapper.officers import officers_to_api_entries, parse_officers_from_tsv
 from edinet_wrapper.parser import parse_tsv
 from edinet_wrapper.schema import Result
 from edinet_wrapper.shareholders import (
@@ -130,11 +132,52 @@ class IngestStats:
     errors: int = 0
 
 
-def _company_meta(downloader: Downloader, edinet_code: str) -> tuple[str | None, str | None]:
+def _cell_str(row: pl.DataFrame, column: str) -> str | None:
+    if column not in row.columns:
+        return None
+    value = row[column][0]
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _company_meta(downloader: Downloader, edinet_code: str) -> dict[str, str | None]:
     row = downloader.edinet_code_info.filter(pl.col("ＥＤＩＮＥＴコード") == edinet_code)
     if row.height == 0:
-        return None, None
-    return row["上場区分"][0], row["提出者業種"][0]
+        return {
+            "listed_category": None,
+            "industry": None,
+            "corporate_number": None,
+            "filer_name_en": None,
+            "filer_name_kana": None,
+            "address": None,
+        }
+    return {
+        "listed_category": _cell_str(row, "上場区分"),
+        "industry": _cell_str(row, "提出者業種"),
+        "corporate_number": _cell_str(row, "提出者法人番号"),
+        "filer_name_en": _cell_str(row, "提出者名（英字）"),
+        "filer_name_kana": _cell_str(row, "提出者名（ヨミ）"),
+        "address": _cell_str(row, "所在地"),
+    }
+
+
+def _meta_text(meta: dict[str, Any], key: str) -> str | None:
+    value = meta.get(key)
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def cover_profile_from_meta(meta: dict[str, Any]) -> dict[str, str | None]:
+    """Extract cover-page profile fields from parse_tsv META (JP labels)."""
+    return {
+        "representative": _meta_text(meta, "代表者の役職氏名"),
+        "head_office_address": _meta_text(meta, "本店の所在の場所"),
+        "phone": _meta_text(meta, "電話番号"),
+    }
 
 
 def _result_to_document(result: Result, doc_type: str) -> dict[str, Any]:
@@ -187,15 +230,7 @@ def ingest_date(
 
             stats.fetched += 1
             sec_code = normalize_sec_code(result.secCode)
-            listed_category, industry = _company_meta(downloader, result.edinetCode)
-            upsert_company(
-                conn,
-                edinet_code=result.edinetCode,
-                sec_code=sec_code,
-                filer_name=result.filerName or "",
-                listed_category=listed_category,
-                industry=industry,
-            )
+            company_meta = _company_meta(downloader, result.edinetCode)
             upsert_document(conn, _result_to_document(result, doc_type))
 
             doc_dir = (
@@ -223,7 +258,31 @@ def ingest_date(
                 stats.skipped += 1
                 continue
 
+            cover = (
+                cover_profile_from_meta(parsed.meta)
+                if doc_type in ("annual", "semiannual")
+                else {
+                    "representative": None,
+                    "head_office_address": None,
+                    "phone": None,
+                }
+            )
             filer_name = result.filerName or str(parsed.meta.get("提出者名") or "")
+            upsert_company(
+                conn,
+                edinet_code=result.edinetCode,
+                sec_code=sec_code,
+                filer_name=filer_name,
+                listed_category=company_meta["listed_category"],
+                industry=company_meta["industry"],
+                corporate_number=company_meta["corporate_number"],
+                filer_name_en=company_meta["filer_name_en"],
+                filer_name_kana=company_meta["filer_name_kana"],
+                address=company_meta["address"],
+                head_office_address=cover["head_office_address"],
+                phone=cover["phone"],
+                representative=cover["representative"],
+            )
             upsert_period_financial(
                 conn,
                 edinet_code=result.edinetCode,
@@ -251,6 +310,16 @@ def ingest_date(
                         period_end=str(period_end),
                         doc_id=result.docID,
                         entries=entries,
+                    )
+            if doc_type == "annual" and sec_code:
+                officer_entries = officers_to_api_entries(parse_officers_from_tsv(tsv_path))
+                if officer_entries:
+                    upsert_officer_snapshot(
+                        conn,
+                        sec_code=sec_code,
+                        period_end=str(period_end),
+                        doc_id=result.docID,
+                        entries=officer_entries,
                     )
             stats.ingested += 1
             known_doc_ids.add(result.docID)

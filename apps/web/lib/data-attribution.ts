@@ -34,6 +34,10 @@ export const RUNTIME_API_PATHS = [
     path: "/api/shareholders/{証券コード}",
     description: "大株主の時系列データ",
   },
+  {
+    path: "/api/officers/{証券コード}",
+    description: "役員（氏名・役職・生年月日）の時系列データ",
+  },
 ] as const;
 
 export const LICENSE_AND_GUIDELINES = {
