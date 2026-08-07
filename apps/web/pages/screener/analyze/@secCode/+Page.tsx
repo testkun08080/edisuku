@@ -15,6 +15,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useConfig } from "vike-react/useConfig";
 import { usePageContext } from "vike-react/usePageContext";
+import { CompanyProfileSection } from "../../../../components/CompanyProfileSection.js";
 import { useFavorites } from "../../../../components/FavoritesContext.js";
 import { MajorShareholdersTimeSeries } from "../../../../components/MajorShareholdersTimeSeries.js";
 import { useRecentCompanies } from "../../../../components/RecentCompaniesContext.js";
@@ -536,6 +537,7 @@ export default function Page() {
               </Button>
             </CardAction>
           </CardHeader>
+          <CompanyProfileSection secCode={companySecCode} />
         </Card>
       </div>
 

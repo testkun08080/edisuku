@@ -53,6 +53,7 @@ bash infra/init/prepare-local-d1.sh
 1. `wrangler.toml.template` → `wrangler.toml` を api ディレクトリにコピー
 2. `packages/db/migrations/0000_init.sql` でスキーマ適用（未適用時のみ）
 3. `packages/db/migrations/0001_company_metrics.sql` で `company_metrics` / `shareholder_snapshots` テーブル追加（未適用時のみ）
+4. `packages/db/migrations/0003_company_profile.sql` で企業プロフィール列 / `officer_snapshots` 追加（未適用時のみ）
 4. リポジトリ同梱の SQL をそのまま投入:
    - `infra/init/seed-local-d1.sql`（11 社分の財務データ）
    - `infra/init/company_metrics.sql`（スクリーナー指標）
@@ -127,11 +128,19 @@ cd apps/api
 D1_NAME=edisuku-db-staging
 pnpm exec wrangler d1 execute "$D1_NAME" --remote --env staging \
   --file ../../packages/db/migrations/0001_company_metrics.sql
+pnpm exec wrangler d1 execute "$D1_NAME" --remote --env staging \
+  --file ../../packages/db/migrations/0002_drop_legacy_tables.sql
+pnpm exec wrangler d1 execute "$D1_NAME" --remote --env staging \
+  --file ../../packages/db/migrations/0003_company_profile.sql
 
 # production は検証後のみ（例: edisuku-db）
 # D1_NAME=edisuku-db
 # pnpm exec wrangler d1 execute "$D1_NAME" --remote --env production \
 #   --file ../../packages/db/migrations/0001_company_metrics.sql
+# pnpm exec wrangler d1 execute "$D1_NAME" --remote --env production \
+#   --file ../../packages/db/migrations/0002_drop_legacy_tables.sql
+# pnpm exec wrangler d1 execute "$D1_NAME" --remote --env production \
+#   --file ../../packages/db/migrations/0003_company_profile.sql
 ```
 
 ### 6-2. company_metrics を生成（--limit で少数社）

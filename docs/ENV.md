@@ -97,6 +97,8 @@
 | `PUBLIC_ENV__CONTACT_FORM_URL` | お問い合わせフォーム URL | 公式デフォルト |
 | `VITE_SCREENER_MODE` | `all`（全件取得）/ `server`（サーバー側ページング） | `all` |
 
+ビルド時定数（環境変数ではない）: `apps/web/lib/features.ts` の `CSV_EXPORT_ENABLED` / `COMPANY_PROFILE_ENABLED`（所在地・代表者などプロフィール UI。既定 `false`）。
+
 フォークで Analytics 等を有効にする場合、**デプロイ前の `pnpm build` 時**に `.env` を置くか、GitHub Actions の build ステップに `env:` を追加してください。wrangler vars だけではクライアント側 `PUBLIC_ENV__*` は反映されません。
 
 ---

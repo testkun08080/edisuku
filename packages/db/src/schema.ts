@@ -7,6 +7,13 @@ export const companies = sqliteTable("companies", {
   filerName: text("filer_name").notNull(),
   listedCategory: text("listed_category"),
   industry: text("industry"),
+  corporateNumber: text("corporate_number"),
+  filerNameEn: text("filer_name_en"),
+  filerNameKana: text("filer_name_kana"),
+  address: text("address"),
+  headOfficeAddress: text("head_office_address"),
+  phone: text("phone"),
+  representative: text("representative"),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
@@ -126,6 +133,21 @@ export const shareholderSnapshots = sqliteTable(
   }),
 );
 
+export const officerSnapshots = sqliteTable(
+  "officer_snapshots",
+  {
+    secCode: text("sec_code").notNull(),
+    periodEnd: text("period_end").notNull(),
+    docId: text("doc_id"),
+    entriesJson: text("entries_json").notNull(),
+    updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.secCode, t.periodEnd] }),
+    secCodeIdx: index("idx_of_sec_code").on(t.secCode),
+  }),
+);
+
 export type Company = typeof companies.$inferSelect;
 export type CompanyInsert = typeof companies.$inferInsert;
 export type Document = typeof documents.$inferSelect;
@@ -133,3 +155,4 @@ export type PeriodFinancial = typeof periodFinancials.$inferSelect;
 export type DailyMetric = typeof dailyMetrics.$inferSelect;
 export type CompanyMetric = typeof companyMetrics.$inferSelect;
 export type ShareholderSnapshot = typeof shareholderSnapshots.$inferSelect;
+export type OfficerSnapshot = typeof officerSnapshots.$inferSelect;

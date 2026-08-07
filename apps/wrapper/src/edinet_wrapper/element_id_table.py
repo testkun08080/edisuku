@@ -11,6 +11,9 @@ META = {
     "AmendmentFlagDEI": "修正の有無",
     "ReportAmendmentFlagDEI": "記載事項訂正のフラグ",
     "XBRLAmendmentFlagDEI": "XBRL訂正のフラグ",
+    "TitleAndNameOfRepresentativeCoverPage": "代表者の役職氏名",
+    "AddressOfRegisteredHeadquarterCoverPage": "本店の所在の場所",
+    "TelephoneNumberAddressOfRegisteredHeadquarterCoverPage": "電話番号",
 }
 
 SUMMARY = {

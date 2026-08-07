@@ -32,3 +32,9 @@ export {
   parseMajorShareholdersFromRaw,
   type MajorShareholderEntry,
 } from "./parseShareholders.js";
+export {
+  officersToApiEntries,
+  parseOfficersFromRaw,
+  type OfficerEntry,
+  type OfficerRoleGroup,
+} from "./parseOfficers.js";

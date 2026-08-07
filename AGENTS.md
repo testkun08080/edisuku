@@ -146,6 +146,7 @@ cd apps/wrapper && uv run pytest         # Python
 | GET    | `/api/metrics/query`         |
 | GET    | `/api/search?q=`             |
 | GET    | `/api/shareholders/:secCode` |
+| GET    | `/api/officers/:secCode`     |
 | GET    | `/api/manifest`              |
 
 ### Web グローバル状態 (`apps/web`)

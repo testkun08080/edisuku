@@ -201,6 +201,8 @@ for db in edisuku-db-staging edisuku-db; do
     --file packages/db/migrations/0000_init.sql
   npx wrangler d1 execute "$db" --remote \
     --file packages/db/migrations/0001_company_metrics.sql
+  npx wrangler d1 execute "$db" --remote \
+    --file packages/db/migrations/0003_company_profile.sql
 done
 ```
 

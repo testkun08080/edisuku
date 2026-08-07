@@ -9,6 +9,13 @@ export interface Company {
   filerName: string;
   listedCategory: string | null;
   industry: string | null;
+  corporateNumber: string | null;
+  filerNameEn: string | null;
+  filerNameKana: string | null;
+  address: string | null;
+  headOfficeAddress: string | null;
+  phone: string | null;
+  representative: string | null;
   updatedAt: string;
 }
 
@@ -108,6 +115,25 @@ export interface ShareholderSnapshot {
 export interface ShareholdersResponse {
   secCode: string;
   snapshots: ShareholderSnapshot[];
+}
+
+export type OfficerRoleGroup = "directors" | "executive";
+
+export interface OfficerEntry {
+  name: string;
+  title: string | null;
+  birthDate: string | null;
+  roleGroup: OfficerRoleGroup;
+}
+
+export interface OfficerSnapshot {
+  periodEnd: string;
+  entries: OfficerEntry[];
+}
+
+export interface OfficersResponse {
+  secCode: string;
+  snapshots: OfficerSnapshot[];
 }
 
 export interface ManifestResponse {
