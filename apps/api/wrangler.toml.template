@@ -14,6 +14,7 @@ NODE_ENV = "development"
 binding = "EDISUKU_DB"
 database_name = "edisuku-local"
 database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "../../packages/db/migrations"
 
 # ─── staging ─────────────────────────────────────────────────────────────
 [env.staging]
@@ -28,6 +29,7 @@ NODE_ENV = "production"
 binding = "EDISUKU_DB"
 database_name = "edisuku-db-staging"
 database_id = "__STAGING_D1_ID__"
+migrations_dir = "../../packages/db/migrations"
 
 [[env.staging.kv_namespaces]]
 binding = "EDISUKU_CACHE"
@@ -46,6 +48,7 @@ NODE_ENV = "production"
 binding = "EDISUKU_DB"
 database_name = "edisuku-db"
 database_id = "__PROD_D1_ID__"
+migrations_dir = "../../packages/db/migrations"
 
 [[env.production.kv_namespaces]]
 binding = "EDISUKU_CACHE"

@@ -14,8 +14,8 @@
     "test": "vitest run",
     "deploy:staging": "wrangler deploy --env staging",
     "deploy:production": "wrangler deploy --env production",
-    "db:migrate:staging": "wrangler d1 migrations apply edisuku-db-staging --remote",
-    "db:migrate:production": "wrangler d1 migrations apply edisuku-db --remote"
+    "db:migrate:staging": "wrangler d1 migrations apply edisuku-db-staging --remote --env staging",
+    "db:migrate:production": "wrangler d1 migrations apply edisuku-db --remote --env production"
   },
   "dependencies": {
     "@edinet/db": "workspace:*",
