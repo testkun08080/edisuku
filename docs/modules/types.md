@@ -15,7 +15,7 @@ packages/types/
 
 | 型 | 用途 |
 |---|---|
-| `Company` | 企業 1 件 |
+| `Company` | 企業 1 件（プロフィール列: corporateNumber / filerNameEn / filerNameKana / address / headOfficeAddress / phone / representative を含む） |
 | `CompanyListResponse` | `/api/companies` |
 | `PeriodFinancialView` / `FinancialBlock` | `/api/summaries` の 1 期 |
 | `SummaryResponse` | `/api/summaries/:secCode` |
@@ -23,6 +23,7 @@ packages/types/
 | `ColumnDefinition` | カラム定義（manifest / metrics 共通） |
 | `SearchResult` / `SearchResponse` | `/api/search` |
 | `ShareholderEntry` / `ShareholderSnapshot` / `ShareholdersResponse` | `/api/shareholders` |
+| `OfficerEntry` / `OfficerSnapshot` / `OfficersResponse` | `/api/officers`（`roleGroup`: `directors` \| `executive`） |
 | `ManifestResponse` | `/api/manifest` |
 | `HealthResponse` | `/api/health` |
 

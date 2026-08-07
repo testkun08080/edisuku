@@ -16,7 +16,10 @@ packages/metrics/
 │   ├── piotroski.ts            Piotroski F-Score
 │   ├── consecutiveDiv.ts       連続増配年数
 │   ├── parseShareholders.ts    大株主 JSON パース
+│   ├── parseOfficers.ts        役員（役員の状況）TSV 行パース
 │   └── helpers.ts              日付比較など
+├── fixtures/
+│   └── officers-wagatoushi-sample.rows.json
 └── vitest.config.ts
 ```
 
@@ -29,6 +32,7 @@ packages/metrics/
 | `getScreenerColumns` | UI/API manifest 用の列メタデータ |
 | `computePiotroskiFScore` | Piotroski スコア |
 | `parseMajorShareholdersFromRaw` | 株主 JSON → API 形式 |
+| `parseOfficersFromRaw` / `officersToApiEntries` | 役員 TSV 行 → `OfficerEntry[]`（wrapper `officers.py` と同ロジック） |
 
 ## backfill との関係
 

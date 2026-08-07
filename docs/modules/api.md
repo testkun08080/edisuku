@@ -20,11 +20,13 @@ apps/api/
 │       ├── metrics.ts      GET /api/metrics, /api/metrics/query
 │       ├── search.ts       GET /api/search?q=
 │       ├── shareholders.ts GET /api/shareholders/:secCode
+│       ├── officers.ts     GET /api/officers/:secCode
 │       └── manifest.ts     GET /api/manifest
 ├── test/
-│   ├── health.test.ts      vitest: app.request() で 4 ルートをスモーク
-│   └── types.test-d.ts     型レベル: hc<AppType> が 8 経路を推論できるか
-├── wrangler.toml.template  D1/KV/R2 binding の placeholder
+│   ├── health.test.ts      vitest: app.request() でルートをスモーク
+│   ├── officers.test.ts
+│   └── types.test-d.ts     型レベル: hc<AppType> 経路推論
+├── wrangler.toml.template  D1/KV placeholder + migrations_dir
 ├── Dockerfile              dev / builder / production の 3 ステージ
 └── vitest.config.ts
 ```
@@ -41,7 +43,10 @@ apps/api/
 | GET | `/api/metrics/query` | `q`, `minRoe`, `maxRoe`, `minSales`, `maxSales`, `minEquityRatio`, `maxEquityRatio`, `minTotalAssets`, `maxTotalAssets`, `sort`, `order`, `page`, `pageSize` | `MetricsQueryResponse` |
 | GET | `/api/search` | `q` (2 文字以上) | `SearchResponse` |
 | GET | `/api/shareholders/:secCode` | — | `ShareholdersResponse` |
+| GET | `/api/officers/:secCode` | — | `OfficersResponse`（`snapshots[].entries`: name / title / birthDate / roleGroup） |
 | GET | `/api/manifest` | — | `ManifestResponse` |
+
+`GET /api/companies` / `:secCode` の `Company` にはプロフィール列（`corporateNumber`, `filerNameEn`, `filerNameKana`, `address`, `headOfficeAddress`, `phone`, `representative`）が含まれる。取得元は [wrapper.md — company-profile](./wrapper.md#company-profile)。
 
 ## リクエストの流れ
 

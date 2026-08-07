@@ -21,10 +21,12 @@ apps/web/
 │   ├── SummaryCharts.tsx       時系列チャート (recharts)
 │   ├── CompanySidebar.tsx / PresetScreeners.tsx / ...
 │   ├── MajorShareholdersTimeSeries.tsx
+│   ├── CompanyProfileSection.tsx  所在地・代表者等（フラグ制御）
 │   ├── *Context.tsx            グローバル状態（下記）
 │   └── ui/                     shadcn/ui プリミティブ
 ├── lib/
 │   ├── api.ts                  hc<AppType>(apiBaseUrl) クライアント
+│   ├── features.ts             CSV_EXPORT_ENABLED / COMPANY_PROFILE_ENABLED
 │   ├── metricsLoader.ts        /api/metrics を叩く薄いラッパ
 │   ├── metricFormat.ts         円→百万円・比率→% などの表示換算
 │   ├── routes.ts               analyzePath などの URL ヘルパ
@@ -71,6 +73,10 @@ const res = await api.api.metrics.$get({ query: { limit: "2000" } });
 | `PUBLIC_ENV__*` / `VITE_SCREENER_MODE` | いいえ | `.env`（ビルド時） |
 
 **データ最終更新日**: プライバシーページが `/api/manifest` の `dataLastUpdated`（D1 `daily_metrics.snapshot_date`）を SSR 表示。daily-refresh 後の Web 再デプロイは不要。
+
+### 企業プロフィール UI
+
+`lib/features.ts` の `COMPANY_PROFILE_ENABLED`（既定 `false`）が on のときだけ、企業詳細で `CompanyProfileSection` が所在地・本店・電話・代表者などを表示する。API 自体（`/api/companies`, `/api/officers`）は常にプロフィール／役員データを返し得る。データ取得は [wrapper.md — company-profile](./wrapper.md#company-profile)。
 
 ## 起動・ビルド
 
