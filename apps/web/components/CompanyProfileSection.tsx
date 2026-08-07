@@ -42,17 +42,18 @@ export function CompanyProfileSection({ secCode }: Props) {
 
   if (!COMPANY_PROFILE_ENABLED || !profile) return null;
 
-  const rows = (
-    [
-      ["代表者", profile.representative],
-      ["本店所在地", profile.headOfficeAddress],
-      ["所在地", profile.address],
-      ["電話番号", profile.phone],
-      ["英字社名", profile.filerNameEn],
-      ["ヨミ", profile.filerNameKana],
-      ["法人番号", profile.corporateNumber],
-    ] as const
-  ).filter((row): row is [string, string] => Boolean(row[1]));
+  const rows: Array<[string, string]> = [];
+  for (const [label, value] of [
+    ["代表者", profile.representative],
+    ["本店所在地", profile.headOfficeAddress],
+    ["所在地", profile.address],
+    ["電話番号", profile.phone],
+    ["英字社名", profile.filerNameEn],
+    ["ヨミ", profile.filerNameKana],
+    ["法人番号", profile.corporateNumber],
+  ] as const) {
+    if (value) rows.push([label, value]);
+  }
 
   if (rows.length === 0) return null;
 
