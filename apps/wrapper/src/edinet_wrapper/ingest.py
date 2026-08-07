@@ -231,6 +231,20 @@ def ingest_date(
             stats.fetched += 1
             sec_code = normalize_sec_code(result.secCode)
             company_meta = _company_meta(downloader, result.edinetCode)
+            # documents.edinet_code FK → companies: insert company before document
+            filer_name = result.filerName or ""
+            upsert_company(
+                conn,
+                edinet_code=result.edinetCode,
+                sec_code=sec_code,
+                filer_name=filer_name,
+                listed_category=company_meta["listed_category"],
+                industry=company_meta["industry"],
+                corporate_number=company_meta["corporate_number"],
+                filer_name_en=company_meta["filer_name_en"],
+                filer_name_kana=company_meta["filer_name_kana"],
+                address=company_meta["address"],
+            )
             upsert_document(conn, _result_to_document(result, doc_type))
 
             doc_dir = (
@@ -267,7 +281,7 @@ def ingest_date(
                     "phone": None,
                 }
             )
-            filer_name = result.filerName or str(parsed.meta.get("提出者名") or "")
+            filer_name = result.filerName or str(parsed.meta.get("提出者名") or "") or filer_name
             upsert_company(
                 conn,
                 edinet_code=result.edinetCode,
