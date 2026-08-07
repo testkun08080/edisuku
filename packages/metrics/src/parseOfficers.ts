@@ -79,12 +79,16 @@ export function parseOfficersFromRaw(raw: { rows?: string[][] }): OfficerEntry[]
 
   return Array.from(map.values())
     .filter((a): a is Acc & { name: string } => Boolean(a.name?.trim()))
-    .map((a) => ({
-      name: a.name!.trim(),
-      title: a.title?.trim() && a.title !== "－" ? a.title.trim() : null,
-      birthDate: a.birthDate?.trim() && a.birthDate !== "－" ? a.birthDate.trim() : null,
-      roleGroup: a.roleGroup,
-    }));
+    .map((a) => {
+      const title = a.title?.trim();
+      const birthDate = a.birthDate?.trim();
+      return {
+        name: a.name!.trim(),
+        title: title && title !== "－" ? title : null,
+        birthDate: birthDate && birthDate !== "－" ? birthDate : null,
+        roleGroup: a.roleGroup,
+      };
+    });
 }
 
 export function officersToApiEntries(entries: OfficerEntry[]): OfficerEntry[] {

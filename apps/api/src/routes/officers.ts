@@ -11,10 +11,24 @@ export const officersRoutes = new Hono<AppEnv>().get("/:secCode", async (c) => {
 
   const body: OfficersResponse = {
     secCode,
-    snapshots: rows.map((r) => ({
-      periodEnd: r.periodEnd,
-      entries: JSON.parse(r.entriesJson) as OfficerEntry[],
-    })),
+    snapshots: rows.flatMap((r) => {
+      try {
+        return [
+          {
+            periodEnd: r.periodEnd,
+            entries: JSON.parse(r.entriesJson) as OfficerEntry[],
+          },
+        ];
+      } catch (err) {
+        console.error("[api] invalid officer_snapshots.entries_json", {
+          secCode,
+          periodEnd: r.periodEnd,
+          docId: r.docId,
+          err,
+        });
+        return [];
+      }
+    }),
   };
   return c.json(body);
 });

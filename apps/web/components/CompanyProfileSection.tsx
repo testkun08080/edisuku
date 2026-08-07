@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../lib/api.js";
 import { COMPANY_PROFILE_ENABLED } from "../lib/features.js";
+import { CardContent } from "./ui/card";
 
 type ProfileFields = {
   address: string | null;
@@ -18,10 +19,6 @@ type Props = {
   secCode: string;
 };
 
-/**
- * 所在地・代表者などの企業プロフィール。
- * `COMPANY_PROFILE_ENABLED` が false の間は何も描画しない。
- */
 export function CompanyProfileSection({ secCode }: Props) {
   const [profile, setProfile] = useState<ProfileFields | null>(null);
 
@@ -45,26 +42,30 @@ export function CompanyProfileSection({ secCode }: Props) {
 
   if (!COMPANY_PROFILE_ENABLED || !profile) return null;
 
-  const rows: Array<[string, string | null]> = [
-    ["代表者", profile.representative],
-    ["本店所在地", profile.headOfficeAddress],
-    ["所在地", profile.address],
-    ["電話番号", profile.phone],
-    ["英字社名", profile.filerNameEn],
-    ["ヨミ", profile.filerNameKana],
-    ["法人番号", profile.corporateNumber],
-  ];
+  const rows = (
+    [
+      ["代表者", profile.representative],
+      ["本店所在地", profile.headOfficeAddress],
+      ["所在地", profile.address],
+      ["電話番号", profile.phone],
+      ["英字社名", profile.filerNameEn],
+      ["ヨミ", profile.filerNameKana],
+      ["法人番号", profile.corporateNumber],
+    ] as const
+  ).filter((row): row is [string, string] => Boolean(row[1]));
+
+  if (rows.length === 0) return null;
 
   return (
-    <dl className="mt-3 grid gap-1 text-sm text-muted-foreground">
-      {rows.map(([label, value]) =>
-        value ? (
+    <CardContent>
+      <dl className="mt-3 grid gap-1 text-sm text-muted-foreground">
+        {rows.map(([label, value]) => (
           <div key={label} className="flex flex-wrap gap-x-2">
             <dt className="font-medium text-foreground/80">{label}</dt>
             <dd>{value}</dd>
           </div>
-        ) : null,
-      )}
-    </dl>
+        ))}
+      </dl>
+    </CardContent>
   );
 }

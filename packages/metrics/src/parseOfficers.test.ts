@@ -167,4 +167,51 @@ describe("parseOfficersFromRaw", () => {
       roleGroup: "directors",
     });
   });
+
+  it("treats whitespace-padded placeholders as null", () => {
+    const entries = parseOfficersFromRaw({
+      rows: [
+        [
+          "jpcrp_cor:NameInformationAboutDirectorsAndCorporateAuditors",
+          "",
+          "Member1",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "山田　太郎",
+        ],
+        [
+          "jpcrp_cor:OfficialTitleOrPositionInformationAboutDirectorsAndCorporateAuditors",
+          "",
+          "Member1",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "－ ",
+        ],
+        [
+          "jpcrp_cor:DateOfBirthInformationAboutDirectorsAndCorporateAuditors",
+          "",
+          "Member1",
+          "",
+          "",
+          "",
+          "",
+          "",
+          " －",
+        ],
+      ],
+    });
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      name: "山田　太郎",
+      title: null,
+      birthDate: null,
+      roleGroup: "directors",
+    });
+  });
 });

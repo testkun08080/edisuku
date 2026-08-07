@@ -129,12 +129,16 @@ D1_NAME=edisuku-db-staging
 pnpm exec wrangler d1 execute "$D1_NAME" --remote --env staging \
   --file ../../packages/db/migrations/0001_company_metrics.sql
 pnpm exec wrangler d1 execute "$D1_NAME" --remote --env staging \
+  --file ../../packages/db/migrations/0002_drop_legacy_tables.sql
+pnpm exec wrangler d1 execute "$D1_NAME" --remote --env staging \
   --file ../../packages/db/migrations/0003_company_profile.sql
 
 # production は検証後のみ（例: edisuku-db）
 # D1_NAME=edisuku-db
 # pnpm exec wrangler d1 execute "$D1_NAME" --remote --env production \
 #   --file ../../packages/db/migrations/0001_company_metrics.sql
+# pnpm exec wrangler d1 execute "$D1_NAME" --remote --env production \
+#   --file ../../packages/db/migrations/0002_drop_legacy_tables.sql
 # pnpm exec wrangler d1 execute "$D1_NAME" --remote --env production \
 #   --file ../../packages/db/migrations/0003_company_profile.sql
 ```

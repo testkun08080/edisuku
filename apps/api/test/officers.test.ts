@@ -80,4 +80,25 @@ describe("GET /api/officers/:secCode", () => {
     expect(body.secCode).toBe("0000");
     expect(body.snapshots).toEqual([]);
   });
+
+  it("skips snapshots with malformed entries_json", async () => {
+    vi.mocked(queries.getOfficersBySecCode).mockResolvedValue([
+      {
+        ...sampleSnapshots[0]!,
+        periodEnd: "2024-03-31",
+        entriesJson: "{not-json",
+      },
+      sampleSnapshots[0]!,
+    ]);
+
+    const res = await app.request("/api/officers/6701", { headers: authHeaders }, env);
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as {
+      snapshots: Array<{ periodEnd: string; entries: unknown[] }>;
+    };
+    expect(body.snapshots).toHaveLength(1);
+    expect(body.snapshots[0]?.periodEnd).toBe("2025-03-31");
+    expect(body.snapshots[0]?.entries[0]).toMatchObject({ name: "森田隆之" });
+  });
 });

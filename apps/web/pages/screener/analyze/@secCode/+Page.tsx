@@ -55,7 +55,6 @@ import {
 } from "../../../../lib/analyze-report-kind.js";
 import { api } from "../../../../lib/api.js";
 import { SITE_NAME } from "../../../../lib/brand";
-import { COMPANY_PROFILE_ENABLED } from "../../../../lib/features.js";
 import {
   ANALYZE_HEADCOUNT_ROW_KEYS,
   formatAnalyzeFinancialTableCell,
@@ -538,11 +537,7 @@ export default function Page() {
               </Button>
             </CardAction>
           </CardHeader>
-          {COMPANY_PROFILE_ENABLED ? (
-            <CardContent>
-              <CompanyProfileSection secCode={companySecCode} />
-            </CardContent>
-          ) : null}
+          <CompanyProfileSection secCode={companySecCode} />
         </Card>
       </div>
 
