@@ -3,7 +3,7 @@
 import zipfile
 
 import pytest
-from edinet_wrapper.downloader import _safe_extract
+from edinet_wrapper.downloader import _safe_extract, _sanitize_doc_id
 
 
 def _make_zip(path, entries: dict[str, bytes]) -> None:
@@ -31,3 +31,13 @@ def test_rejects_path_traversal(tmp_path):
     with zipfile.ZipFile(zip_path) as zf, pytest.raises(ValueError, match="unsafe zip entry"):
         _safe_extract(zf, str(dest))
     assert not (tmp_path / "escape.txt").exists()
+
+
+def test_sanitize_doc_id_accepts_edinet_ids():
+    assert _sanitize_doc_id("S100ABC0") == "S100ABC0"
+
+
+@pytest.mark.parametrize("bad", ["../x", "a/b", "S100 ABC", "", "S100;rm"])
+def test_sanitize_doc_id_rejects_unsafe(bad: str):
+    with pytest.raises(ValueError, match="invalid doc_id"):
+        _sanitize_doc_id(bad)

@@ -8,6 +8,7 @@ import datetime
 import io
 import json
 import os
+import re
 import shutil
 import tempfile
 import time
@@ -22,6 +23,15 @@ from edinet_wrapper.schema import Response, Result
 
 pl.Config.set_tbl_cols(-1)
 
+_DOC_ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
+def _sanitize_doc_id(doc_id: str) -> str:
+    """Reject path-like doc_id values before joining into local paths / URL paths."""
+    if not isinstance(doc_id, str) or not _DOC_ID_RE.fullmatch(doc_id):
+        raise ValueError(f"invalid doc_id: {doc_id!r}")
+    return doc_id
+
 
 def _safe_extract(zf: zipfile.ZipFile, dest: str) -> None:
     """Extract a zip, refusing entries that escape `dest` (Zip Slip guard)."""
@@ -31,6 +41,18 @@ def _safe_extract(zf: zipfile.ZipFile, dest: str) -> None:
         if target != dest_root and not target.startswith(dest_root + os.sep):
             raise ValueError(f"unsafe zip entry escapes destination: {member!r}")
     zf.extractall(dest)
+
+
+def _move_under(src_root: str, relative: str, dest_path: str) -> None:
+    """Move `relative` from under `src_root` to `dest_path`, refusing path escape."""
+    src_root_real = os.path.realpath(src_root)
+    src = os.path.realpath(os.path.join(src_root, relative))
+    if src != src_root_real and not src.startswith(src_root_real + os.sep):
+        raise ValueError(f"unsafe zip entry escapes destination: {relative!r}")
+    if not os.path.isfile(src):
+        return
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    shutil.move(src, dest_path)
 
 
 def download_edinetinfo_csv(dir: str = "data"):
@@ -249,6 +271,7 @@ class Downloader:
 
     def _download_document_in_pdf(self, doc_id: str, output_dir: str = "data") -> None:
         """Retrieve a specific document from EDINET API. type: 2 for PDF"""
+        doc_id = _sanitize_doc_id(doc_id)
         url = f"{self._doc_base_url}/{doc_id}"
         params = {"type": 2, "Subscription-Key": self.edinet_api_key}
         with requests.get(url, params=params, timeout=(10, 60)) as res:
@@ -259,6 +282,7 @@ class Downloader:
 
     def _download_document_in_xbrl(self, doc_id: str, output_dir: str = "data") -> None:
         """Retrieve a specific document from EDINET API. type: 1 for XBRL"""
+        doc_id = _sanitize_doc_id(doc_id)
         url = f"{self._doc_base_url}/{doc_id}"
         params = {"type": 1, "Subscription-Key": self.edinet_api_key}
         # zip download
@@ -266,14 +290,12 @@ class Downloader:
             with requests.get(url, params=params, timeout=(10, 60)) as res:
                 with tempfile.TemporaryDirectory() as tmp_dir:
                     with zipfile.ZipFile(io.BytesIO(res.content)) as z:
+                        _safe_extract(z, tmp_dir)
                         for file in z.namelist():
-                            z.extract(file, tmp_dir)
-                            output_file = os.path.join(output_dir, f"{doc_id}", file)
-                            os.makedirs(os.path.dirname(output_file), exist_ok=True)
-                            shutil.move(
-                                os.path.join(tmp_dir, file),
-                                output_file,
-                            )
+                            if file.endswith("/"):
+                                continue
+                            output_file = os.path.join(output_dir, doc_id, file)
+                            _move_under(tmp_dir, file, output_file)
             time.sleep(self._request_delay_sec)
         except Exception as e:
             logger.error(f"Error downloading document {doc_id}: {e}")
@@ -282,21 +304,19 @@ class Downloader:
 
     def _download_document_in_tsv(self, doc_id: str, output_dir: str = "data") -> None:
         """Retrieve a specific document from EDINET API. type: 5 for CSV"""
+        doc_id = _sanitize_doc_id(doc_id)
         url = f"{self._doc_base_url}/{doc_id}"
         params = {"type": 5, "Subscription-Key": self.edinet_api_key}
         try:
             with requests.get(url, params=params, timeout=(10, 60)) as res:
                 with tempfile.TemporaryDirectory() as tmp_dir:
                     with zipfile.ZipFile(io.BytesIO(res.content)) as z:
+                        _safe_extract(z, tmp_dir)
                         for file in z.namelist():
                             if file.startswith("XBRL_TO_CSV/jpcrp") and file.endswith(".csv"):
-                                z.extract(file, tmp_dir)
                                 output_file = os.path.join(output_dir, f"{doc_id}.tsv")
                                 if not os.path.exists(output_file):
-                                    shutil.move(
-                                        os.path.join(tmp_dir, file),
-                                        output_file,
-                                    )
+                                    _move_under(tmp_dir, file, output_file)
             time.sleep(self._request_delay_sec)
         except Exception as e:
             logger.error(f"Error downloading document {doc_id}: {e}")

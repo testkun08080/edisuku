@@ -14,8 +14,16 @@ if [ ! -f "$key_file" ]; then
 fi
 
 INTERNAL_API_KEY=$(grep -v '^#' "$key_file" | grep -v '^[[:space:]]*$' | head -1 | tr -d '\n\r')
-if [ -z "$INTERNAL_API_KEY" ] || [ "$INTERNAL_API_KEY" = "your-internal-api-key-change-me" ]; then
-  echo "Replace the placeholder in .internal-api-key before running this script." >&2
+# Reject empty / documented sample keys so local defaults never land on Workers.
+case "$INTERNAL_API_KEY" in
+  "" | "your-internal-api-key-change-me" | "dev-local-key" | "test-secret")
+    echo "Replace the placeholder in .internal-api-key with a unique secret before running this script." >&2
+    echo "Do not reuse local sample keys (dev-local-key / test-secret / example placeholders)." >&2
+    exit 1
+    ;;
+esac
+if [ "${#INTERNAL_API_KEY}" -lt 16 ]; then
+  echo "INTERNAL_API_KEY must be at least 16 characters." >&2
   exit 1
 fi
 

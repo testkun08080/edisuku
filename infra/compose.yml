@@ -44,7 +44,8 @@ services:
       - NODE_ENV=development
       - DB_PATH=/app/data/edinet.db
     ports:
-      - "8787:8787"
+      # Bind to loopback by default so LAN peers cannot hit the sample key API.
+      - "127.0.0.1:8787:8787"
     command: sh -c "cp -f .dev.vars.example .dev.vars && sh /workspace/infra/init/prepare-local-d1.sh && pnpm exec wrangler dev --ip 0.0.0.0 --port 8787"
 
   web:
@@ -64,7 +65,7 @@ services:
     environment:
       - NODE_ENV=development
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     command: sh -c "cp -f wrangler.jsonc.template wrangler.jsonc && pnpm dev --host 0.0.0.0 --port 3000"
 
   wrapper:

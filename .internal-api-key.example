@@ -1,3 +1,4 @@
 # Placeholder only — replace before running infra/apply-internal-api-key.sh
 # See docs/ENV.md
+# Must be unique (≥16 chars). Do not reuse local samples (dev-local-key / test-secret).
 your-internal-api-key-change-me
