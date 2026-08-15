@@ -1,0 +1,3 @@
+edinet_code,sec_code,filer_name,field,value,precision,source,source_url,source_qid,query,retrieved_at,notes,error
+E01777,7203,トヨタ自動車株式会社,date_of_establishment,1937-08-28,date,wikidata,https://www.wikidata.org/wiki/Q53268,Q53268,,2026-08-15T00:00:00Z,Wikidata P571,
+E00012,1301,株式会社極洋,date_of_establishment,1937-09-03,date,wikipedia,https://ja.wikipedia.org/wiki/%E6%A5%B5%E6%B4%8B,,極洋,2026-08-15T00:00:00Z,Wikipedia infobox 設立,
