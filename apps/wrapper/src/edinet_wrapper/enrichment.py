@@ -77,7 +77,7 @@ _TMPL_Y = re.compile(
 )
 
 
-@dataclass(frozen=True)
+@dataclass
 class ListedCompany:
     edinet_code: str
     sec_code: str
@@ -322,7 +322,7 @@ def load_listed_from_edinet_csv(path: Path) -> list[ListedCompany]:
     listed: list[ListedCompany] = []
     for row in frame.iter_rows(named=True):
         category = str(row.get("上場区分") or "").strip()
-        if "上場" not in category:
+        if category != "上場":
             continue
         edinet = str(row.get("ＥＤＩＮＥＴコード") or "").strip()
         if not edinet:

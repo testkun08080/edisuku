@@ -42,6 +42,7 @@ from edinet_wrapper.establishment_lookup import (
     fetch_wikipedia_pages,
     lookup_web_establishment,
     query_wikidata_by_jcn,
+    query_wikidata_by_label,
     query_wikidata_by_ticker,
     wikipedia_search_title,
 )
@@ -93,6 +94,19 @@ def collect_wikidata_hits(companies: list[ListedCompany]) -> dict[str, WikidataH
     by_ticker = query_wikidata_by_ticker(session, tickers) if tickers else {}
     for company in missing_ticker:
         hit = by_ticker.get(company.sec_code)
+        if hit:
+            by_edinet[company.edinet_code] = hit
+    unlabeled = [company for company in companies if company.edinet_code not in by_edinet]
+    names: list[str] = []
+    for company in unlabeled:
+        names.append(company.filer_name)
+        stripped = company.filer_name.replace("株式会社", "").replace("　", "").strip()
+        if stripped and stripped != company.filer_name:
+            names.append(stripped)
+    by_label = query_wikidata_by_label(session, names) if unlabeled else {}
+    for company in unlabeled:
+        stripped = company.filer_name.replace("株式会社", "").replace("　", "").strip()
+        hit = by_label.get(company.filer_name) or by_label.get(stripped)
         if hit:
             by_edinet[company.edinet_code] = hit
     return by_edinet
@@ -152,7 +166,7 @@ def fill_wikipedia(
                 continue
             if title:
                 titles[company.edinet_code] = title
-            time.sleep(0.15)
+            time.sleep(0.8)
     pages = fetch_wikipedia_pages(session, list(dict.fromkeys(titles.values())))
     added = 0
     for company in pending:
@@ -178,6 +192,7 @@ def fill_web(
     output: Path,
     *,
     delay_sec: float,
+    official_only: bool = False,
 ) -> int:
     pending = companies_needing_establishment(companies, rows)
     if not pending:
@@ -190,6 +205,7 @@ def fill_web(
                 session,
                 company.filer_name,
                 company_url=company.company_url,
+                official_only=official_only,
             )
         except Exception as exc:
             print(f"[enrich] web fail {company.edinet_code}: {exc}", file=sys.stderr)
@@ -238,6 +254,11 @@ def parse_args() -> argparse.Namespace:
         help="Do not Wikipedia-search by company name; only use Wikidata ja sitelinks",
     )
     parser.add_argument("--web-delay-sec", type=float, default=1.5)
+    parser.add_argument(
+        "--web-official-only",
+        action="store_true",
+        help="Fetch Wikidata/gBiz official websites only; skip DuckDuckGo",
+    )
     return parser.parse_args()
 
 
@@ -278,7 +299,13 @@ def main() -> int:
         )
         write_enrichment_csv(args.output, rows)
     if not args.skip_web:
-        fill_web(companies, rows, args.output, delay_sec=args.web_delay_sec)
+        fill_web(
+            companies,
+            rows,
+            args.output,
+            delay_sec=args.web_delay_sec,
+            official_only=args.web_official_only,
+        )
         write_enrichment_csv(args.output, rows)
 
     remaining = companies_needing_establishment(companies, rows)

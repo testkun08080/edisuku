@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import re
 import time
 from collections.abc import Callable
@@ -55,6 +56,39 @@ def _session() -> requests.Session:
     return session
 
 
+def request_with_retry(
+    session: requests.Session,
+    method: str,
+    url: str,
+    *,
+    retries: int = 6,
+    backoff: float = 2.0,
+    **kwargs,
+) -> requests.Response:
+    last: requests.Response | None = None
+    for attempt in range(retries):
+        try:
+            response = session.request(method, url, **kwargs)
+        except requests.RequestException:
+            if attempt >= retries - 1:
+                raise
+            time.sleep(backoff * (2**attempt))
+            continue
+        if response.status_code != 429 and response.status_code < 500:
+            response.raise_for_status()
+            return response
+        last = response
+        wait = backoff * (2**attempt)
+        retry_after = response.headers.get("Retry-After")
+        if retry_after:
+            with contextlib.suppress(ValueError):
+                wait = max(wait, float(retry_after))
+        time.sleep(wait)
+    if last is not None:
+        last.raise_for_status()
+    raise RuntimeError(f"retry exhausted for {url}")
+
+
 def _qid_from_uri(uri: str) -> str:
     return uri.rsplit("/", 1)[-1]
 
@@ -76,13 +110,14 @@ def _literal(binding: dict, key: str) -> str:
 
 
 def sparql_query(session: requests.Session, query: str, timeout: int = 60) -> dict:
-    response = session.get(
+    response = request_with_retry(
+        session,
+        "GET",
         WIKIDATA_SPARQL,
         params={"query": query, "format": "json"},
         headers={"Accept": "application/sparql-results+json", "User-Agent": USER_AGENT},
         timeout=timeout,
     )
-    response.raise_for_status()
     return response.json()
 
 
@@ -181,6 +216,42 @@ def query_wikidata_by_ticker(
     return hits
 
 
+def _sparql_string(value: str) -> str:
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"@ja'
+
+
+def query_wikidata_by_label(
+    session: requests.Session,
+    names: list[str],
+    *,
+    delay_sec: float = 0.4,
+) -> dict[str, WikidataHit]:
+    hits: dict[str, WikidataHit] = {}
+    chunk_size = 15
+    unique = list(dict.fromkeys(name for name in names if name))
+    for offset in range(0, len(unique), chunk_size):
+        chunk = unique[offset : offset + chunk_size]
+        values = " ".join(_sparql_string(name) for name in chunk)
+        query = f"""
+        SELECT ?label ?item ?inception ?precision ?article ?website WHERE {{
+          VALUES ?label {{ {values} }}
+          ?item rdfs:label ?label .
+          {_inception_block()}
+        }}
+        """
+        try:
+            payload = sparql_query(session, query, timeout=45)
+        except requests.RequestException as exc:
+            print(f"[enrich] wikidata label chunk fail offset={offset}: {exc}")
+            continue
+        parsed = _parse_wikidata_bindings(_bindings(payload), "label")
+        hits.update(parsed)
+        if offset + chunk_size < len(unique) and delay_sec:
+            time.sleep(delay_sec)
+    return hits
+
+
 def date_hit_from_wikidata(hit: WikidataHit) -> DateHit | None:
     if not hit.inception:
         return None
@@ -201,14 +272,16 @@ def fetch_wikipedia_pages(
     session: requests.Session,
     titles: list[str],
     *,
-    delay_sec: float = 0.2,
+    delay_sec: float = 1.0,
 ) -> dict[str, str]:
     pages: dict[str, str] = {}
     chunk_size = 40
     unique = list(dict.fromkeys(title for title in titles if title))
     for offset in range(0, len(unique), chunk_size):
         chunk = unique[offset : offset + chunk_size]
-        response = session.get(
+        response = request_with_retry(
+            session,
+            "GET",
             WIKIPEDIA_API,
             params={
                 "action": "query",
@@ -223,7 +296,6 @@ def fetch_wikipedia_pages(
             headers={"User-Agent": USER_AGENT},
             timeout=60,
         )
-        response.raise_for_status()
         payload = response.json()
         redirects = {
             item.get("from"): item.get("to")
@@ -256,7 +328,9 @@ def fetch_wikipedia_pages(
 
 
 def wikipedia_search_title(session: requests.Session, name: str) -> str | None:
-    response = session.get(
+    response = request_with_retry(
+        session,
+        "GET",
         WIKIPEDIA_API,
         params={
             "action": "query",
@@ -269,7 +343,6 @@ def wikipedia_search_title(session: requests.Session, name: str) -> str | None:
         headers={"User-Agent": USER_AGENT},
         timeout=30,
     )
-    response.raise_for_status()
     hits = response.json().get("query", {}).get("search", [])
     if not hits:
         return None
@@ -323,7 +396,9 @@ def duckduckgo_search(
     *,
     timeout: int = 30,
 ) -> tuple[str, str]:
-    response = session.post(
+    response = request_with_retry(
+        session,
+        "POST",
         DDG_HTML,
         data={"q": query, "kl": "jp-jp"},
         headers={
@@ -333,18 +408,20 @@ def duckduckgo_search(
         },
         timeout=timeout,
     )
-    response.raise_for_status()
     return parse_duckduckgo_html(response.text)
 
 
-def fetch_text(session: requests.Session, url: str, *, timeout: int = 20) -> str:
-    response = session.get(
+def fetch_text(session: requests.Session, url: str, *, timeout: int = 8) -> str:
+    response = request_with_retry(
+        session,
+        "GET",
         url,
+        retries=2,
+        backoff=1.0,
         headers={"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"},
         timeout=timeout,
         allow_redirects=True,
     )
-    response.raise_for_status()
     content_type = response.headers.get("Content-Type", "")
     if "html" not in content_type.lower() and not response.text.lstrip().startswith("<"):
         return ""
@@ -374,6 +451,7 @@ def lookup_web_establishment(
     filer_name: str,
     *,
     company_url: str = "",
+    official_only: bool = False,
     sleep: Callable[[float], None] = time.sleep,
 ) -> DateHit | None:
     if company_url:
@@ -384,7 +462,11 @@ def lookup_web_establishment(
         hit = date_hit_from_web_text(html, company_url, f"{filer_name} site") if html else None
         if hit:
             return hit
-        sleep(0.3)
+        if official_only:
+            return None
+        sleep(0.2)
+    elif official_only:
+        return None
     query = f"{filer_name} 設立"
     try:
         snippet, url = duckduckgo_search(session, query)

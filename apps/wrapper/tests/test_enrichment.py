@@ -14,6 +14,7 @@ from edinet_wrapper.enrichment import (
     extract_wikipedia_establishment,
     gbiz_blocks,
     load_enrichment_csv,
+    load_listed_from_edinet_csv,
     parse_establishment_text,
     parse_wikidata_time,
     seed_gbiz_establishment,
@@ -128,3 +129,18 @@ def test_seed_gbiz_and_need_list(tmp_path: Path):
     loaded = load_enrichment_csv(out)
     assert loaded[0].value == "1937-08-27"
     assert loaded[0].source == SOURCE_GBIZ
+
+
+def test_load_listed_skips_unlisted(tmp_path: Path):
+    csv_text = (
+        "ダウンロード実行日,2026年01月01日現在,件数,3件\n"
+        "ＥＤＩＮＥＴコード,提出者種別,上場区分,連結の有無,資本金,決算日,提出者名,"
+        "提出者名（英字）,提出者名（ヨミ）,所在地,提出者業種,証券コード,提出者法人番号\n"
+        "E00001,内国法人,上場,有,1,3月31日,上場会社,,,,水産,13010,1010401033225\n"
+        "E00002,内国法人,非上場,有,1,3月31日,非上場会社,,,,水産,99990,2010401033225\n"
+    )
+    path = tmp_path / "EdinetcodeDlInfo.csv"
+    path.write_text(csv_text, encoding="cp932")
+    listed = load_listed_from_edinet_csv(path)
+    assert [c.edinet_code for c in listed] == ["E00001"]
+    assert listed[0].sec_code == "1301"
