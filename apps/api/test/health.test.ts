@@ -34,6 +34,14 @@ describe("api", () => {
     expect(body.error).toBe("unauthorized");
   });
 
+  it("GET /api/manifest without INTERNAL_API_KEY configured returns 503", async () => {
+    const misconfigured = { ...env, INTERNAL_API_KEY: undefined };
+    const res = await app.request("/api/manifest", {}, misconfigured);
+    expect(res.status).toBe(503);
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("misconfigured");
+  });
+
   it("GET /api/manifest with api key returns manifest stub", async () => {
     const res = await app.request("/api/manifest", { headers: authHeaders }, env);
     expect(res.status).toBe(200);

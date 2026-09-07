@@ -140,7 +140,7 @@
 | `D1_STAGING_NAME` | いいえ | D1 データベース名（未設定: `edisuku-db-staging`） |
 | `D1_PRODUCTION_NAME` | いいえ | 同上（未設定: `edisuku-db`） |
 
-**トリガー**: 現状は `workflow_dispatch`（手動）。`schedule`（コメントアウト済み: 毎日 05:10 JST）を有効化すれば cron 実行も可。
+**トリガー**: 現状は `workflow_dispatch`（手動）。`schedule`（毎日 05:10 JST）はコメントアウト済み。有効化すると cron 実行も可（未指定時の環境は **production**）。
 
 **提出日**: `target_date` 未指定時は **昨日 JST**（`ingest_daily.py` と同じ）。
 
@@ -181,6 +181,7 @@ docker compose -f infra/compose.yml up
 
 - api: `apps/api/.dev.vars` → `INTERNAL_API_KEY=dev-local-key`（compose が example からコピー）
 - web: `infra/init/web.dev.vars.docker` をマウント（`API_UPSTREAM_URL=http://api:8787`）
+- 公開ポートは `127.0.0.1:3000` / `127.0.0.1:8787`（LAN 公開が必要なときだけ compose の ports を `0.0.0.0:` に変更）
 - `.env` は不要（スクリーナー・OGP のデフォルトで動作）
 
 ### ローカル（ホスト: `pnpm dev`）

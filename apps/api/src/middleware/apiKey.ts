@@ -28,10 +28,8 @@ export const apiKeyMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
   }
 
   const expected = c.env.INTERNAL_API_KEY;
+  // Fail closed in every environment — local uses apps/api/.dev.vars (see .dev.vars.example).
   if (!expected) {
-    if (c.env.NODE_ENV === "development") {
-      return next();
-    }
     return c.json({ error: "misconfigured", message: "INTERNAL_API_KEY is not set" }, 503);
   }
 
