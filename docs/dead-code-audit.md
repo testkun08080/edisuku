@@ -21,7 +21,7 @@ pnpm db:backfill:shareholders-corpus /tmp/corpus.db /tmp/shareholder_snapshots.s
 cd apps/api && pnpm exec wrangler d1 execute edisuku-db-staging --remote --env staging --file /tmp/shareholder_snapshots.sql
 ```
 
-D1 のみ export した corpus では `raw_tsv_path` が CI ローカルパスのため TSV が無く skip される。全量更新には re-ingest（`backfill.py`）が必要。
+D1 のみ export した corpus では `raw_tsv_path` が CI ローカルパスのため TSV が無く skip される。全量更新には re-ingest（`backfill.py`）が必要。edinet-wagatoushi の JSON から投入する一時手順は [SHAREHOLDER_IMPORT_WAGATOUSHI.md](./SHAREHOLDER_IMPORT_WAGATOUSHI.md) を参照。
 
 ---
 

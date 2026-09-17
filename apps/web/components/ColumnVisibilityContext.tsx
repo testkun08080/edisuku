@@ -8,14 +8,12 @@ export type ColumnId =
   | "edinetCode"
   | "calcDate"
   | "fiscalMonth"
-  | "PBR"
+  | "reportKind"
   | "PER"
   | "payoutRatio"
   | "payoutRatioComputed"
   | "dividendYield"
   | "marketCap"
-  | "netCash"
-  | "netCashRatio"
   | "EPS"
   | "dilutedEPS"
   | "ROE"
@@ -53,7 +51,6 @@ export type ColumnId =
   | "consecutiveDivIncreases"
   | "currentRatio"
   | "deRatio"
-  | "roic"
   | "piotroskiFScore";
 
 export type ColumnCategory =
@@ -70,14 +67,12 @@ const COLUMN_CONFIG: { id: ColumnId; label: string; category: ColumnCategory }[]
   { id: "edinetCode", label: "EDINETコード", category: "basic" },
   { id: "calcDate", label: "計算日", category: "basic" },
   { id: "fiscalMonth", label: "決算月", category: "basic" },
-  { id: "PBR", label: "PBR（倍）", category: "valuation" },
+  { id: "reportKind", label: "決算期", category: "basic" },
   { id: "PER", label: "PER（倍）", category: "valuation" },
   { id: "payoutRatio", label: "配当性向（%）", category: "valuation" },
   { id: "payoutRatioComputed", label: "配当性向（算出・%）", category: "valuation" },
   { id: "dividendYield", label: "配当利回り（%）", category: "valuation" },
   { id: "marketCap", label: "時価総額（百万円）", category: "valuation" },
-  { id: "netCash", label: "ネットキャッシュ（百万円）", category: "valuation" },
-  { id: "netCashRatio", label: "ネットキャッシュ比率（%）", category: "valuation" },
   { id: "EPS", label: "EPS（円）", category: "valuation" },
   { id: "dilutedEPS", label: "希薄化EPS（円）", category: "valuation" },
   { id: "ROE", label: "ROE（%）", category: "valuation" },
@@ -115,7 +110,6 @@ const COLUMN_CONFIG: { id: ColumnId; label: string; category: ColumnCategory }[]
   { id: "consecutiveDivIncreases", label: "連続増配年数", category: "growth" },
   { id: "currentRatio", label: "流動比率", category: "balancesheet" },
   { id: "deRatio", label: "D/Eレシオ", category: "balancesheet" },
-  { id: "roic", label: "ROIC（%）", category: "valuation" },
   { id: "piotroskiFScore", label: "Piotroski F-Score", category: "valuation" },
 ];
 

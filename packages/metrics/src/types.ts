@@ -21,6 +21,9 @@ export type CompanyMetricsRow = {
   filerName: string;
   calcDate: string | null;
   fiscalMonth: string | null;
+  /** この行の数値がどの開示種別のものか。通期→半期→四半期のフォールバックで決まる */
+  reportKind?: "quarter" | "semiAnnual" | "annual" | "other" | null;
+  latestSubmitDateTime?: string | null;
   equityRatio: string | null;
   EPS: string | null;
   sales: string | null;

@@ -1,7 +1,11 @@
 import type { MetricsRow } from "@edinet/types";
 import type { CompanyMetricsDbRow, CompanyMetricsRow } from "./types.js";
 
-export const METRICS_SCHEMA_VERSION = "v2";
+/**
+ * 行の形状を変えたら必ず上げること（KV スナップショットのキーに使われる）。
+ * v3: reportKind / latestSubmitDateTime を追加し、headline を通期優先に変更。
+ */
+export const METRICS_SCHEMA_VERSION = "v3";
 
 export function metricsToDenormalizedColumns(metrics: CompanyMetricsRow): {
   sales: number | null;
@@ -35,6 +39,7 @@ export function flattenMetricsRow(row: CompanyMetricsDbRow): MetricsRow {
     filerName: _filerName,
     calcDate: parsedCalcDate,
     fiscalMonth: parsedFiscalMonth,
+    latestSubmitDateTime: parsedSubmitDateTime,
     ...metricFields
   } = parsed;
   return {
@@ -42,7 +47,7 @@ export function flattenMetricsRow(row: CompanyMetricsDbRow): MetricsRow {
     edinetCode: row.edinetCode,
     filerName: row.filerName,
     latestPeriodEnd: row.calcDate ?? parsedCalcDate ?? "",
-    latestSubmitDateTime: null,
+    latestSubmitDateTime: parsedSubmitDateTime ?? null,
     industry: parsed.industry ?? null,
     listedCategory: parsed.listedCategory ?? null,
     calcDate: row.calcDate ?? parsedCalcDate ?? null,

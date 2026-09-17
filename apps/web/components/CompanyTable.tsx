@@ -6,6 +6,7 @@ import { passesFilter } from "../lib/filterEngine.js";
 import {
   formatDecimalAsPercent,
   formatRatioDecimalStringAsPercent,
+  formatReportKind,
   formatYenStringAsMillionYen,
 } from "../lib/metricFormat.js";
 import {
@@ -117,18 +118,14 @@ function getCellValue(
       return m.calcDate ?? "－";
     case "fiscalMonth":
       return m.fiscalMonth ?? "－";
+    case "reportKind":
+      return formatReportKind(m.reportKind);
     case "PER":
       return m.PER != null ? m.PER.toFixed(1) : "－";
-    case "PBR":
-      return m.PBR != null ? m.PBR.toFixed(2) : "－";
     case "dividendYield":
       return formatDecimalAsPercent(m.dividendYield);
     case "marketCap":
       return m.marketCap != null ? formatSales(String(m.marketCap)) : "－";
-    case "netCash":
-      return m.netCash != null ? formatSales(String(m.netCash)) : "－";
-    case "netCashRatio":
-      return m.netCashRatio != null ? (m.netCashRatio * 100).toFixed(2) + "%" : "－";
     case "equityRatio":
       return formatRatio(m.equityRatio);
     case "ROE":
@@ -217,8 +214,6 @@ function getCellValue(
       return m.currentRatio != null ? m.currentRatio.toFixed(2) : "－";
     case "deRatio":
       return m.deRatio != null ? m.deRatio.toFixed(2) : "－";
-    case "roic":
-      return m.roic != null ? (m.roic * 100).toFixed(2) + "%" : "－";
     case "piotroskiFScore":
       return m.piotroskiFScore != null ? String(m.piotroskiFScore) : "－";
     default:
@@ -238,18 +233,14 @@ function getSortValue(m: CompanyMetric, colId: ColumnId): number | string {
       return m.calcDate ?? "";
     case "fiscalMonth":
       return m.fiscalMonth ?? "";
+    case "reportKind":
+      return String(m.reportKind ?? "");
     case "PER":
       return m.PER ?? Number.NEGATIVE_INFINITY;
-    case "PBR":
-      return m.PBR ?? Number.NEGATIVE_INFINITY;
     case "dividendYield":
       return m.dividendYield ?? Number.NEGATIVE_INFINITY;
     case "marketCap":
       return m.marketCap ?? Number.NEGATIVE_INFINITY;
-    case "netCash":
-      return m.netCash ?? Number.NEGATIVE_INFINITY;
-    case "netCashRatio":
-      return m.netCashRatio ?? Number.NEGATIVE_INFINITY;
     case "equityRatio":
       return sortNum(m.equityRatio);
     case "ROE":
@@ -336,8 +327,6 @@ function getSortValue(m: CompanyMetric, colId: ColumnId): number | string {
       return m.currentRatio ?? Number.NEGATIVE_INFINITY;
     case "deRatio":
       return m.deRatio ?? Number.NEGATIVE_INFINITY;
-    case "roic":
-      return m.roic ?? Number.NEGATIVE_INFINITY;
     case "piotroskiFScore":
       return m.piotroskiFScore ?? Number.NEGATIVE_INFINITY;
     default:
@@ -356,7 +345,8 @@ function getCellAlign(colId: ColumnId): string {
     colId === "secCode" ||
     colId === "edinetCode" ||
     colId === "calcDate" ||
-    colId === "fiscalMonth"
+    colId === "fiscalMonth" ||
+    colId === "reportKind"
   )
     return "tabular-nums";
   return "text-right tabular-nums";
@@ -369,6 +359,7 @@ export function CompanyTable() {
   const [metrics, setMetrics] = useState<CompanyMetric[]>([]);
   const [loading, setLoading] = useState(true);
   const [serverTotal, setServerTotal] = useState(0);
+  const [annualOnly, setAnnualOnly] = useState(true);
   const [sortColumn, setSortColumn] = useState<ColumnId | null>(null);
   const [sortAsc, setSortAsc] = useState(true);
   const [pageIndex, setPageIndex] = useState(0);
@@ -456,7 +447,12 @@ export function CompanyTable() {
     };
   }, [serverQuerySignature, filters, sortColumn, sortAsc, pageIndex, pageSize]);
 
-  const filtered = metrics.filter((m) => applyFilters(m, filters, favorites));
+  // 半期・四半期の数値は通期の約半分のスケールになるため、既定では通期実績のみを
+  // 並べて比較可能にする。通期未提出の企業（新規上場直後など）を見たい場合は解除する。
+  const filtered = metrics
+    .filter((m) => !annualOnly || (m.reportKind ?? "annual") === "annual")
+    .filter((m) => applyFilters(m, filters, favorites));
+  const nonAnnualCount = metrics.filter((m) => (m.reportKind ?? "annual") !== "annual").length;
   const visibleColumns = columnIds.filter((id) => visibility[id]);
   const hasColumns = visibleColumns.length > 0;
 
@@ -491,7 +487,7 @@ export function CompanyTable() {
 
   useEffect(() => {
     setPageIndex(0);
-  }, [filterSignature]);
+  }, [filterSignature, annualOnly]);
 
   useEffect(() => {
     setPageIndex((p) => Math.min(p, pageCount - 1));
@@ -541,8 +537,28 @@ export function CompanyTable() {
           {totalRows.toLocaleString()}件中{" "}
           {totalRows === 0 ? "0" : `${rangeStart.toLocaleString()}〜${rangeEnd.toLocaleString()}`}
           件を表示
+          <span className="ml-2">
+            {annualOnly
+              ? "／数値は最新の通期（有価証券報告書）実績"
+              : "／通期未提出の企業は半期・四半期の数値。「決算期」列で判別できます"}
+          </span>
         </span>
         <div className="flex flex-wrap items-center gap-3">
+          <label
+            className="inline-flex items-center gap-2 text-xs text-muted-foreground"
+            title="半期・四半期の数値は通期の約半分になるため、既定では通期実績のみを比較対象にしています"
+          >
+            <input
+              type="checkbox"
+              className="size-3.5 accent-primary"
+              checked={annualOnly}
+              onChange={(e) => setAnnualOnly(e.target.checked)}
+            />
+            通期実績のみ
+            {nonAnnualCount > 0 ? (
+              <span className="tabular-nums">（除外 {nonAnnualCount.toLocaleString()}件）</span>
+            ) : null}
+          </label>
           <div className="flex items-center gap-1">
             <Button
               type="button"

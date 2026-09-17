@@ -10,14 +10,8 @@
     },
     { "id": "calcDate", "label": "計算日", "category": "basic", "metricsKey": "calcDate" },
     { "id": "fiscalMonth", "label": "決算月", "category": "basic", "metricsKey": "fiscalMonth" },
+    { "id": "reportKind", "label": "決算期", "category": "basic", "metricsKey": "reportKind" },
 
-    {
-      "id": "PBR",
-      "label": "PBR（倍）",
-      "category": "valuation",
-      "metricsKey": "PBR",
-      "computed": true
-    },
     {
       "id": "PER",
       "label": "PER（倍）",
@@ -50,20 +44,6 @@
       "label": "時価総額（百万円）",
       "category": "valuation",
       "metricsKey": "marketCap",
-      "computed": true
-    },
-    {
-      "id": "netCash",
-      "label": "ネットキャッシュ（百万円）",
-      "category": "valuation",
-      "metricsKey": "netCash",
-      "computed": true
-    },
-    {
-      "id": "netCashRatio",
-      "label": "ネットキャッシュ比率（%）",
-      "category": "valuation",
-      "metricsKey": "netCashRatio",
       "computed": true
     },
     { "id": "EPS", "label": "EPS（円）", "category": "valuation", "metricsKey": "EPS" },
@@ -288,13 +268,6 @@
       "label": "D/Eレシオ",
       "category": "balancesheet",
       "metricsKey": "deRatio",
-      "computed": true
-    },
-    {
-      "id": "roic",
-      "label": "ROIC（%）",
-      "category": "valuation",
-      "metricsKey": "roic",
       "computed": true
     },
     {

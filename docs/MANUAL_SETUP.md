@@ -173,14 +173,18 @@ pnpm exec wrangler d1 execute "$D1_NAME" --remote --env staging \
   --file ../../infra/init/company_metrics.sql
 ```
 
-投入後、KV キャッシュ（設定済みの場合）を無効化します。
+投入後、KV キャッシュ（設定済みの場合）を無効化します。キーの版数は
+`packages/metrics/src/flattenMetricsRow.ts` の `METRICS_SCHEMA_VERSION` と一致させること
+（現在は `v3`）。
 
 ```bash
-pnpm exec wrangler kv key delete "screener:metrics:v2" \
+pnpm exec wrangler kv key delete "screener:metrics:v3" \
   --namespace-id "<KV_STAGING_ID>"
 ```
 
 ### 6-4. 大株主スナップショット（任意）
+
+edinet-wagatoushi から歴史データを一括投入する場合は [SHAREHOLDER_IMPORT_WAGATOUSHI.md](./SHAREHOLDER_IMPORT_WAGATOUSHI.md) を参照。
 
 `infra/init/sample/shareholders/*.json` から D1 へ投入する場合:
 

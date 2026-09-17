@@ -17,7 +17,7 @@ export function formatRatioDecimalStringAsPercent(s: string | null | undefined):
   return `${(n * 100).toFixed(2)}%`;
 }
 
-/** 内部小数（0.026 = 2.6%）を % 表示。dividendYield / roic / netCashRatio 等の number 型指標用 */
+/** 内部小数（0.026 = 2.6%）を % 表示。dividendYield 等の number 型指標用 */
 export function formatDecimalAsPercent(n: number | null | undefined): string {
   if (n == null || !Number.isFinite(n)) return "－";
   return `${(n * 100).toFixed(2)}%`;
@@ -86,4 +86,18 @@ export function formatAnalyzeFinancialTableCell(
   }
   const millions = n / 1_000_000;
   return millions.toLocaleString("ja-JP", { maximumFractionDigits: 2 });
+}
+
+/** reportKind の内部値を一覧・CSV 共通の表示ラベルへ */
+export function formatReportKind(kind: string | number | null | undefined): string {
+  switch (kind) {
+    case "annual":
+      return "通期";
+    case "semiAnnual":
+      return "半期";
+    case "quarter":
+      return "四半期";
+    default:
+      return "－";
+  }
 }

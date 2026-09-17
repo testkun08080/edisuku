@@ -1,0 +1,248 @@
+#!/usr/bin/env node
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+/**
+ * One-off import: edinet-wagatoushi shareholders JSON → shareholder_snapshots SQL.
+ *
+ * Reads wagatoushi format ({ periods[], shareholders[], docID }) and emits
+ * D1-ready INSERT OR REPLACE statements in chunked files.
+ *
+ * Usage:
+ *   pnpm db:import:shareholders-wagatoushi [input-dir] [output-dir] [options]
+ *   LIMIT=5 pnpm db:import:shareholders-wagatoushi
+ *
+ * Defaults:
+ *   input:  $WAGATOUSHI_SHAREHOLDERS_DIR or ../edinet-wagatoushi/.../shareholders
+ *   output: /tmp/shareholder_import/
+ *
+ * Options:
+ *   --limit N          Process first N JSON files only
+ *   --corpus-db PATH   Only sec_codes present in companies table
+ *   --chunk-size N     Statements per SQL file (default: 1000)
+ */
+import Database from "better-sqlite3";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+
+function defaultInputDir() {
+  if (process.env.WAGATOUSHI_SHAREHOLDERS_DIR) {
+    return process.env.WAGATOUSHI_SHAREHOLDERS_DIR;
+  }
+  return join(dirname(root), "edinet-wagatoushi/edinet-screener/public/data/shareholders");
+}
+
+function parseCliArgs(argv) {
+  const positional = [];
+  let limit = process.env.LIMIT ? Number.parseInt(process.env.LIMIT, 10) : null;
+  let corpusDb = null;
+  let chunkSize = 1000;
+
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === "--limit") {
+      limit = Number.parseInt(argv[i + 1] ?? "", 10);
+      i++;
+      continue;
+    }
+    if (argv[i] === "--corpus-db") {
+      corpusDb = argv[i + 1] ?? null;
+      i++;
+      continue;
+    }
+    if (argv[i] === "--chunk-size") {
+      chunkSize = Number.parseInt(argv[i + 1] ?? "", 10);
+      i++;
+      continue;
+    }
+    if (argv[i] !== "--") {
+      positional.push(argv[i]);
+    }
+  }
+
+  if (limit != null && (Number.isNaN(limit) || limit < 1)) {
+    console.error("Invalid --limit / LIMIT (must be a positive integer)");
+    process.exit(1);
+  }
+  if (Number.isNaN(chunkSize) || chunkSize < 1) {
+    console.error("Invalid --chunk-size (must be a positive integer)");
+    process.exit(1);
+  }
+
+  return { positional, limit, corpusDb, chunkSize };
+}
+
+function escSql(s) {
+  return String(s).replace(/'/g, "''");
+}
+
+function parseShares(value) {
+  if (value == null || value === "" || value === "－") return 0;
+  const n = Number.parseInt(String(value).replace(/,/g, ""), 10);
+  return Number.isNaN(n) ? 0 : n;
+}
+
+function parseRatio(value) {
+  if (value == null || value === "" || value === "－") return null;
+  const r = Number.parseFloat(String(value));
+  if (!Number.isFinite(r)) return null;
+  return r <= 1 ? r : r / 100;
+}
+
+/** @param {unknown} raw */
+export function convertWagatoushiPeriods(raw) {
+  const periods = Array.isArray(raw?.periods) ? raw.periods : [];
+  /** @type {Map<string, { periodEnd: string, docId: string | null, entries: object[] }>} */
+  const byPeriodEnd = new Map();
+  let duplicateResolved = 0;
+
+  for (const p of periods) {
+    const periodEnd = p?.periodEnd;
+    if (!periodEnd || !Array.isArray(p.shareholders) || p.shareholders.length === 0) {
+      continue;
+    }
+
+    const docId = p.docID ?? p.docId ?? null;
+    const entries = p.shareholders
+      .filter((s) => s?.name?.trim())
+      .map((s) => ({
+        name: String(s.name).trim(),
+        shares: parseShares(s.shares),
+        ratio: parseRatio(s.ratio),
+      }));
+
+    if (!entries.length) continue;
+
+    const existing = byPeriodEnd.get(periodEnd);
+    if (!existing) {
+      byPeriodEnd.set(periodEnd, { periodEnd, docId, entries });
+      continue;
+    }
+
+    duplicateResolved++;
+    const existingKey = existing.docId ?? "";
+    const newKey = docId ?? "";
+    if (newKey.localeCompare(existingKey) > 0) {
+      byPeriodEnd.set(periodEnd, { periodEnd, docId, entries });
+    }
+  }
+
+  return {
+    snapshots: Array.from(byPeriodEnd.values()).sort((a, b) =>
+      a.periodEnd.localeCompare(b.periodEnd),
+    ),
+    duplicateResolved,
+  };
+}
+
+function loadAllowedSecCodes(corpusDbPath) {
+  const db = new Database(corpusDbPath, { readonly: true });
+  const rows = db
+    .prepare("SELECT DISTINCT sec_code FROM companies WHERE sec_code IS NOT NULL")
+    .all();
+  db.close();
+  return new Set(rows.map((r) => r.sec_code));
+}
+
+function buildInsertStatement(secCode, snap, now) {
+  const entriesJson = escSql(JSON.stringify(snap.entries));
+  return `INSERT OR REPLACE INTO shareholder_snapshots (
+  sec_code, period_end, doc_id, entries_json, updated_at
+) VALUES (
+  '${escSql(secCode)}',
+  '${escSql(snap.periodEnd)}',
+  ${snap.docId ? `'${escSql(snap.docId)}'` : "NULL"},
+  '${entriesJson}',
+  '${escSql(now)}'
+);`;
+}
+
+function writeChunkFiles(outputDir, statements, chunkSize) {
+  mkdirSync(outputDir, { recursive: true });
+  const header = [
+    "-- Generated by infra/init/import-shareholders-from-wagatoushi.mjs — do not edit by hand.",
+    "PRAGMA foreign_keys = ON;",
+    "",
+  ];
+  const files = [];
+  for (let i = 0; i < statements.length; i += chunkSize) {
+    const chunk = statements.slice(i, i + chunkSize);
+    const fileIndex = String(Math.floor(i / chunkSize) + 1).padStart(3, "0");
+    const filePath = join(outputDir, `shareholder_import_${fileIndex}.sql`);
+    writeFileSync(filePath, `${header.join("\n")}${chunk.join("\n\n")}\n\n`);
+    files.push(filePath);
+  }
+  return files;
+}
+
+const { positional, limit, corpusDb, chunkSize } = parseCliArgs(process.argv.slice(2));
+const inputDir = positional[0] ?? defaultInputDir();
+const outputDir = positional[1] ?? "/tmp/shareholder_import";
+
+if (!existsSync(inputDir)) {
+  console.error(`Input directory not found: ${inputDir}`);
+  console.error("Set WAGATOUSHI_SHAREHOLDERS_DIR or pass input-dir as first argument.");
+  process.exit(1);
+}
+
+let allowedSecCodes = null;
+if (corpusDb) {
+  const corpusPath = resolve(corpusDb);
+  if (!existsSync(corpusPath)) {
+    console.error(`Corpus DB not found: ${corpusPath}`);
+    process.exit(1);
+  }
+  allowedSecCodes = loadAllowedSecCodes(corpusPath);
+  console.log(`Filtering to ${allowedSecCodes.size} sec_codes from ${corpusPath}`);
+}
+
+const jsonFiles = readdirSync(inputDir)
+  .filter((f) => f.endsWith(".json"))
+  .sort();
+const filesToProcess = limit ? jsonFiles.slice(0, limit) : jsonFiles;
+if (limit) {
+  console.log(`Processing first ${limit} of ${jsonFiles.length} JSON files`);
+}
+
+const now = new Date().toISOString();
+const statements = [];
+let skippedEmpty = 0;
+let skippedCorpus = 0;
+let totalDuplicateResolved = 0;
+
+for (const file of filesToProcess) {
+  const secCode = file.replace(/\.json$/, "");
+  if (allowedSecCodes && !allowedSecCodes.has(secCode)) {
+    skippedCorpus++;
+    continue;
+  }
+
+  const raw = JSON.parse(readFileSync(join(inputDir, file), "utf8"));
+  const { snapshots, duplicateResolved } = convertWagatoushiPeriods(raw);
+  totalDuplicateResolved += duplicateResolved;
+
+  if (!snapshots.length) {
+    skippedEmpty++;
+    continue;
+  }
+
+  for (const snap of snapshots) {
+    statements.push(buildInsertStatement(secCode, snap, now));
+  }
+}
+
+if (!statements.length) {
+  console.error("No shareholder snapshots to write.");
+  process.exit(1);
+}
+
+const files = writeChunkFiles(outputDir, statements, chunkSize);
+
+console.log(`Wrote ${statements.length} INSERT statements to ${outputDir}/`);
+console.log(`  Files: ${files.length} (chunk-size=${chunkSize})`);
+console.log(
+  `  Source JSON files processed: ${filesToProcess.length - skippedCorpus - skippedEmpty}`,
+);
+if (skippedCorpus) console.log(`  Skipped (not in corpus): ${skippedCorpus}`);
+if (skippedEmpty) console.log(`  Skipped (no periods): ${skippedEmpty}`);
+if (totalDuplicateResolved)
+  console.log(`  Duplicate period_end resolved: ${totalDuplicateResolved}`);
