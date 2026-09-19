@@ -106,6 +106,8 @@ gh secret set KV_STAGING_ID --body "$STAGING_KV_ID"
 gh secret set KV_PRODUCTION_ID --body "$PROD_KV_ID"
 gh secret set STAGING_WEB_URL --body "$STAGING_WEB_URL"
 gh secret set PROD_WEB_URL --body "$PROD_WEB_URL"
+# 任意: GA4（deploy の web ビルド時にクライアントへ焼き込む）
+# gh secret set PUBLIC_ENV__GOOGLE_ANALYTICS --body "G-XXXXXXXXXX"
 # EDINET 日次取り込みを使う場合
 gh secret set EDINET_API_KEY
 ```

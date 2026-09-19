@@ -66,6 +66,8 @@ jobs:
       - name: Build web Worker
         env:
           CLOUDFLARE_ENV: ${{ github.event.inputs.env || 'staging' }}
+          # Client-side Vite env (baked into the bundle). Not available via wrangler vars.
+          PUBLIC_ENV__GOOGLE_ANALYTICS: ${{ secrets.PUBLIC_ENV__GOOGLE_ANALYTICS }}
         run: pnpm --filter @edinet/web build
       - name: Deploy web Worker
         uses: cloudflare/wrangler-action@v4
