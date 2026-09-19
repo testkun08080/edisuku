@@ -99,7 +99,7 @@
 
 ビルド時定数（環境変数ではない）: `apps/web/lib/features.ts` の `CSV_EXPORT_ENABLED` / `COMPANY_PROFILE_ENABLED`（所在地・代表者などプロフィール UI。既定 `false`）。
 
-フォークで Analytics 等を有効にする場合、**デプロイ前の `pnpm build` 時**に `.env` を置くか、GitHub Actions の build ステップに `env:` を追加してください。wrangler vars だけではクライアント側 `PUBLIC_ENV__*` は反映されません。
+フォークで Analytics 等を有効にする場合、GitHub Secret `PUBLIC_ENV__GOOGLE_ANALYTICS` を設定すれば `deploy.yml` の web ビルドに渡されます。手動ビルドでは `.env` を置くか、build コマンドに同名の環境変数を渡してください。wrangler vars だけではクライアント側 `PUBLIC_ENV__*` は反映されません。
 
 ---
 
@@ -128,6 +128,12 @@
 | `KV_PRODUCTION_ID` | production KV namespace id |
 | `STAGING_WEB_URL` | staging の公開 Web URL（`CORS_ORIGIN` / `PUBLIC_ENV__SITE_URL` に注入） |
 | `PROD_WEB_URL` | production の公開 Web URL（カスタムドメイン可） |
+
+### デプロイ（任意）
+
+| Secret | 用途 |
+|---|---|
+| `PUBLIC_ENV__GOOGLE_ANALYTICS` | web ビルド時に GA4 測定 ID をクライアントバンドルへ焼き込む。未設定なら計測なし |
 
 デプロイは **Actions の `workflow_dispatch`**（手動）。`main` への push だけでは自動デプロイされません。
 
