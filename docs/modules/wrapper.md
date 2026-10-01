@@ -15,16 +15,21 @@ apps/wrapper/
 │   ├── officers.py          有報「役員の状況」TSV パース
 │   ├── element_id_table.py  XBRL element ID → 日本語ラベル辞書 (META/BS/PL/CF/SUMMARY)
 │   ├── schema.py            Metadata / Result / FinancialData データモデル
-│   └── db.py                SQLite UPSERT + updated_at ベースの delta export
+│   ├── db.py                SQLite UPSERT + updated_at ベースの delta export
+│   ├── enrichment.py        出典つき設立日（gBiz 優先、検索は空欄のみ）
+│   └── establishment_lookup.py  Wikidata / Wikipedia / Web 検索
 ├── scripts/
 │   ├── ingest_daily.py      当日提出分を取得 → ローカル SQLite
 │   ├── publish_to_d1.py     SQLite 差分 → D1 用 SQL ファイル
 │   ├── emit_pipeline_meta.py  pipeline_runs / daily_metrics 用 SQL 出力
-│   └── backfill.py          過去 N 年バルク取り込み
+│   ├── backfill.py          過去 N 年バルク取り込み
+│   └── enrich_establishment_dates.py  上場企業の設立日を出典つきで埋める
 ├── tests/
 │   ├── test_ingest.py
 │   ├── test_cover_profile.py
-│   └── test_officers.py
+│   ├── test_officers.py
+│   ├── test_enrichment.py
+│   └── test_establishment_lookup.py
 ├── pyproject.toml           deps + pytest 設定
 └── Dockerfile
 ```
@@ -164,6 +169,8 @@ get_results → filter
 | `tests/test_cover_profile.py` | カバー META 抽出（注記保持含む） |
 | `tests/test_officers.py` | 役員 TSV パース / API JSON 形 |
 | `tests/test_ingest.py` | FK 順（company → document）、カバーの companies 反映 |
+| `tests/test_enrichment.py` | 設立日パース、gBiz 優先、CSV 入出力 |
+| `tests/test_establishment_lookup.py` | Wikipedia / Web 抽出 |
 
 ---
 
@@ -192,6 +199,10 @@ uv run python scripts/emit_pipeline_meta.py \
 
 # 過去 N 年
 uv run python scripts/backfill.py --years 5 --output data/edinet.db
+
+# 上場企業の設立日（出典つき）。作業出力は data/、スナップショットは fixtures/
+uv run python scripts/enrich_establishment_dates.py
+uv run python scripts/enrich_establishment_dates.py --gbiz-csv path/to/gbiz-listed.csv
 ```
 
 ## 開発
@@ -209,3 +220,4 @@ uv run ruff check . && uv run ruff format --check .
 - ローカル SQLite は ephemeral。状態は D1 が持ち、差分は `updated_at` で抽出する一方通行。
 - スクリーナーカラム定義は `packages/metrics/src/screener_columns.json` が正本。
 - 企業プロフィールの「マスタ現在値」と役員の「期次スナップショット」を分離する（大株主と同じパターン）。
+- 設立日は D1 にまだ載せず、`company-enrichment.csv` に出典（`gbiz` / `wikidata` / `wikipedia` / `web_search`）つきで置く。gBiz がある行は検索で上書きしない。

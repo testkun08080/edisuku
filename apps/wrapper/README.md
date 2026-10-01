@@ -11,6 +11,8 @@
 | `src/edinet_wrapper/element_id_table.py` | XBRL element ID 辞書 |
 | `src/edinet_wrapper/schema.py` | データモデル |
 | `src/edinet_wrapper/db.py` | SQLite UPSERT + delta export |
+| `src/edinet_wrapper/enrichment.py` | 出典つき設立日（gBiz 優先） |
+| `src/edinet_wrapper/establishment_lookup.py` | Wikidata / Wikipedia / Web |
 
 ## スクリプト
 
@@ -20,6 +22,13 @@
 | `scripts/publish_to_d1.py` | SQLite 差分 → Cloudflare D1 用 SQL 出力 |
 | `scripts/emit_pipeline_meta.py` | pipeline_runs / daily_metrics 用 SQL 出力 |
 | `scripts/backfill.py` | 過去 N 年バルク取り込み |
+| `scripts/enrich_establishment_dates.py` | 上場企業の設立日を出典つきで埋める |
+
+```bash
+# 設立日（Wikidata → Wikipedia → Web）。gBiz CSV があれば公式値を seed
+uv run python scripts/enrich_establishment_dates.py --wikipedia-sitelinks-only
+uv run python scripts/enrich_establishment_dates.py --gbiz-csv path/to/gbiz-listed.csv
+```
 
 ## 開発
 
