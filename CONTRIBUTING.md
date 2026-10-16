@@ -54,7 +54,8 @@ npx wrangler login
 
 ## ブランチ運用
 
-- `main` — 常にデプロイ可能
+- `main` — 開発用。自動デプロイしない
+- `production` — デプロイ／daily-refresh 用。安定したら `main` をマージして更新し、Actions は **このブランチから** 手動実行する
 - `feat/*`, `fix/*`, `docs/*`, `chore/*` — 機能/修正/ドキュメント/雑務
 - PR は `main` 向けに作成
 

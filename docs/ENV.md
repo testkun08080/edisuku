@@ -135,7 +135,7 @@
 |---|---|
 | `PUBLIC_ENV__GOOGLE_ANALYTICS` | web ビルド時に GA4 測定 ID をクライアントバンドルへ焼き込む。未設定なら計測なし |
 
-デプロイは **Actions の `workflow_dispatch`**（手動）。`main` への push だけでは自動デプロイされません。
+デプロイは **`production` ブランチ上での Actions `workflow_dispatch`**（手動）。`main` への push ではデプロイされません。Run workflow 時にブランチを `production` に選んでください。
 
 ### 日次取り込み（`.github/workflows/daily-refresh.yml`）
 
@@ -146,7 +146,7 @@
 | `D1_STAGING_NAME` | いいえ | D1 データベース名（未設定: `edisuku-db-staging`） |
 | `D1_PRODUCTION_NAME` | いいえ | 同上（未設定: `edisuku-db`） |
 
-**トリガー**: 現状は `workflow_dispatch`（手動）。`schedule`（毎日 05:10 JST）はコメントアウト済み。有効化すると cron 実行も可（未指定時の環境は **production**）。
+**トリガー**: 現状は **`production` ブランチ上の** `workflow_dispatch`（手動）。`schedule`（毎日 05:10 JST）はコメントアウト済み。有効化する場合も workflow は `production` 上で運用する（未指定時の環境は Cloudflare の **production**）。
 
 **提出日**: `target_date` 未指定時は **昨日 JST**（`ingest_daily.py` と同じ）。
 

@@ -268,7 +268,7 @@ curl -s "https://edisuku-api.<subdomain>.workers.dev/api/health"
 open "https://edisuku-web.<subdomain>.workers.dev"
 ```
 
-GitHub Actions を使う場合は Actions → **deploy** → `staging` または `production` を選択（手動トリガーのみ）。
+GitHub Actions を使う場合は Actions → **deploy** → ブランチ **`production`** → 環境として `staging` または `production` を選択（手動トリガーのみ）。
 
 ---
 
@@ -292,8 +292,10 @@ CI のデプロイは `render-wrangler-config.sh` で wrangler 設定を生成�
 
 | Workflow | 用途 |
 |----------|------|
-| **deploy** | Worker のコードデプロイ（手動） |
-| **daily-refresh** | EDINET 取り込み → D1 更新（手動。cron はデフォルト無効） |
+| **deploy** | Worker のコードデプロイ（手動。**`production` ブランチから**実行） |
+| **daily-refresh** | EDINET 取り込み → D1 更新（手動。**`production` ブランチから**。cron はデフォルト無効） |
+
+開発は `main`、デプロイ可能なスナップショットは `production` です。安定したら `main` を `production` へマージしてから Actions を実行してください。
 
 ---
 
@@ -301,7 +303,7 @@ CI のデプロイは `render-wrangler-config.sh` で wrangler 設定を生成�
 
 スキーマのみではスクリーナーは空です。
 
-- Actions → **daily-refresh** → `environment: staging` または `production`
+- Actions → **daily-refresh** → ブランチ **`production`** → `environment: staging` または `production`
 - `EDINET_API_KEY` が必要
 
 取り込み成功後、プライバシーページのデータ最終更新日は D1 から自動反映されます（[ENV.md](./ENV.md)）。
