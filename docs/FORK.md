@@ -153,9 +153,9 @@ printf '%s' 'あなたの秘密文字列' | (cd apps/web && wrangler secret put 
 
 ### GitHub Actions（推奨）
 
-Actions タブ → **deploy** workflow → **Run workflow** → `staging` または `production` を選択。
+Actions タブ → **deploy** workflow → **Run workflow** → ブランチを **`production`** に選び、環境として `staging` または `production` を選択。
 
-[deploy ワークフロー](../.github/workflows/deploy.yml) は **手動トリガーのみ**（`workflow_dispatch`）。デプロイ**前**に手順 3（`INTERNAL_API_KEY`）を完了してください。
+[deploy ワークフロー](../.github/workflows/deploy.yml) は **`production` ブランチからの手動トリガーのみ**（`workflow_dispatch`）。`main` からは実行できません。デプロイ**前**に手順 3（`INTERNAL_API_KEY`）を完了してください。
 
 ### wrangler CLI から直接
 

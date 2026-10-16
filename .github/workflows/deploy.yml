@@ -9,8 +9,10 @@ on:
         type: choice
         default: staging
         options: [staging, production]
+  # Auto-deploy is intentionally off. Promote main → production, then run this
+  # workflow from the production branch only.
   # push:
-  #   branches: [main]
+  #   branches: [production]
   #   paths:
   #     - "apps/api/**"
   #     - "apps/web/**"
@@ -22,7 +24,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require production branch
+        run: |
+          if [ "${{ github.ref }}" != "refs/heads/production" ]; then
+            echo "::error::Deploy is only allowed from the production branch (got ${{ github.ref }}). Merge main into production, then re-run from production."
+            exit 1
+          fi
+
   api:
+    needs: guard
+    if: github.ref == 'refs/heads/production'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -50,6 +64,7 @@ jobs:
 
   web:
     needs: api
+    if: github.ref == 'refs/heads/production'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

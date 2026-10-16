@@ -131,7 +131,6 @@ Cloudflare D1
 
 | workflow | トリガ | 内容 |
 |---|---|---|
-| `ci.yml` | PR / push | biome + turbo typecheck/test + ruff/pytest |
-| `deploy.yml` | main push / 手動 | wrangler.toml をテンプレ生成 → api/web を Workers へ |
-| `daily-refresh.yml` | cron / 手動 | ingest_daily → publish_to_d1 → D1 → company_metrics rebuild → KV 無効化 |
-| `release.yml` | main push | changesets で version bump + tag |
+| `ci.yml` | PR / push (`main`, `production`) | biome + turbo typecheck/test + ruff/pytest |
+| `deploy.yml` | `production` 上の手動 (`workflow_dispatch`) | wrangler.toml をテンプレ生成 → api/web を Workers へ |
+| `daily-refresh.yml` | `production` 上の手動（cron はコメントアウト） | ingest_daily → publish_to_d1 → D1 → company_metrics rebuild → KV 無効化 |

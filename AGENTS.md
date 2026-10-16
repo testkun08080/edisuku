@@ -160,10 +160,9 @@ cd apps/wrapper && uv run pytest         # Python
 
 | ワークフロー        | 役割                                         |
 | ------------------- | -------------------------------------------- |
-| `ci.yml`            | PR / push 時に lint + typecheck + test       |
-| `deploy.yml`        | `workflow_dispatch` で staging/production デプロイ |
-| `daily-refresh.yml` | 日次 EDINET 取り込み → D1 → company_metrics rebuild → KV 無効化 |
-| `release.yml`       | changesets による version bump とタグ付け    |
+| `ci.yml`            | PR / push（`main`, `production`）時に lint + typecheck + test |
+| `deploy.yml`        | `production` ブランチの `workflow_dispatch` で staging/production デプロイ |
+| `daily-refresh.yml` | `production` ブランチから日次 EDINET 取り込み → D1 → company_metrics rebuild → KV 無効化 |
 
 ### ドキュメント
 
